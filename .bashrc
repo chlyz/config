@@ -2,6 +2,12 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
+# Base16 Shell
+BASE16_SHELL="$HOME/.local/git/base16-shell/"
+[ -n "$PS1" ] && \
+	[ -s "$BASE16_SHELL/profile_helper.sh" ] && \
+	eval "$("$BASE16_SHELL/profile_helper.sh")"
+
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;
@@ -89,7 +95,8 @@ fi
 export EDITOR='/usr/local/bin/nvim'
 
 # some more ls aliases
-alias ll='ls -alF'
+alias ls='ls --group-directories-first --color=always'
+alias ll='ls -lhF'
 alias la='ls -A'
 alias l='ls -CF'
 
@@ -116,3 +123,5 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
