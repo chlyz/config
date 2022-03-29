@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+setxkbmap -layout us -variant dvorak -option caps:escape
+xmodmap -e "keycode 107 = Super_R"
