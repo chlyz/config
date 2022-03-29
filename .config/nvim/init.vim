@@ -1,6 +1,13 @@
 set number
 set relativenumber
 set nowrap
+set mouse=a
+set ignorecase
+set smartcase
+set expandtab
+set shiftwidth=4
+set softtabstop=4
+set smartindent
 
 abbreviate td TODO(chlyz):
 
