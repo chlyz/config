@@ -31,6 +31,8 @@ Plug 'junegunn/fzf.vim'
 
 Plug 'ThePrimeagen/harpoon'
 
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
 call plug#end()
 
 let mapleader = " "
