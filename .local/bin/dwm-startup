@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+killall picom > /dev/null
+killall slstatus > /dev/null
+
+picom &
+hsetroot #000000
+slstatus &
