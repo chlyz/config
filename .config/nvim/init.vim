@@ -42,6 +42,7 @@ nnoremap <leader>n :nohlsearch<CR>
 nnoremap <leader>tg :GFiles<CR>
 nnoremap <leader>tf :Files<CR>
 nnoremap <leader>th :Buffers<CR>
+nnoremap <leader>tt :BTags<CR>
 
 nnoremap <leader>ua :lua require("harpoon.mark").add_file()<CR>
 nnoremap <leader>um :lua require("harpoon.ui").toggle_quick_menu()<CR>
