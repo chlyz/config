@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+
+mkdir -p ~/.local/git/
+
+# Add repository for the latest git
+have_git=`apt-add-repository --list`
+if [[ ! $have_git  == *"git-core/ppa"* ]]; then
+    echo "Add git ppa"
+    sudo add-apt-repository --yes ppa:git-core/ppa
+fi
+
+echo "Update packages"
+sudo apt -qq update
+
+echo "Upgrade packages"
+sudo apt -qq upgrade --yes
+
+echo "Install git"
+sudo apt -qq install --yes git
+
+echo "Install fzf (fuzzy finder)"
+if [ ! -d ~/.local/git/fzf ]; then
+    git clone --depth 1 https://github.com/junegunn/fzf.git ~/.local/git/fzf
+else
+    git --git-dir ~/.local/git/fzf/.git pull
+fi
+~/.local/git/fzf/install --all > /dev/null
+
+echo "Install base16-shell (color schemes for the shell)"
+if [ ! -d ~/.local/git/base16-shell ]; then
+    git clone --depth 1 https://github.com/chriskempson/base16-shell.git ~/.local/git/base16-shell
+    sh ~/.local/git/base16-shell/scripts/base16-bright.sh
+else
+    git --git-dir ~/.local/git/base16-shell/.git pull
+fi
+
+echo "Install vim plug (plugin manager)"
+if [ ! -f ~/.local/share/nvim/site/autoload/plug.vim ]; then
+    sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
+        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+fi
+
+echo "Install convenience packages"
+sudo apt -qq install --yes \
+    arandr \
+    blueman \
+    build-essential \
+    cmake \
+    ninja-build \
+    fd-find \
+    flameshot \
+    htop \
+    mlocate \
+    picom \
+    pavucontrol \
+    qutebrowser \
+    ripgrep \
+    stow \
+    tmux \
+    trash-cli \
+    tree \
+    vim \
+    xcape \
+    xclip
+
+echo "Install neovim from source"
+if [ ! -d ~/.local/git/neovim ]; then
+    git clone --depth 1 https://github.com/neovim/neovim.git ~/.local/git/neovim
+else
+    git --git-dir ~/.local/git/neovim/.git pull
+fi
+cd ~/.local/git/neovim
+make CMAKE_BUILD_TYPE=Release -j9
+sudo make install
+
+echo "Install suckless dependencies"
+sudo apt install -y \
+    hsetroot \
+    libxft-dev \
+    libxinerama-dev \
+    libxrandr-dev
+
+echo "Install suckless terminal"
+if [ ! -d ~/.local/git/chlyz-st ]; then
+    git clone https://github.com/chlyz/st.git ~/.local/git/chlyz-st
+fi
+cd ~/.local/git/chlyz-st
+git stash
+git checkout origin/merge
+make -j9
+sudo make install
+git checkout -
+git stash pop
+
+echo "Install suckless window manager"
+if [ ! -d ~/.local/git/chlyz-dwm ]; then
+    git clone https://github.com/chlyz/dwm.git ~/.local/git/chlyz-dwm
+fi
+cd ~/.local/git/chlyz-dwm
+git stash
+git checkout origin/config
+make -j9
+sudo make install
+if [ ! -f /usr/share/xsessions/dwm.desktop ]; then
+    sudo cp dwm.desktop /usr/share/xsessions/
+fi
+git checkout -
+git stash pop
+
+echo "Install suckless lock screen"
+if [ ! -d ~/.local/git/chlyz-slock ]; then
+    git clone https://github.com/chlyz/slock.git ~/.local/git/chlyz-slock
+fi
+cd ~/.local/git/chlyz-slock
+git stash
+git checkout origin/config
+make -j9
+sudo make install
+git checkout -
+git stash pop
+
+echo "Install suckless status"
+if [ ! -d ~/.local/git/chlyz-slstatus ]; then
+    git clone https://github.com/chlyz/slstatus.git ~/.local/git/chlyz-slstatus
+fi
+cd ~/.local/git/chlyz-slstatus
+git stash
+git checkout origin/config
+make -j9
+sudo make install
+git checkout -
+git stash pop
