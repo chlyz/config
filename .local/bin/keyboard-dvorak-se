@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+setxkbmap -layout se -variant dvorak -option ctrl:nocaps
+xcape -e 'Control_L=Escape'
