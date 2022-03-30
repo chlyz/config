@@ -47,14 +47,12 @@ sudo apt -qq install --yes \
     build-essential \
     cmake \
     ninja-build \
-    fd-find \
     flameshot \
     htop \
     mlocate \
     picom \
     pavucontrol \
     qutebrowser \
-    ripgrep \
     stow \
     tmux \
     trash-cli \
@@ -130,3 +128,13 @@ make -j9
 sudo make install
 git checkout -
 git stash pop
+
+if [ ! -d ~/.cargo ]; then
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    source $HOME/.cargo/env
+else
+    rustup update
+fi
+cargo install zoxide
+cargo install ripgrep
+cargo install fd-find
