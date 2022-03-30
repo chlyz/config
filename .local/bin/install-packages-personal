@@ -139,9 +139,10 @@ cargo install zoxide
 cargo install ripgrep
 cargo install fd-find
 
+echo "Install go tools"
 if [ ! -d /usr/local/go ]; then
     wget https://go.dev/dl/go1.18.linux-amd64.tar.gz
-    tar -C /usr/local -xzf go1.18.linux-amd64.tar.gz
+    sudo tar -C /usr/local -xzf go1.18.linux-amd64.tar.gz
 fi
 if [ ! -f ~/go/bin/lf ]; then
     env CGO_ENABLED=0 go install -ldflags="-s -w" github.com/gokcehan/lf@latest
