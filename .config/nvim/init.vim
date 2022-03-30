@@ -67,7 +67,7 @@ autocmd BufReadPost *
 " Highlight yanked text.
 augroup highlight_yank
     autocmd!
-    autocmd TextYankPost * silent! lua require'vim.highlight'.on_yank("IncSearch", 1000)
+    autocmd TextYankPost * silent! lua require'vim.highlight'.on_yank({timeout = 100})
 augroup END
 
 function! ToggleQuickFix()
