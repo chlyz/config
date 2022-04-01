@@ -1,3 +1,4 @@
+
 " Built-in settings {{{
 set number
 set relativenumber
@@ -49,8 +50,15 @@ Plug  'gerw/vim-HiLinkTrace'
 call plug#end()
 " }}}
 
-let g:gutentags_ctags_exclude = ['*bazel-*', '.git', 'Build', '.ccls-cache', 'MDF4', 'HDF5', 'Compiler', 'sqlite3.*', 'Rte_*.*', 'VehicleModel', 'ProtoBuf', 'Protobuf', '*.cs']
-let g:fzf_tags_command = 'ctags -R --exclude=.git --exclude=Build --exclude=.ccls-cache --exclude=Rte_*.* --exclude=Protobuf --exclude=ProtoBuf --exclude=.ccls-cache --exclude=*bazel* --languages=-javascript'
+let g:gutentags_ctags_exclude = [
+            \ '*bazel-*', '.git', 'Build', '.ccls-cache', 'MDF4', 'HDF5',
+            \ 'Compiler', 'sqlite3.*', 'Rte_*.*', 'VehicleModel', 'ProtoBuf',
+            \ 'Protobuf', '*.cs'
+            \]
+let g:fzf_tags_command = 'ctags -R --exclude=.git --exclude=Build
+            \ --exclude=.ccls-cache --exclude=Rte_*.* --exclude=Protobuf
+            \ --exclude=ProtoBuf --exclude=.ccls-cache --exclude=*bazel*
+            \ --languages=-javascript'
 
 " Functions {{{
 " Return to last edit position when opening files.
