@@ -3,10 +3,10 @@
 # for examples
 
 # Base16 Shell
-BASE16_SHELL="$HOME/.local/git/base16-shell/"
-[ -n "$PS1" ] && \
-	[ -s "$BASE16_SHELL/profile_helper.sh" ] && \
-	eval "$("$BASE16_SHELL/profile_helper.sh")"
+# BASE16_SHELL="$HOME/.local/git/base16-shell/"
+# [ -n "$PS1" ] && \
+# 	[ -s "$BASE16_SHELL/profile_helper.sh" ] && \
+# 	eval "$("$BASE16_SHELL/profile_helper.sh")"
 
 # If not running interactively, don't do anything
 case $- in
@@ -144,7 +144,7 @@ lfcd () {
 bind '"\C-o":"lfcd\C-m"'
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
-source ~/.local/git/base16-fzf/bash/base16-modus-operandi.config
+source ~/.config/bash/fzf.config
 
 . "$HOME/.cargo/env"
 eval "$(zoxide init bash)"
