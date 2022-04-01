@@ -105,6 +105,9 @@ alias l='ls -CF'
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
 export _JAVA_AWT_WM_NONREPARENTING=1
+export JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64"
+export PATH=~/go/bin:~/.local/bin:$PATH:/usr/local/go/bin
+
 # Alias definitions.
 # You may want to put all your additions into a separate file like
 # ~/.bash_aliases, instead of adding them here directly.
@@ -141,5 +144,7 @@ lfcd () {
 bind '"\C-o":"lfcd\C-m"'
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+source ~/.local/git/base16-fzf/bash/base16-modus-operandi.config
+
 . "$HOME/.cargo/env"
 eval "$(zoxide init bash)"

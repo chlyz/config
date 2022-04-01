@@ -52,6 +52,7 @@ sudo apt -qq install --yes \
     mlocate \
     picom \
     pavucontrol \
+    p7zip-full \
     qutebrowser \
     stow \
     tmux \
@@ -129,6 +130,7 @@ sudo make install
 git checkout -
 git stash pop
 
+echo "Install rust tools"
 if [ ! -d ~/.cargo ]; then
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
     source $HOME/.cargo/env
@@ -138,6 +140,7 @@ fi
 cargo install zoxide
 cargo install ripgrep
 cargo install fd-find
+cargo install bat
 
 echo "Install go tools"
 if [ ! -d /usr/local/go ]; then
@@ -147,4 +150,13 @@ fi
 if [ ! -f ~/go/bin/lf ]; then
     env CGO_ENABLED=0 go install -ldflags="-s -w" github.com/gokcehan/lf@latest
 fi
+
+# Emacs
+# git clone --depth 1 https://github.com/emacs-mirror/emacs.git ~/.local/git/emacs
+# cd ~/.local/git/emacs
+# sh autogen.sh
+# sudo apt install -y texinfo libgtk-3-dev libjansson-dev librsvg2-dev libgccjit-11-dev libgnutls28-dev
+# ./configure --with-pgtk --with-native-compilation
+# make -j9
+# sudo make install
 
