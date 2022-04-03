@@ -114,6 +114,9 @@ nnoremap <silent> <leader>cs :source ~/.config/nvim/init.vim<CR>
 nnoremap <silent> <leader>cv :edit ~/.config/nvim/init.vim<CR>
 
 nnoremap <leader>y "+y
+vnoremap <leader>y "+y
+nnoremap <leader>p "+p
+nnoremap <leader>P "+P
 
 nnoremap <silent> <leader>sc :w<CR>:so<CR>
 
@@ -168,7 +171,8 @@ abbreviate td TODO(chlyz):
 " colorscheme base16-gruvbox-light-hard
 
 colorscheme modus-operandi
+" colorscheme modus-vivendi
 
 " Show syntax highlighting groups for word under cursor
-nmap <C-P> :HLT<CR>
-" nnoremap <C-P> :TSHighlightCapturesUnderCursor<CR>
+" nmap <C-P> :HLT<CR>
+nnoremap <C-P> :TSHighlightCapturesUnderCursor<CR>
