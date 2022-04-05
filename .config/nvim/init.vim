@@ -13,6 +13,9 @@ set smartindent
 set termguicolors
 set cursorline
 set guicursor=n-c-v:blinkwait300-blinkon200-blinkoff150,i-ci-ve:blinkon1-ver25,r-cr-o:hor20-blinkon1
+set wildignore+=*.o,*.rej,*.so
+set wildmenu
+set wildmode=longest:full,full
 " }}}
 
 " Plugins {{{
@@ -89,7 +92,7 @@ nnoremap <leader>n :nohlsearch<CR>
 
 nnoremap <leader>. :GFiles<CR>
 nnoremap <leader>, :Buffers<CR>
-nnoremap <leader>p :Files<CR>
+nnoremap <leader>> :Files<CR>
 nnoremap <leader>; :History:<CR>
 nnoremap <leader>/ :History/<CR>
 nnoremap <leader>' :BTags<CR>
