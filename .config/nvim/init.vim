@@ -54,34 +54,36 @@ call plug#end()
 " }}}
 
 let g:gutentags_ctags_exclude = [
-            \ '*bazel-*', '.git', 'Build', '.ccls-cache', 'MDF4', 'HDF5',
-            \ 'Compiler', 'sqlite3.*', 'Rte_*.*', 'VehicleModel', 'ProtoBuf',
-            \ 'Protobuf', '*.cs'
+      \ '*bazel-*', '.git', 'Build', '.ccls-cache', 'MDF4', 'HDF5',
+      \ 'Compiler', 'sqlite3.*', 'Rte_*.*', 'VehicleModel', 'ProtoBuf',
+      \ 'Protobuf', '*.cs'
             \]
 let g:fzf_tags_command = 'ctags -R --exclude=.git --exclude=Build
-            \ --exclude=.ccls-cache --exclude=Rte_*.* --exclude=Protobuf
-            \ --exclude=ProtoBuf --exclude=.ccls-cache --exclude=*bazel*
-            \ --languages=-javascript'
+      \ --exclude=.ccls-cache --exclude=Rte_*.* --exclude=Protobuf
+      \ --exclude=ProtoBuf --exclude=.ccls-cache --exclude=*bazel*
+      \ --languages=-javascript'
+
+autocmd FileType vim setlocal shiftwidth=2 softtabstop=2 expandtab
 
 " Functions {{{
 " Return to last edit position when opening files.
 autocmd BufReadPost *
-     \ if line("'\"") > 0 && line("'\"") <= line("$") |
-     \   exe "normal! g`\"" |
-     \ endif
+      \ if line("'\"") > 0 && line("'\"") <= line("$") |
+      \   exe "normal! g`\"" |
+      \ endif
 
 " Highlight yanked text.
 augroup highlight_yank
-    autocmd!
-    autocmd TextYankPost * silent! lua require'vim.highlight'.on_yank({timeout = 100})
+  autocmd!
+  autocmd TextYankPost * silent! lua require'vim.highlight'.on_yank({timeout = 100})
 augroup END
 
 function! ToggleQuickFix()
-    if empty(filter(getwininfo(), 'v:val.quickfix'))
-        copen
-    else
-        cclose
-    endif
+  if empty(filter(getwininfo(), 'v:val.quickfix'))
+    copen
+  else
+    cclose
+  endif
 endfunction
 " }}}
 
@@ -134,45 +136,43 @@ nmap ga <Plug>(EasyAlign)
 " Harpoon {{{
 lua << EOF
 require("harpoon").setup({
-    menu = {
-        width = 120,
-    }
+menu = {
+  width = 120,
+  }
 })
 EOF
 " }}}
 
 lua << EOF
 require'nvim-treesitter.configs'.setup({
-  -- One of "all", "maintained" (parsers with maintainers), or a list of languages
-  ensure_installed = "maintained",
+-- One of "all", "maintained" (parsers with maintainers), or a list of languages
+ensure_installed = "maintained",
 
-  -- Install languages synchronously (only applied to `ensure_installed`)
-  sync_install = false,
+-- Install languages synchronously (only applied to `ensure_installed`)
+sync_install = false,
 
-  -- List of parsers to ignore installing
-  ignore_install = { "javascript" },
+-- List of parsers to ignore installing
+ignore_install = { "javascript" },
 
-  highlight = {
-    -- `false` will disable the whole extension
-    enable = true,
+highlight = {
+  -- `false` will disable the whole extension
+  enable = true,
 
-    -- NOTE: these are the names of the parsers and not the filetype. (for example if you want to disable highlighting for the `tex` filetype, you need to include `latex` in this list as this is the name of the parser)
-    -- list of language that will be disabled
-    disable = { },
+  -- NOTE: these are the names of the parsers and not the filetype. (for example if you want to disable highlighting for the `tex` filetype, you need to include `latex` in this list as this is the name of the parser)
+  -- list of language that will be disabled
+  disable = { },
 
-    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-    -- Using this option may slow down your editor, and you may see some duplicate highlights.
-    -- Instead of true it can also be a list of languages
-    additional_vim_regex_highlighting = false,
+  -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+  -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+  -- Using this option may slow down your editor, and you may see some duplicate highlights.
+  -- Instead of true it can also be a list of languages
+  additional_vim_regex_highlighting = false,
   },
 })
 EOF
 abbreviate td TODO(chlyz):
 
 " let base16colorspace=256
-" colorscheme base16-gruvbox-light-hard
-
 colorscheme modus-operandi
 " colorscheme modus-vivendi
 
