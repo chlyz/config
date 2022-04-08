@@ -73,7 +73,7 @@ make CMAKE_BUILD_TYPE=Release -j9
 sudo make install
 
 echo "Install suckless dependencies"
-sudo apt install -y \
+sudo apt-get -qq install -y \
     hsetroot \
     libxft-dev \
     libxinerama-dev \
@@ -81,7 +81,7 @@ sudo apt install -y \
 
 echo "Install suckless terminal"
 if [ ! -d ~/.local/git/chlyz-st ]; then
-    git clone https://github.com/chlyz/st.git ~/.local/git/chlyz-st
+    git clone git@github.com:chlyz/st.git ~/.local/git/chlyz-st
 fi
 cd ~/.local/git/chlyz-st
 git stash
@@ -93,7 +93,7 @@ git stash pop
 
 echo "Install suckless window manager"
 if [ ! -d ~/.local/git/chlyz-dwm ]; then
-    git clone https://github.com/chlyz/dwm.git ~/.local/git/chlyz-dwm
+    git clone git@github.com:chlyz/dwm.git ~/.local/git/chlyz-dwm
 fi
 cd ~/.local/git/chlyz-dwm
 git stash
@@ -108,7 +108,7 @@ git stash pop
 
 echo "Install suckless lock screen"
 if [ ! -d ~/.local/git/chlyz-slock ]; then
-    git clone https://github.com/chlyz/slock.git ~/.local/git/chlyz-slock
+    git clone git@github.com:chlyz/slock.git ~/.local/git/chlyz-slock
 fi
 cd ~/.local/git/chlyz-slock
 git stash
@@ -120,7 +120,9 @@ git stash pop
 
 echo "Install suckless status"
 if [ ! -d ~/.local/git/chlyz-slstatus ]; then
-    git clone https://github.com/chlyz/slstatus.git ~/.local/git/chlyz-slstatus
+    git clone git@github.com:chlyz/slstatus.git ~/.local/git/chlyz-slstatus
+    git config user.name "Christian Lyzell"
+    git config user.email "christian.lyzell@gmail.com"
 fi
 cd ~/.local/git/chlyz-slstatus
 git stash

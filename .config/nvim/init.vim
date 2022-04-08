@@ -178,4 +178,4 @@ colorscheme modus-operandi
 
 " Show syntax highlighting groups for word under cursor
 " nmap <C-P> :HLT<CR>
-nnoremap <C-P> :TSHighlightCapturesUnderCursor<CR>
+" nnoremap <C-P> :TSHighlightCapturesUnderCursor<CR>
