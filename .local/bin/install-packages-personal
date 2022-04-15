@@ -2,21 +2,38 @@
 
 mkdir -p ~/.local/git/
 
-# Add repository for the latest git
-have_git=`apt-add-repository --list`
-if [[ ! $have_git  == *"git-core/ppa"* ]]; then
-    echo "Add git ppa"
-    sudo add-apt-repository --yes ppa:git-core/ppa
-fi
+# Helper Functions {{{
+install_package() {
+    local is_installed=$(echo "$INSTALLED_PACKAGES" | grep -P "^$1\$")
+    if [ -z $is_installed ]; then
+        printf "%s" "Installing $1 ..."
+        sudo apt-get -qq install --yes "$1" > /dev/null
+        printf "\n"
+    fi
+}
+# }}}
 
-echo "Update packages"
-sudo apt -qq update
-
-echo "Upgrade packages"
-sudo apt -qq upgrade --yes
-
-echo "Install git"
-sudo apt -qq install --yes git
+install_package arandr
+install_package blueman
+install_package cmake
+install_package gettext
+install_package flameshot
+install_package htop
+install_package libtool
+install_package libtool-bin
+install_package mlocate
+install_package ninja-build
+install_package p7zip-full
+install_package pavucontrol
+install_package picom
+install_package qutebrowser
+install_package stow
+install_package tmux
+install_package trash-cli
+install_package tree
+install_package vim
+install_package xcape
+install_package xclip
 
 echo "Install fzf (fuzzy finder)"
 if [ ! -d ~/.local/git/fzf ]; then
@@ -40,28 +57,6 @@ if [ ! -f ~/.local/share/nvim/site/autoload/plug.vim ]; then
         https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 fi
 
-echo "Install convenience packages"
-sudo apt -qq install --yes \
-    arandr \
-    blueman \
-    build-essential \
-    cmake \
-    ninja-build \
-    flameshot \
-    htop \
-    mlocate \
-    picom \
-    pavucontrol \
-    p7zip-full \
-    qutebrowser \
-    stow \
-    tmux \
-    trash-cli \
-    tree \
-    vim \
-    xcape \
-    xclip
-
 echo "Install neovim from source"
 if [ ! -d ~/.local/git/neovim ]; then
     git clone --depth 1 https://github.com/neovim/neovim.git ~/.local/git/neovim
@@ -73,11 +68,10 @@ make CMAKE_BUILD_TYPE=Release -j9
 sudo make install
 
 echo "Install suckless dependencies"
-sudo apt-get -qq install -y \
-    hsetroot \
-    libxft-dev \
-    libxinerama-dev \
-    libxrandr-dev
+install_package hsetroot
+install_package libxft-dev
+install_package libxinerama-dev
+install_package libxrandr-dev
 
 echo "Install suckless terminal"
 if [ ! -d ~/.local/git/chlyz-st ]; then
