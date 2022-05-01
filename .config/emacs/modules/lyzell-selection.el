@@ -35,6 +35,7 @@
 
 ;; Setup embark.
 (global-set-key (kbd "C-.") 'embark-act)
+(global-set-key (kbd "M-c") 'embark-act)
 (setq prefix-help-command #'embark-prefix-help-command)
 
 ;; Setup consult.

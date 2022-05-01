@@ -1,8 +1,8 @@
 ;;; lyzell-programming.el -*- lexical-binding; t: -*-
 
 ;;;; Install dependencies.
-(straight-use-package 'tree-sitter)
-(straight-use-package 'tree-sitter-langs)
+;; (straight-use-package 'tree-sitter)
+;; (straight-use-package 'tree-sitter-langs)
 (straight-use-package 'evil-nerd-commenter)
 (straight-use-package '(matlab-emacs
                         :type git
@@ -24,10 +24,10 @@
 (setq c-default-style "bsd")
 
 ;;;; Octave
-(setq-default octave-block-offset 4)	; indent by four spaces
-(setq octave-comment-char 37)	        ; comment with %
-(setq octave-comment-start "% ")        ; comment with %
-(setq octave-block-comment-start "%% ") ; comment with %
+;; (setq-default octave-block-offset 4)	; indent by four spaces
+;; (setq octave-comment-char 37)	        ; comment with %
+;; (setq octave-comment-start "% ")        ; comment with %
+;; (setq octave-block-comment-start "%% ") ; comment with %
 
 ;;;; Matlab
 (require 'matlab)

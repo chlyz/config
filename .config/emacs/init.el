@@ -38,6 +38,7 @@
 (require 'lyzell-editing)
 (require 'lyzell-evil)
 (require 'lyzell-selection)
+(require 'lyzell-proced)
 (require 'lyzell-programming)
 (require 'lyzell-vc)
 (require 'lyzell-terminal)
@@ -48,6 +49,7 @@
 
 ;; This needs to be explored.
 (straight-use-package 'perspective)
+(setq persp-suppress-no-prefix-key-warning t)
 (persp-mode)
 
 ;; (defun lyzell/git-merge-base ()
@@ -56,11 +58,14 @@
   ;; (start-process "
 
 ;; Maybe to be used as an auto-completion.
-(straight-use-package 'corfu)
-(setq corfu-auto t
-      corfu-quit-no-match 'separator) ;; or t
-(corfu-global-mode)
-(require 'corfu)
+;; (straight-use-package 'corfu)
+;; (setq corfu-auto t
+;;       corfu-quit-no-match 'separator) ;; or t
+;; (corfu-global-mode)
+;; (require 'corfu)
+;; (setq-local completion-at-point-functions
+;;             (mapcar #'cape-company-to-capf
+;;                     (list #'company-files #'company-ispell #'company-dabbrev)))
 
 (straight-use-package 'cape)
 (add-to-list 'completion-at-point-functions #'cape-dabbrev)
@@ -69,11 +74,7 @@
   (add-hook mode (lambda () (add-to-list 'completion-at-point-functions #'cape-symbol))))
 
 (straight-use-package 'company)
-(require 'corfu)
 (require 'company)
-(setq-local completion-at-point-functions
-            (mapcar #'cape-company-to-capf
-                    (list #'company-files #'company-ispell #'company-dabbrev)))
 
 (straight-use-package 'lsp-mode)
 
@@ -88,7 +89,7 @@
 ;;; Fonts
 (set-face-attribute 'default nil
                     :font "JetBrainsMono Nerd Font:antialias=subpixel"
-                    :height 120)
+                    :height 100)
 
 ;;; Basic settings
 (setq frame-title-format '("%b"))	; set the title of the emacs window

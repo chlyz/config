@@ -1,1 +1,11 @@
 tags
+.config/emacs/auto-save-list
+.config/emacs/auto-save
+.config/emacs/backup
+.config/emacs/eln-cache
+.config/emacs/eshell
+.config/emacs/history
+.config/emacs/projects
+.config/emacs/saveplace
+.config/emacs/straight
+.config/emacs/transient
