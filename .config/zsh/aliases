@@ -1,0 +1,2 @@
+alias ls='ls --color=always --group-directories-first'
+alias ll='ls -hkl'
