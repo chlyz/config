@@ -8,13 +8,14 @@ let g:colors_name="Modus Operandi"
 
 let s:bg_main                = "#ffffff"
 let s:fg_main                = "#000000"
+let s:bg_dim                 = "#f8f8f8"
+let s:fg_dim                 = "#282828"
 let s:bg_alt                 = "#f0f0f0"
 let s:fg_alt                 = "#505050"
 let s:bg_active              = "#d7d7d7"
 let s:fg_active              = "#0a0a0a"
 let s:bg_inactive            = "#efefef"
 let s:fg_inactive            = "#404148"
-let s:bg_dim                 = "#f8f8f8"
 let s:bg_hl_line             = "#f2eff3"
 let s:bg_region              = "#bcbcbc"
 let s:bg_paren_match         = "#e0af82"
@@ -24,6 +25,7 @@ let s:yellow                 = "#813e00"
 let s:blue                   = "#0031a9"
 let s:blue_alt               = "#2544bb"
 let s:magenta                = "#721045"
+let s:magenta_alt            = "#8f0075"
 let s:magenta_alt_other      = "#5317ac"
 let s:magenta_faint          = "#752f50"
 let s:cyan                   = "#00538b"
@@ -99,6 +101,7 @@ call <SID>highlight("Visual",       s:bg_region,      s:fg_main,   "None")
 call <SID>highlight("VisualNOS",    "None",           "None",      "None")
 call <SID>highlight("WarningMsg",   "None",           "None",      "None")
 call <SID>highlight("WildMenu",     "None",           "None",      "None")
+call <SID>highlight("WinBar",       s:bg_dim,         s:fg_dim,    "None")
 call <SID>highlight("Title",        "None",           "None",      "None")
 call <SID>highlight("Conceal",      "None",           "None",      "None")
 call <SID>highlight("Cursor",       "None",           "None",      "None")
@@ -144,7 +147,7 @@ call <SID>highlight("StorageClass", "None",  s:magenta_alt_other,  "None")
 call <SID>highlight("String",       "None",  s:blue_alt,           "None")
 call <SID>highlight("Structure",    "None",  "None",               "None")
 call <SID>highlight("Tag",          "None",  "None",               "None")
-call <SID>highlight("Todo",         "None",  "None",               "None")
+call <SID>highlight("Todo",         "None",  s:yellow,            "bold")
 call <SID>highlight("Type",         "None",  s:cyan,               "None")
 call <SID>highlight("Typedef",      "None",  "None",               "None")
 
@@ -170,10 +173,14 @@ call <SID>highlight("cType",      "None", s:cyan, "None")
 " Netrw highlight
 highlight link netrwDir Directory
 
+" Telescope highlighting
+call <SID>highlight("TelescopeSelection",   s:bg_hl_line,     "None",         "bold")
+call <SID>highlight("TelescopeMatching",    "None",           s:magenta_alt,  "bold")
+
 " Remove variables
-unlet s:bg_main s:fg_main s:bg_dim  s:bg_alt s:fg_alt s:bg_hl_line s:bg_active s:fg_active
+unlet s:bg_main s:fg_main s:bg_dim s:fg_dim s:bg_alt s:fg_alt s:bg_hl_line s:bg_active s:fg_active
 unlet s:bg_inactive s:fg_inactive s:bg_region s:bg_paren_match s:bg_search s:bg_incsearch
-unlet s:red s:cyan s:cyan_alt_other s:green s:blue s:blue_alt s:yellow s:magenta s:magenta_alt_other s:magenta_faint
+unlet s:red s:cyan s:cyan_alt_other s:green s:blue s:blue_alt s:yellow s:magenta s:magenta_alt s:magenta_alt_other s:magenta_faint
 unlet s:bg_diff_heading s:fg_diff_heading s:bg_diff_added s:fg_diff_added s:bg_diff_added_deuteran s:fg_diff_added_deuteran
 unlet s:bg_diff_changed s:fg_diff_changed s:bg_diff_removed s:fg_diff_removed
 

@@ -8,7 +8,8 @@ let g:colors_name="Modus Vivendi"
 let s:bg_main           = "#000000"
 let s:fg_main           = "#ffffff"
 let s:bg_dim            = "#100f10"
-let s:bg_alt            = "#f0f0f0"
+let s:fg_dim            = "#e0e6f0"
+let s:bg_alt            = "#191a1b"
 let s:fg_alt            = "#a8a8a8"
 let s:bg_hl_line        = "#151823"
 let s:bg_region         = "#3c3c3c"
@@ -23,12 +24,14 @@ let s:blue              = "#2fafff"
 let s:blue_alt          = "#79a8ff"
 let s:blue_alt_other    = "#00bcff"
 let s:magenta           = "#feacd0"
+let s:magenta_alt       = "#f78fe7"
 let s:magenta_alt_other = "#b6a0ff"
 let s:magenta_faint     = "#e0b2d6"
 let s:cyan              = "#00d3d0"
 let s:cyan_alt_other    = "#6ae4b9"
 
 " These are not in the proper theme but emacs applies them somewhere.
+" TODO(chlyz): Check this.
 let s:bg_search    = "#004065"
 let s:bg_incsearch = "#ee6a50"
 
@@ -91,7 +94,7 @@ call <SID>highlight("MatchParen",   s:bg_paren_match,     "None",               
 call <SID>highlight("ModeMsg",      "None",               "None",               "None")
 call <SID>highlight("MoreMsg",      "None",               "None",               "None")
 call <SID>highlight("Question",     "None",               "None",               "None")
-call <SID>highlight("Search",       s:bg_search,          s:bg_main,            "None")
+call <SID>highlight("Search",       s:bg_search,          s:fg_dim,            "None")
 call <SID>highlight("Substitute",   "None",               "None",               "None")
 call <SID>highlight("SpecialKey",   "None",               "None",               "None")
 call <SID>highlight("TooLong",      "None",               "None",               "None")
@@ -100,6 +103,7 @@ call <SID>highlight("Visual",       s:bg_region,          s:fg_main,            
 call <SID>highlight("VisualNOS",    "None",               "None",               "None")
 call <SID>highlight("WarningMsg",   "None",               "None",               "None")
 call <SID>highlight("WildMenu",     "None",               "None",               "None")
+call <SID>highlight("WinBar",       s:bg_dim,             s:fg_dim,             "None")
 call <SID>highlight("Title",        "None",               "None",               "None")
 call <SID>highlight("Conceal",      "None",               "None",               "None")
 call <SID>highlight("Cursor",       "None",               "None",               "None")
@@ -314,13 +318,16 @@ call <SID>highlight("javaOperator", "None", "None", "None")
 " Netrw highlight
 highlight link netrwDir Directory
 
+call <SID>highlight("TelescopeSelection",   s:bg_hl_line,     "None",         "bold")
+call <SID>highlight("TelescopeMatching",    "None",           s:magenta_alt,  "bold")
+
 " Remove functions
 
 " Remove color variables
 " unlet s:gui00 s:gui01 s:gui02 s:gui03  s:gui04  s:gui05  s:gui06  s:gui07  s:gui08  s:gui09 s:gui0A  s:gui0B  s:gui0C  s:gui0D  s:gui0E  s:gui0F
 " unlet s:cterm00 s:cterm01 s:cterm02 s:cterm03 s:cterm04 s:cterm05 s:cterm06 s:cterm07 s:cterm08 s:cterm09 s:cterm0A s:cterm0B s:cterm0C s:cterm0D s:cterm0E s:cterm0F
 
-unlet s:bg_main s:fg_main s:bg_dim s:bg_alt s:fg_alt
+unlet s:bg_main s:fg_main s:bg_dim s:fg_dim s:bg_alt s:fg_alt
 unlet s:bg_hl_line
 unlet s:bg_active s:bg_inactive
 unlet s:bg_region
@@ -331,7 +338,7 @@ unlet s:cyan s:cyan_alt_other
 unlet s:green
 unlet s:blue s:blue_alt
 unlet s:yellow
-unlet s:magenta s:magenta_alt_other s:magenta_faint
+unlet s:magenta s:magenta_alt s:magenta_alt_other s:magenta_faint
 
 
 " Remove functions

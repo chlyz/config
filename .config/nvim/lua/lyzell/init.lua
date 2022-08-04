@@ -1,0 +1,6 @@
+require("lyzell.options")
+require("lyzell.plugins")
+require("lyzell.keymaps")
+require("lyzell.comment")
+require("lyzell.completion")
+require("lyzell.harpoon")
