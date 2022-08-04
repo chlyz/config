@@ -1,30 +1,26 @@
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 
-# if [[ $(uname -s) = Darwin ]]; then
-#   # Override insanely low open file limits on macOS.
-#   ulimit -n 65536
-#   ulimit -u 1064
-#
-#   # Mitigate: https://github.blog/2022-04-12-git-security-vulnerability-announced/
-#   export GIT_CEILING_DIRECTORIES=/Users
-# else
-#   export GIT_CEILING_DIRECTORIES=/home/chlyz
-# fi
-
-# if [ -d "$HOME/.zshenv.d" ]; then
-#   for EXTENSION_FILE in $(find $HOME/.zshenv.d/ -name '*.zsh'); do
-#     source "$EXTENSION_FILE"
-#   done
-# fi
-
 export EDITOR="/usr/local/bin/nvim"
+export TERMINAL="$HOME/.local/bin/kitty"
+
+# export GIT_CEILING_DIRECTORIES=$HOME
 
 # Colors for directory listings
 export LS_COLORS="rs=0:di=00;94:ln=04;36:mh=00:pi=00;35:so=00;35:do=01;35:bd=00;35:cd=00;35:or=00;36:mi=101;30:su=37;41:sg=30;43:ca=30;41:tw=00;94:ow=00;94:st=37;44:ex=00;95:*.tar=01;31:*.tgz=00;96:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=00;96:*.zip=00;96:*.z=01;31:*.dz=01;31:*.gz=00;96:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=00;96:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31"
 
 # Same as LS_COLORS except no underline for symbolic links
 export LF_COLORS="rs=0:di=00;94:ln=00;36:mh=00:pi=00;35:so=00;35:do=01;35:bd=00;35:cd=00;35:or=00;36:mi=101;30:su=37;41:sg=30;43:ca=30;41:tw=00;94:ow=00;94:st=37;44:ex=00;95:*.tar=01;31:*.tgz=00;96:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=00;96:*.zip=00;96:*.z=01;31:*.dz=01;31:*.gz=00;96:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=00;96:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31"
+
+# Improve the `less` pager.
+export LESSPROMPT='?f%f .?ltLine %lt:?pt%pt\%:?btByte %bt:-...'
+export LESS="-iFMRX -#.25"
+export LESS_TERMCAP_mb=$'\E[01;31m'
+export LESS_TERMCAP_md=$'\E[01;38;5;208m'
+export LESS_TERMCAP_me=$'\E[0m'
+export LESS_TERMCAP_se=$'\E[0m'
+export LESS_TERMCAP_ue=$'\E[0m'
+export LESS_TERMCAP_us=$'\E[04;38;5;111m'
 
 # Specify default directories
 export XDG_CONFIG_HOME="$HOME/.config"
