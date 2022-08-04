@@ -108,7 +108,7 @@
     (font-lock-flush (point-min) (point-max))))
 
 (setq proced-auto-update-flag t)
-(setq proced-auto-update-interval 5)
+(setq proced-auto-update-interval 2)
 (setq proced-descend t)
 (setq proced-filter 'user)
 

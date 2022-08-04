@@ -1,49 +1,75 @@
 ;;; lyzell-programming.el -*- lexical-binding; t: -*-
 
-;;;; Install dependencies.
+;;; Install dependencies.
 ;; (straight-use-package 'tree-sitter)
 ;; (straight-use-package 'tree-sitter-langs)
 (straight-use-package 'evil-nerd-commenter)
 (straight-use-package '(matlab-emacs
                         :type git
                         :repo "https://git.code.sf.net/p/matlab-emacs/src"))
+(straight-use-package '(global-tags
+                        :type git
+                        :repo "https://github.com/emacsmirror/global-tags.git"))
+(straight-use-package 'jenkinsfile-mode)
+(require 'jenkinsfile-mode)
 
-;;;; Indent by spaces
+(add-hook 'c-mode-hook #'global-tags-exclusive-backend-mode)
+
+;;; Indent by spaces
 (setq-default indent-tabs-mode nil)
+
+;; (global-hl-line-mode 1)
 
 ;; Whitespace
 (dolist (mode '(text-mode-hook
                 prog-mode-hook
                 conf-mode-hook
+                matlab-mode-hook
                 ))
-  (add-hook mode (lambda () (setq show-trailing-whitespace 't))))
+  (add-hook mode (lambda ()
+                   (setq show-trailing-whitespace t))))
 
-;;;; C/C++
+(add-hook 'conf-mode-hook #'hl-line-mode)
+(add-hook 'prog-mode-hook #'hl-line-mode)
+(add-hook 'prog-mode-hook #'abbrev-mode)
+(add-hook 'text-mode-hook #'hl-line-mode)
+(add-hook 'proced-mode-hook #'hl-line-mode)
+(add-hook 'occur-hook (lambda () (switch-to-buffer-other-window "*Occur*")))
+(add-hook 'grep-hook (lambda () (switch-to-buffer-other-window "*grep*")))
+
+;;; C/C++
 (setq-default c-default-style "linux")	; general style
 (setq-default c-basic-offset 4)		; indent by four spaces
 (setq c-default-style "bsd")
 
-;;;; Octave
-;; (setq-default octave-block-offset 4)	; indent by four spaces
-;; (setq octave-comment-char 37)	        ; comment with %
-;; (setq octave-comment-start "% ")        ; comment with %
-;; (setq octave-block-comment-start "%% ") ; comment with %
+;;; Octave
+(setq-default octave-block-offset 4)	; indent by four spaces
+(setq octave-comment-char 37)	        ; comment with %
+(setq octave-comment-start "% ")        ; comment with %
+(setq octave-block-comment-start "%% ") ; comment with %
 
-;;;; Matlab
-(require 'matlab)
-(add-to-list 'auto-mode-alist '("\\.m\\'" . matlab-mode))
-(modify-syntax-entry ?_ "w" matlab-mode-syntax-table)
-(customize-set-value 'matlab-align-to-paren nil)
+;;; Matlab
 
-;;;; Bazel
+;; (require 'matlab)
+;; (add-to-list 'auto-mode-alist '("\\.m\\'" . matlab-mode))
+;; (modify-syntax-entry ?_ "w" matlab-mode-syntax-table)
+;; (customize-set-value 'matlab-align-to-paren nil)
+;; (add-hook 'matlab-mode-hook #'abbrev-mode)
+
+;; Use the Octave expression for iMenu that works better and finds all the
+;; functions file.
+;; (setq matlab-imenu-generic-expression
+;;       (list (list nil octave-function-header-regexp 3)))
+
+;;; Bazel
 (add-to-list 'auto-mode-alist '("\\.bazel\\'" . python-mode))
 (add-to-list 'auto-mode-alist '("\\.bzl\\'" . python-mode))
 
-;;;; SCons
+;;; SCons
 (add-to-list 'auto-mode-alist '("\\SConscript*\\'" . python-mode))
 (add-to-list 'auto-mode-alist '("\\SConstruct*\\'" . python-mode))
 
-;;;; Line numbers
+;;; Line numbers
 
 (defun lyzell/toggle-relative-line-numbers ()
   "Toggle between absolute and relative line numbers."
@@ -70,11 +96,11 @@
                 matlab-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 1))))
 
-;;;; Setup commenting.
+;;; Setup commenting.
 (require 'evil-nerd-commenter)
 (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
 
-;;;; Setup treesitter highlightning.
+;;; Setup treesitter highlightning.
 ; (require 'tree-sitter)
 ; (require 'tree-sitter-langs)
 ; (global-tree-sitter-mode)

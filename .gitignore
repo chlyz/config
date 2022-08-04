@@ -1,4 +1,10 @@
+*.bak
 tags
+.config/emacs/projectile-bookmarks.eld
+.config/emacs/tramp
+.config/emacs/elpa
+.config/emacs/.local
+.config/emacs/.lsp-session-v1
 .config/emacs/auto-save-list
 .config/emacs/auto-save
 .config/emacs/backup
@@ -9,3 +15,4 @@ tags
 .config/emacs/saveplace
 .config/emacs/straight
 .config/emacs/transient
+.config/emacs/url

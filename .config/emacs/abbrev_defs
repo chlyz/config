@@ -1,0 +1,7 @@
+;;-*-coding: utf-8;-*-
+(define-abbrev-table 'global-abbrev-table
+  '(
+    ("td" "TODO:" nil :count 6)
+    ("tm" "TODO(chlyz):" nil :count 1)
+   ))
+

@@ -1,10 +1,16 @@
 ;;; early-init.el --- Early Init File -*- lexical-binding: t -*-
 
-;; Set the garbage collection threshold for faster start-up.
+;; Increase the garbage collection threshold for faster startup.
 (setq gc-cons-threshold (* 50 1000 1000))
 
+
+(setq modus-themes-italic-constructs t)
+(setq modus-themes-mode-line '(padded))
+;; (setq modus-themes-syntax '(yellow-comments))
+(setq modus-themes-syntax nil)
+(load-theme 'modus-vivendi t nil)
 ;; Prefer loading newest compiled .el file.
-(setq load-prefer-newer noninteractive)
+(customize-set-variable 'load-prefer-newer noninteractive)
 
 ;; Native compilation settings
 (when (featurep 'native-compile)
