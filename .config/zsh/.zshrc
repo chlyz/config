@@ -1,13 +1,9 @@
-#
-# Global
-#
-
 # Create a hash table for globally stashing variables without polluting main
 # scope with a bunch of identifiers.
-typeset -A __WINCENT
+typeset -A __LYZELL
 
-__WINCENT[ITALIC_ON]=$'\e[3m'
-__WINCENT[ITALIC_OFF]=$'\e[23m'
+__LYZELL[ITALIC_ON]=$'\e[3m'
+__LYZELL[ITALIC_OFF]=$'\e[23m'
 
 # --- Completion --- {{{
 
@@ -15,6 +11,7 @@ fpath=($HOME/.zsh/completions $fpath)
 
 autoload -U compinit
 compinit -u
+
 # Make completion:
 # - Try exact (case-sensitive) match first.
 # - Then fall back to case-insensitive.
@@ -35,7 +32,7 @@ zstyle ':completion:*:complete:(cd|pushd):*' tag-order 'local-directories named-
 
 # Categorize completion suggestions with headings:
 zstyle ':completion:*' group-name ''
-zstyle ':completion:*:descriptions' format %F{default}%B%{$__WINCENT[ITALIC_ON]%}--- %d ---%{$__WINCENT[ITALIC_OFF]%}%b%f
+zstyle ':completion:*:descriptions' format %F{default}%B%{$__LYZELL[ITALIC_ON]%}--- %d ---%{$__LYZELL[ITALIC_OFF]%}%b%f
 
 # Enable keyboard navigation of completions in menu
 # (not just tab/shift-tab but cursor keys as well):
@@ -53,28 +50,8 @@ setopt PROMPT_SUBST
 
 # Anonymous function to avoid leaking variables.
 function () {
-  # Check for tmux by looking at $TERM, because $TMUX won't be propagated to any
-  # nested sudo shells but $TERM will.
-  local TMUXING=$([[ "$TERM" =~ "tmux" ]] && echo tmux)
-  if [ -n "$TMUXING" -a -n "$TMUX" ]; then
-    # In a a tmux session created in a non-root or root shell.
-    local LVL=$(($SHLVL - 1))
-  elif [ -n "$XAUTHORITY" ]; then
-    # Probably in X on Linux.
-    local LVL=$(($SHLVL - 2))
-  else
-    # Either in a root shell created inside a non-root tmux session,
-    # or not in a tmux session.
-    local LVL=$SHLVL
-  fi
-  local SUFFIX='%(!.%F{yellow}%n%f.)%(!.%F{yellow}.%F{red})'$(printf '\u276f%.0s' {1..$LVL})'%f'
-
+  local SUFFIX='%(!.%F{yellow}%n%f.)%(!.%F{yellow}.%F{red})'$(printf '\u276f%.0s')'%f'
   export PS1="%F{green}${SSH_TTY:+%n@%m}%f%B${SSH_TTY:+:}%b%F{blue}%B%1~%b%F{yellow}%B%(1j.*.)%(?..!)%b%f %B${SUFFIX}%b "
-  if [[ -n "$TMUXING" ]]; then
-    # Outside tmux, ZLE_RPROMPT_INDENT ends up eating the space after PS1, and
-    # prompt still gets corrupted even if we add an extra space to compensate.
-    export ZLE_RPROMPT_INDENT=0
-  fi
 }
 
 export RPROMPT=$RPROMPT_BASE
@@ -85,7 +62,7 @@ export SPROMPT="zsh: correct %F{red}'%R'%f to %F{red}'%r'%f [%B%Uy%u%bes, %B%Un%
 # --- History --- {{{
 
 export HISTSIZE=100000
-export HISTFILE="$HOME/.local/share/.zsh_history"
+export HISTFILE="$XDG_DATA_HOME/.zsh_history"
 export SAVEHIST=$HISTSIZE
 
 # }}}
@@ -122,26 +99,21 @@ setopt SHARE_HISTORY
 autoload -U select-word-style
 select-word-style bash # only alphanumeric chars are considered WORDCHARS
 
-# source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+source ~/.local/git/zsh-autosuggestions/zsh-autosuggestions.zsh
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=59'
 ZSH_AUTOSUGGEST_STRATEGY=(match_prev_cmd completion)
 
 # NOTE: must come after select-word-style.
-# source ~/.zsh/zsh-history-substring-search/zsh-history-substring-search.zsh
+source /home/chlyz/.local/git/zsh-history-substring-search/zsh-history-substring-search.zsh
 
-# Note that this will only ensure unique history if we supply a prefix
-# before hitting "up" (ie. we perform a "search"). HIST_FIND_NO_DUPS
-# won't prevent dupes from appearing when just hitting "up" without a
-# prefix (ie. that's "zle up-line-or-history" and not classified as a
-# "search"). So, we have HIST_IGNORE_DUPS to make life bearable for that
-# case.
+# Note that this will only ensure unique history if we supply a prefix before
+# hitting "up" (ie. we perform a "search"). HIST_FIND_NO_DUPS won't prevent
+# dupes from appearing when just hitting "up" without a prefix (ie. that's "zle
+# up-line-or-history" and not classified as a "search"). So, we have
+# HIST_IGNORE_DUPS to make life bearable for that case.
 #
 # https://superuser.com/a/1494647/322531
 HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
-
-# Uncomment this to get syntax highlighting:
-# NOTE: must come after select-word-style.
-# source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # }}}
 
@@ -220,7 +192,9 @@ bindkey '^Z' fg-bg
 
 # --- Colors --- {{{
 
+LOCAL_CONFIG="$HOME/config/.config"
 color_file="$XDG_DATA_HOME/.background"
+kitty_theme="$XDG_CONFIG_HOME/kitty/current-theme.conf"
 
 function fzf_default() {
     read -r background < "$color_file"
@@ -250,8 +224,8 @@ function fzf_default() {
 
 function set_dark_theme() {
     echo "dark" > "$color_file"
-    cp "$HOME/.config/kitty/modus-vivendi-theme.conf" \
-        "$HOME/.config/kitty/current-theme.conf"
+    unlink "$kitty_theme"
+    ln -s "$LOCAL_CONFIG/kitty/modus-vivendi-theme.conf" "$kitty_theme"
     cp "$HOME/.config/task/modus-vivendi.theme" \
         "$HOME/.config/task/current.theme"
     fzf_default
@@ -259,8 +233,8 @@ function set_dark_theme() {
 
 function set_light_theme() {
     echo "light" > "$color_file"
-    cp "$HOME/.config/kitty/modus-operandi-theme.conf" \
-        "$HOME/.config/kitty/current-theme.conf"
+    unlink "$kitty_theme"
+    ln -s "$LOCAL_CONFIG/kitty/modus-operandi-theme.conf" "$kitty_theme"
     cp "$HOME/.config/task/modus-operandi.theme" \
         "$HOME/.config/task/current.theme"
     fzf_default
@@ -276,9 +250,10 @@ function toggle_theme() {
         else
             set_light_theme
         fi
-        source "$HOME/.bashrc"
+        source "$XDG_CONFIG_HOME/zsh/.zshrc"
     fi
 }
+bindkey -s '^[t' 'toggle_theme\n'
 
 if [ ! -f $color_file ]; then
     set_light_theme
@@ -293,30 +268,13 @@ fi
 
 # }}}
 
-#
-# Other prerequisites before we set up `$PATH`.
-#
-
-# TODO: Check what the following does.
-# test -d $HOME/n && export N_PREFIX="$HOME/n"
-
-#
-# Other
-#
-
-# source $HOME/.zsh/path # Must come first! (Others depend on it.)
+# --- Sources -- {{{
 
 source $XDG_CONFIG_HOME/zsh/aliases
-# source $HOME/.zsh/common
-# source $HOME/.zsh/color
-# source $HOME/.zsh/exports
-# source $HOME/.zsh/functions
-# source $HOME/.zsh/hash
-# source $HOME/.zsh/vars
 
-#
-# Hooks
-#
+# }}}
+
+# --- Hooks --- {{{
 
 autoload -U add-zsh-hook
 
@@ -372,6 +330,7 @@ function -update-window-title-preexec() {
     -set-tab-and-window-title "$(basename $PWD) > $TRIMMED"
   fi
 }
+
 add-zsh-hook preexec -update-window-title-preexec
 
 typeset -F SECONDS
@@ -401,7 +360,7 @@ function -report-start-time() {
       SECS="$((~~$SECS))s"
     fi
     ELAPSED="${ELAPSED}${SECS}"
-    export RPROMPT="%F{cyan}%{$__WINCENT[ITALIC_ON]%}${ELAPSED}%{$__WINCENT[ITALIC_OFF]%}%f $RPROMPT_BASE"
+    export RPROMPT="%F{cyan}%{$__LYZELL[ITALIC_ON]%}${ELAPSED}%{$__LYZELL[ITALIC_OFF]%}%f $RPROMPT_BASE"
     unset ZSH_START_TIME
   else
     export RPROMPT="$RPROMPT_BASE"
@@ -417,69 +376,27 @@ function -auto-ls-after-cd() {
   # function).
   if [ "$ZSH_EVAL_CONTEXT" = "toplevel:shfunc" ]; then
     ls -a
-    # if [ -f .nirarc ]; then
-    #     echo 'hej'
-    #     source .nirarc
-    # fi
   fi
 }
 add-zsh-hook chpwd -auto-ls-after-cd
 
 # Remember each command we run.
 function -record-command() {
-  __WINCENT[LAST_COMMAND]="$2"
+  __LYZELL[LAST_COMMAND]="$2"
 }
 add-zsh-hook preexec -record-command
-
-# Update vcs_info (slow) after any command that probably changed it.
-# function -maybe-show-vcs-info() {
-#   local LAST="$__WINCENT[LAST_COMMAND]"
-
-#   # In case user just hit enter, overwrite LAST_COMMAND, because preexec
-#   # will not run and it will otherwise linger.
-#   __WINCENT[LAST_COMMAND]="<unset>"
-
-#   # Check first word; via:
-#   # http://tim.vanwerkhoven.org/post/2012/10/28/ZSH/Bash-string-manipulation
-#   case "$LAST[(w)1]" in
-#     cd|cp|git|rm|touch|mv)
-#       vcs_info
-#       ;;
-#     *)
-#       ;;
-#   esac
-# }
-# add-zsh-hook precmd -maybe-show-vcs-info
 
 # adds `cdr` command for navigating to recent directories
 autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
 add-zsh-hook chpwd chpwd_recent_dirs
+
+# }}}
 
 # enable menu-style completion for cdr
 zstyle ':completion:*:*:cdr:*:*' menu selection
 
 # fall through to cd if cdr is passed a non-recent dir as an argument
 zstyle ':chpwd:*' recent-dirs-default true
-
-# Local and host-specific overrides.
-
-LOCAL_RC=$HOME/.zshrc.local
-test -f $LOCAL_RC && source $LOCAL_RC
-
-# If your hostname ever gets unset on macOS, reset with:
-#   sudo scutil --set HostName $desired-host-name
-HOST_RC=$HOME/.zsh/host/$(hostname -s | tr '[:upper:]' '[:lower:]')
-test -f $HOST_RC && source $HOST_RC
-
-#
-# /etc/motd
-#
-
-if [ -e /etc/motd ]; then
-  if ! cmp -s $HOME/.hushlogin /etc/motd; then
-    tee $HOME/.hushlogin < /etc/motd
-  fi
-fi
 
 # Use lf to switch directories and bind it to ctrl-o
 lfcd () {
@@ -494,17 +411,9 @@ lfcd () {
 bindkey -s '^o' '^ulfcd\n'
 
 . "$HOME/.cargo/env"
-eval "$(zoxide init bash)"
+# eval "$(zoxide init bash)"
 
-# NOTE: must come before zsh-history-substring-search & zsh-syntax-highlighting.
-autoload -U select-word-style
-select-word-style bash # only alphanumeric chars are considered WORDCHARS
-
-source ~/.local/git/zsh-autosuggestions/zsh-autosuggestions.zsh
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=59'
-ZSH_AUTOSUGGEST_STRATEGY=(match_prev_cmd completion)
-
-# NOTE: must come after select-word-style.
-source /home/chlyz/.local/git/zsh-history-substring-search/zsh-history-substring-search.zsh
-
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# Install `fzf` using the `--xdg` flag to get the configuration into the
+# `XDG_CONFIG_HOME/fzf` directory.
+[ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] \
+    && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh
