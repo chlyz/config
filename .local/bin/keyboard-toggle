@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+layout=`setxkbmap -query | grep layout | awk '{print $2}'`
+
+if [ $layout = us ]; then
+    keyboard-qwerty-se
+else
+    keyboard-dvorak-us
+fi

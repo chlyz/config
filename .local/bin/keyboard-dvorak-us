@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 
-setxkbmap -layout us -variant dvorak -option ctrl:nocaps
+killall xcape 2&> /dev/null
+setxkbmap -layout us -variant rpd -option ctrl:nocaps -option shift:both_capslock
 xcape -e 'Control_L=Escape'
