@@ -6,16 +6,18 @@ endif
 let g:colors_name="Modus Vivendi"
 
 let s:bg_main           = "#000000"
-let s:fg_main           = "#ffffff"
 let s:bg_dim            = "#100f10"
-let s:fg_dim            = "#e0e6f0"
 let s:bg_alt            = "#191a1b"
+
+let s:fg_main           = "#ffffff"
+let s:fg_dim            = "#e0e6f0"
 let s:fg_alt            = "#a8a8a8"
+
 let s:bg_hl_line        = "#151823"
 let s:bg_region         = "#3c3c3c"
 let s:bg_paren_match    = "#6f3355"
 let s:bg_active         = "#323232"
-let s:bg_inactive       = "#efefef"
+let s:bg_inactive       = "#1e1e1e"
 let s:red               = "#ff8059"
 let s:red_alt_other     = "#ff9077"
 let s:green             = "#44bc44"
@@ -94,7 +96,7 @@ call <SID>highlight("MatchParen",   s:bg_paren_match,     "None",               
 call <SID>highlight("ModeMsg",      "None",               "None",               "None")
 call <SID>highlight("MoreMsg",      "None",               "None",               "None")
 call <SID>highlight("Question",     "None",               "None",               "None")
-call <SID>highlight("Search",       s:bg_search,          s:fg_dim,            "None")
+call <SID>highlight("Search",       s:bg_search,          s:fg_dim,             "None")
 call <SID>highlight("Substitute",   "None",               "None",               "None")
 call <SID>highlight("SpecialKey",   "None",               "None",               "None")
 call <SID>highlight("TooLong",      "None",               "None",               "None")
@@ -108,7 +110,7 @@ call <SID>highlight("Title",        "None",               "None",               
 call <SID>highlight("Conceal",      "None",               "None",               "None")
 call <SID>highlight("Cursor",       "None",               "None",               "None")
 call <SID>highlight("NonText",      "None",               "None",               "None")
-call <SID>highlight("LineNr",       s:bg_dim,             "None",               "None")
+call <SID>highlight("LineNr",       s:bg_dim,             s:fg_alt,             "None")
 call <SID>highlight("SignColumn",   "None",               "None",               "None")
 call <SID>highlight("StatusLine",   s:bg_active,          "None",               "None")
 call <SID>highlight("StatusLineNC", s:bg_inactive,        "None",               "None")
