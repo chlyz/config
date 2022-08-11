@@ -46,6 +46,12 @@ augroup highlight_yank
     autocmd!
     au TextYankPost * silent! lua vim.highlight.on_yank{higroup="IncSearch", timeout=100}
 augroup END
+
+let g:gutentags_ctags_exclude = [
+      \ '*bazel-*', '.git', 'Build', '.ccls-cache', 'MDF4', 'HDF5',
+      \ 'Compiler', 'sqlite3.*', 'Rte_*.*', 'VehicleModel', 'ProtoBuf',
+      \ 'Protobuf', '*.cs'
+            \]
 ]],
 true)
 
