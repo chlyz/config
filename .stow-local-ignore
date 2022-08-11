@@ -1,0 +1,10 @@
+\.git
+\.gitignore
+tags
+tags\.lock
+tags\.temp
+^/nira-install
+^/modus-theme-colors.md
+^/LICENSE
+current-theme.conf
+^/.*\.bak
