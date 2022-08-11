@@ -5,8 +5,8 @@ require("lyzell.init")
 vim.api.nvim_exec(
 [[
 function CheckColors()
-  if filereadable(expand("~/.background"))
-    for line in readfile(expand("~/.background"), '', 1)
+  if filereadable(expand("~/.local/share/.background"))
+    for line in readfile(expand("~/.local/share/.background"), '', 1)
       if line =~ "light"
         colorscheme modus-operandi
       else
