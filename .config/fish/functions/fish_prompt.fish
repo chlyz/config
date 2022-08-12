@@ -10,6 +10,6 @@ function fish_prompt
     set_color cyan
     printf '%s ' (__fish_git_prompt)
     set_color red
-    echo -n '> '
+    echo -n '> '
     set_color normal
 end
