@@ -195,82 +195,94 @@ bindkey '^Z' fg-bg
 LOCAL_CONFIG="$HOME/config/.config"
 color_file="$XDG_DATA_HOME/.background"
 kitty_theme="$XDG_CONFIG_HOME/kitty/current-theme.conf"
+alacritty_config="$XDG_CONFIG_HOME/alacritty"
+alacritty_theme="$alacritty_config/current-theme.yml"
 
 function fzf_default() {
-    read -r background < "$color_file"
-    if [ $background = dark ]; then
-        # set_dark_theme
-        local fg_main='#ffffff'
-        local bg_main='#000000'
-        local bg_alt='#191a1b'
-        local red='#ff8059'
-        local green='#44bc44'
-        local magenta='#feacd0'
-
-        export FZF_DEFAULT_OPTS="--color=bg+:$bg_alt,bg:$bg_main,spinner:$red,hl:$blue --color=fg:$fg_main,header:$green,info:$cyan,pointer:$magenta --color=marker:$green,fg+:$fg_main,prompt:$cyan,hl+:$red --layout=reverse --exact"
-    else
-        # set_light_theme
-        local fg_main='#000000'
-        local bg_main='#ffffff'
-        local bg_alt='#f2eff3'
-        local red='#a60000'
-        local green='#005e00'
-        local magenta='#721045'
-        local cyan='#00538b'
-        local blue='#0031a9'
-        export FZF_DEFAULT_OPTS="--color=bg+:$bg_alt,bg:$bg_main,spinner:$red,hl:$blue --color=fg:$fg_main,header:$green,info:$cyan,pointer:$magenta --color=marker:$green,fg+:$fg_main,prompt:$cyan,hl+:$red --layout=reverse --exact"
-    fi
+  read -r background < "$color_file"
+  if [ $background = dark ]; then
+    # set_dark_theme
+    local fg_main='#ffffff'
+    local bg_main='#000000'
+    local bg_alt='#191a1b'
+    local red='#ff8059'
+    local green='#44bc44'
+    local magenta='#feacd0'
+    export FZF_DEFAULT_OPTS="--color=bg+:$bg_alt,bg:$bg_main,spinner:$red,hl:$blue --color=fg:$fg_main,header:$green,info:$cyan,pointer:$magenta --color=marker:$green,fg+:$fg_main,prompt:$cyan,hl+:$red --layout=reverse --exact"
+  else
+    # set_light_theme
+    local fg_main='#000000'
+    local bg_main='#ffffff'
+    local bg_alt='#f2eff3'
+    local red='#a60000'
+    local green='#005e00'
+    local magenta='#721045'
+    local cyan='#00538b'
+    local blue='#0031a9'
+    export FZF_DEFAULT_OPTS="--color=bg+:$bg_alt,bg:$bg_main,spinner:$red,hl:$blue --color=fg:$fg_main,header:$green,info:$cyan,pointer:$magenta --color=marker:$green,fg+:$fg_main,prompt:$cyan,hl+:$red --layout=reverse --exact"
+  fi
 }
 
 function set_dark_theme() {
-    echo "dark" > "$color_file"
-    unlink "$kitty_theme"
-    ln -s "$LOCAL_CONFIG/kitty/modus-vivendi-theme.conf" "$kitty_theme"
-    cp "$HOME/.config/task/modus-vivendi.theme" \
-        "$HOME/.config/task/current.theme"
-    fzf_default
+  echo "dark" > "$color_file"
+  cp "$alacritty_config/modus-vivendi-theme.yml" "$alacritty_theme"
+  cp "$HOME/.config/task/modus-vivendi.theme" "$HOME/.config/task/current.theme"
+  if [ -n "$TMUX" ]; then
+    tmux set-option -g status-style 'bg=#1e1e1e,fg=#f4f4f4'
+    tmux set-option -g status-left '#[fg=#2fafff,bold]#S § '
+    tmux set-option -g status-right "#[bg=#323232,fg=#f4f4f4,bold,italics] $USER@#h #[bg=#323232,fg=#f4f4f4,bold]%l:%M %p "
+    tmux set-option -w -g window-status-current-style 'bg=#323232,fg=#f4f4f4,bold,italics'
+    tmux set -g pane-active-border-style 'bg=#323232,fg=#f4f4f4,bold'
+    tmux set -g pane-border-style 'bg=#1e1e1e,fg=#f4f4f4'
+    tmux set -g mode-style 'bg=#bcbcbc,fg=#505050'
+  fi
 }
-
 function set_light_theme() {
-    echo "light" > "$color_file"
-    unlink "$kitty_theme"
-    ln -s "$LOCAL_CONFIG/kitty/modus-operandi-theme.conf" "$kitty_theme"
-    cp "$HOME/.config/task/modus-operandi.theme" \
-        "$HOME/.config/task/current.theme"
-    fzf_default
+  echo "light" > "$color_file"
+  cp "$alacritty_config/modus-operandi-theme.yml" "$alacritty_theme"
+  cp "$HOME/.config/task/modus-operandi.theme" "$HOME/.config/task/current.theme"
+  if [ -n "$TMUX" ]; then
+    tmux set-option -g status-style 'bg=#efefef,fg=#404148'
+    tmux set-option -g status-left '#[fg=#2544bb,bold]#S § '
+    tmux set-option -g status-right "#[bg=#d7d7d7,fg=#0a0a0a,bold,italics] $USER@#h #[bg=#d7d7d7,fg=#0a0a0a,bold]%l:%M %p "
+    tmux set-option -w -g window-status-current-style 'bg=#d7d7d7,fg=#0a0a0a,bold,italics' # active
+    tmux set -g pane-active-border-style 'bg=#d7d7d7,fg=#0a0a0a,bold'
+    tmux set -g pane-border-style 'bg=#efefef,fg=#404148'
+    tmux set -g mode-style 'bg=#bcbcbc,fg=#505050'
+  fi
 }
 
 function toggle_theme() {
-    if [ ! -f $color_file ]; then
-        set_light_theme
+  if [ ! -f $color_file ]; then
+    set_light_theme
+  else
+    read -r background < "$color_file"
+    if [ $background = light ]; then
+      set_dark_theme
     else
-        read -r background < "$color_file"
-        if [ $background = light ]; then
-            set_dark_theme
-        else
-            set_light_theme
-        fi
-        source "$XDG_CONFIG_HOME/zsh/.zshrc"
+      set_light_theme
     fi
+    source $ZDOTDIR/.zshrc
+  fi
 }
 bindkey -s '^[t' 'toggle_theme\n'
 
 if [ ! -f $color_file ]; then
-    set_light_theme
+  set_light_theme
 else
-    read -r background < "$color_file"
-    if [ $background = light ]; then
-        set_light_theme
-    else
-        set_dark_theme
-    fi
+  read -r background < "$color_file"
+  if [ $background = light ]; then
+    set_light_theme
+  else
+    set_dark_theme
+  fi
 fi
 
 # }}}
 
 # --- Sources -- {{{
 
-source $XDG_CONFIG_HOME/zsh/aliases
+source $ZDOTDIR/aliases
 
 # }}}
 
