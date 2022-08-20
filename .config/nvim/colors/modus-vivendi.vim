@@ -8,6 +8,7 @@ let g:colors_name="Modus Vivendi"
 let s:bg_main           = "#000000"
 let s:bg_dim            = "#100f10"
 let s:bg_alt            = "#191a1b"
+let s:bg_active_accent  = "#2a2a66"
 
 let s:fg_main           = "#ffffff"
 let s:fg_dim            = "#e0e6f0"
@@ -104,7 +105,7 @@ call <SID>highlight("Underlined",   "None",               "None",               
 call <SID>highlight("Visual",       s:bg_region,          s:fg_main,            "None")
 call <SID>highlight("VisualNOS",    "None",               "None",               "None")
 call <SID>highlight("WarningMsg",   "None",               "None",               "None")
-call <SID>highlight("WildMenu",     "None",               "None",               "None")
+call <SID>highlight("WildMenu",     "None",               s:magenta_alt,        "None")
 call <SID>highlight("WinBar",       s:bg_dim,             s:fg_dim,             "None")
 call <SID>highlight("Title",        "None",               "None",               "None")
 call <SID>highlight("Conceal",      "None",               "None",               "None")
@@ -120,8 +121,8 @@ call <SID>highlight("CursorColumn", "None",               "None",               
 call <SID>highlight("CursorLine",   s:bg_hl_line,         "None",               "None")
 call <SID>highlight("CursorLineNr", s:bg_active,          "None",               "bold")
 call <SID>highlight("QuickFixLine", "None",               "None",               "None")
-call <SID>highlight("PMenu",        "None",               "None",               "None")
-call <SID>highlight("PMenuSel",     "None",               "None",               "None")
+call <SID>highlight("PMenu",        s:bg_alt,             "None",               "None")
+call <SID>highlight("PMenuSel",     s:bg_active,          "None",               "bold")
 call <SID>highlight("TabLine",      "None",               "None",               "None")
 call <SID>highlight("TabLineFill",  "None",               "None",               "None")
 call <SID>highlight("TabLineSel",   "None",               "None",               "None")
@@ -154,6 +155,18 @@ call <SID>highlight("Tag",          "None",               "None",               
 call <SID>highlight("Todo",         "None",               "None",               "None")
 call <SID>highlight("Type",         "None",               s:cyan,               "None")
 call <SID>highlight("Typedef",      "None",               "None",               "None")
+
+" Completion
+
+" CmpItemAbbr: Highlight group for unmatched characters of each completion field.
+" CmpItemAbbrDeprecated: Highlight group for unmatched characters of each deprecated completion field.
+" CmpItemAbbrMatch: Highlight group for matched characters of each completion field. Matched characters must form a substring of a field which share a starting position.
+" CmpItemAbbrMatchFuzzy: Highlight group for fuzzy-matched characters of each completion field. 
+" CmpItemKind: Highlight group for the kind of the field.
+" CmpItemMenu: The menu field's highlight group.
+call <SID>highlight("CmpItemAbbr",               "None",               s:fg_main,            "None")
+call <SID>highlight("CmpItemAbbrMatch",          "None",               s:magenta_alt,        "None")
+call <SID>highlight("CmpItemAbbrMatchFuzzy",     "None",               s:magenta_alt,        "None")
 
 " Matlab highlighting
 " TODO(chlyz): Improve highlight for `...`
@@ -322,6 +335,9 @@ highlight link netrwDir Directory
 
 call <SID>highlight("TelescopeSelection",   s:bg_hl_line,     "None",         "bold")
 call <SID>highlight("TelescopeMatching",    "None",           s:magenta_alt,  "bold")
+
+call <SID>highlight("TextYankPost", s:bg_active_accent, "None", "None")
+
 
 " Remove functions
 
