@@ -23,6 +23,7 @@ let s:red               = "#ff8059"
 let s:red_alt_other     = "#ff9077"
 let s:green             = "#44bc44"
 let s:yellow            = "#d0bc00"
+let s:yellow_intense_bg = "#874900"
 let s:blue              = "#2fafff"
 let s:blue_alt          = "#79a8ff"
 let s:blue_alt_other    = "#00bcff"
@@ -32,11 +33,7 @@ let s:magenta_alt_other = "#b6a0ff"
 let s:magenta_faint     = "#e0b2d6"
 let s:cyan              = "#00d3d0"
 let s:cyan_alt_other    = "#6ae4b9"
-
-" These are not in the proper theme but emacs applies them somewhere.
-" TODO(chlyz): Check this.
-let s:bg_search    = "#004065"
-let s:bg_incsearch = "#ee6a50"
+let s:cyan_subtle_bg    = "#00415e"
 
 let s:bg_diff_heading               = "#304466"
 let s:fg_diff_heading               = "#dae7ff"
@@ -90,14 +87,14 @@ call <SID>highlight("ErrorMsg",     "None",               "None",               
 call <SID>highlight("Exception",    "None",               "None",               "None")
 call <SID>highlight("FoldColumn",   "None",               "None",               "None")
 call <SID>highlight("Folded",       "None",               "None",               "None")
-call <SID>highlight("IncSearch",    s:bg_incsearch,       s:bg_main,            "bold")
+call <SID>highlight("IncSearch",    s:yellow_intense_bg,  s:fg_dim,             "None")
 call <SID>highlight("Italic",       "None",               "None",               "italic")
 call <SID>highlight("Macro",        "None",               "None",               "None")
 call <SID>highlight("MatchParen",   s:bg_paren_match,     "None",               "None")
 call <SID>highlight("ModeMsg",      "None",               "None",               "None")
 call <SID>highlight("MoreMsg",      "None",               "None",               "None")
 call <SID>highlight("Question",     "None",               "None",               "None")
-call <SID>highlight("Search",       s:bg_search,          s:fg_dim,             "None")
+call <SID>highlight("Search",       s:cyan_subtle_bg,     s:fg_main,            "None")
 call <SID>highlight("Substitute",   "None",               "None",               "None")
 call <SID>highlight("SpecialKey",   "None",               "None",               "None")
 call <SID>highlight("TooLong",      "None",               "None",               "None")
@@ -350,7 +347,6 @@ unlet s:bg_hl_line
 unlet s:bg_active s:bg_inactive
 unlet s:bg_region
 unlet s:bg_paren_match
-unlet s:bg_search s:bg_incsearch
 unlet s:red
 unlet s:cyan s:cyan_alt_other
 unlet s:green

@@ -24,11 +24,10 @@ let s:red                    = "#a60000"
 let s:green                  = "#005e00"
 let s:yellow                 = "#813e00"
 let s:yellow_intense_bg      = "#f5df23"
+let s:yellow_subtle_bg       = "#e4c340"
 let s:red_intense_bg         = "#ff9f9f"
 let s:green_subtle_bg        = "#aecf90"
 let s:green_intense_bg       = "#5ada88"
-let s:yellow_subtle_bg       = "#e4c340"
-let s:yellow_intense_bg      = "#f5df23"
 let s:blue_subtle_bg         = "#b5d0ff"
 let s:blue_intense_bg        = "#77baff"
 let s:magenta_subtle_bg      = "#f0d3ff"
@@ -55,10 +54,6 @@ let s:bg_diff_changed        = "#fcefcf"
 let s:fg_diff_changed        = "#524200"
 let s:bg_diff_removed        = "#ffe8ef"
 let s:fg_diff_removed        = "#691616"
-
-" These are not in the proper theme but emacs applies them somewhere.
-let s:bg_search              = "#5f9ea0"
-let s:bg_incsearch           = "#ee6a50"
 
 function! g:ModusHighlight(group, guibg, guifg, gui)
   exec "highlight " . a:group . " guibg=" . a:guibg . " guifg=" . a:guifg . " gui=" . a:gui
@@ -101,51 +96,51 @@ call <SID>highlight("fugitiveUntrackedSection",  "None", "None",    "None")
 call <SID>highlight("fugitiveSymbolicRef",       "None", s:blue,    "None")
 
 " Vim editor colors
-call <SID>highlight("Normal",       s:bg_main,        s:fg_main,   "None")
-call <SID>highlight("Bold",         "None",           "None",      "bold")
-call <SID>highlight("Debug",        "None",           "None",      "None")
-call <SID>highlight("Directory",    "None",           s:blue,      "bold")
-call <SID>highlight("Error",        "None",           "None",      "None")
-call <SID>highlight("ErrorMsg",     "None",           "None",      "None")
-call <SID>highlight("Exception",    "None",           "None",      "None")
-call <SID>highlight("FoldColumn",   "None",           "None",      "None")
-call <SID>highlight("Folded",       "None",           "None",      "None")
-call <SID>highlight("IncSearch",    s:red_intense_bg, "None",      "None")
-call <SID>highlight("Italic",       "None",           "None",      "italic")
-call <SID>highlight("Macro",        "None",           "None",      "None")
-call <SID>highlight("MatchParen",   s:bg_paren_match, "None",      "None")
-call <SID>highlight("ModeMsg",      "None",           "None",      "None")
-call <SID>highlight("MoreMsg",      "None",           "None",      "None")
-call <SID>highlight("Question",     "None",           "None",      "None")
-call <SID>highlight("Search",      s:blue_intense_bg, "None",      "None")
-call <SID>highlight("Substitute",   "None",           "None",      "None")
-call <SID>highlight("SpecialKey",   "None",           "None",      "None")
-call <SID>highlight("TooLong",      "None",           "None",      "None")
-call <SID>highlight("Underlined",   "None",           "None",      "None")
-call <SID>highlight("Visual",       s:bg_region,      s:fg_main,   "None")
-call <SID>highlight("VisualNOS",    "None",           "None",      "None")
-call <SID>highlight("WarningMsg",   "None",           "None",      "None")
-call <SID>highlight("WildMenu",     "None",           "None",      "None")
-call <SID>highlight("WinBar",       s:bg_dim,         s:fg_dim,    "None")
-call <SID>highlight("Title",        "None",           "None",      "None")
-call <SID>highlight("Conceal",      "None",           "None",      "None")
-call <SID>highlight("Cursor",       "None",           "None",      "None")
-call <SID>highlight("NonText",      "None",           "None",      "None")
-call <SID>highlight("LineNr",       s:bg_dim,         "None",      "None")
-call <SID>highlight("SignColumn",   "None",           "None",      "None")
-call <SID>highlight("StatusLine",   s:bg_active,      "None",      "None")
-call <SID>highlight("StatusLineNC", s:bg_inactive,    "None",      "None")
-call <SID>highlight("VertSplit",    "None",           "None",      "None")
-call <SID>highlight("ColorColumn",  "None",           "None",      "None")
-call <SID>highlight("CursorColumn", "None",           "None",      "None")
-call <SID>highlight("CursorLine",   s:bg_hl_line,     "None",      "None")
-call <SID>highlight("CursorLineNr", s:bg_active,      "None",      "bold")
-call <SID>highlight("QuickFixLine", "None",           "None",      "None")
-call <sid>highlight("PMenu",        s:bg_alt,         "None",      "None")
-call <SID>highlight("PMenuSel",     s:bg_active,      "None",      "bold")
-call <SID>highlight("TabLine",      "None",           "None",      "None")
-call <SID>highlight("TabLineFill",  "None",           "None",      "None")
-call <SID>highlight("TabLineSel",   "None",           "None",      "None")
+call <SID>highlight("Normal",       s:bg_main,           s:fg_main,   "None")
+call <SID>highlight("Bold",         "None",              "None",      "bold")
+call <SID>highlight("Debug",        "None",              "None",      "None")
+call <SID>highlight("Directory",    "None",              s:blue,      "bold")
+call <SID>highlight("Error",        "None",              "None",      "None")
+call <SID>highlight("ErrorMsg",     "None",              "None",      "None")
+call <SID>highlight("Exception",    "None",              "None",      "None")
+call <SID>highlight("FoldColumn",   "None",              "None",      "None")
+call <SID>highlight("Folded",       "None",              "None",      "None")
+call <SID>highlight("IncSearch",    s:yellow_intense_bg, s:fg_main,   "None")
+call <SID>highlight("Italic",       "None",              "None",      "italic")
+call <SID>highlight("Macro",        "None",              "None",      "None")
+call <SID>highlight("MatchParen",   s:bg_paren_match,    "None",      "None")
+call <SID>highlight("ModeMsg",      "None",              "None",      "None")
+call <SID>highlight("MoreMsg",      "None",              "None",      "None")
+call <SID>highlight("Question",     "None",              "None",      "None")
+call <SID>highlight("Search",       s:cyan_subtle_bg,    s:fg_dim,    "None")
+call <SID>highlight("Substitute",   "None",              "None",      "None")
+call <SID>highlight("SpecialKey",   "None",              "None",      "None")
+call <SID>highlight("TooLong",      "None",              "None",      "None")
+call <SID>highlight("Underlined",   "None",              "None",      "None")
+call <SID>highlight("Visual",       s:bg_region,         s:fg_main,   "None")
+call <SID>highlight("VisualNOS",    "None",              "None",      "None")
+call <SID>highlight("WarningMsg",   "None",              "None",      "None")
+call <SID>highlight("WildMenu",     "None",              "None",      "None")
+call <SID>highlight("WinBar",       s:bg_dim,            s:fg_dim,    "None")
+call <SID>highlight("Title",        "None",              "None",      "None")
+call <SID>highlight("Conceal",      "None",              "None",      "None")
+call <SID>highlight("Cursor",       "None",              "None",      "None")
+call <SID>highlight("NonText",      "None",              "None",      "None")
+call <SID>highlight("LineNr",       s:bg_dim,            "None",      "None")
+call <SID>highlight("SignColumn",   "None",              "None",      "None")
+call <SID>highlight("StatusLine",   s:bg_active,         "None",      "None")
+call <SID>highlight("StatusLineNC", s:bg_inactive,       "None",      "None")
+call <SID>highlight("VertSplit",    "None",              "None",      "None")
+call <SID>highlight("ColorColumn",  "None",              "None",      "None")
+call <SID>highlight("CursorColumn", "None",              "None",      "None")
+call <SID>highlight("CursorLine",   s:bg_hl_line,        "None",      "None")
+call <SID>highlight("CursorLineNr", s:bg_active,         "None",      "bold")
+call <SID>highlight("QuickFixLine", "None",              "None",      "None")
+call <sid>highlight("PMenu",        s:bg_alt,            "None",      "None")
+call <SID>highlight("PMenuSel",     s:bg_active,         "None",      "bold")
+call <SID>highlight("TabLine",      "None",              "None",      "None")
+call <SID>highlight("TabLineFill",  "None",              "None",      "None")
+call <SID>highlight("TabLineSel",   "None",              "None",      "None")
 
 " Standard syntax highlighting
 call <SID>highlight("Boolean",      "None",  "None",               "None")
@@ -209,7 +204,7 @@ call <SID>highlight("TextYankPost", s:bg_active_accent, "None", "None")
 
 " Remove variables
 unlet s:bg_main s:fg_main s:bg_dim s:fg_dim s:bg_alt s:fg_alt s:bg_hl_line s:bg_active s:fg_active
-unlet s:bg_inactive s:fg_inactive s:bg_region s:bg_paren_match s:bg_search s:bg_incsearch
+unlet s:bg_inactive s:fg_inactive s:bg_region s:bg_paren_match
 unlet s:red s:cyan s:cyan_alt_other s:green s:blue s:blue_alt s:blue_alt_other s:yellow s:yellow_intense_bg s:magenta s:magenta_alt s:magenta_alt_other s:magenta_faint
 unlet s:bg_diff_heading s:fg_diff_heading s:bg_diff_added s:fg_diff_added s:bg_diff_added_deuteran s:fg_diff_added_deuteran
 unlet s:bg_diff_changed s:fg_diff_changed s:bg_diff_removed s:fg_diff_removed
