@@ -52,6 +52,8 @@ let g:gutentags_ctags_exclude = [
       \ 'Compiler', 'sqlite3.*', 'Rte_*.*', 'VehicleModel', 'ProtoBuf',
       \ 'Protobuf', '*.cs'
             \]
+
+let g:CommandTPreferredImplementation='lua'
 ]],
 true)
 
