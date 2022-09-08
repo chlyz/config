@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+XMONAD_VERSION="v0.17.1"
+XMONAD_DIR="$HOME/.config/xmonad"
+
+# Helper Functions {{{
+install_package() {
+    local is_installed=$(echo "$INSTALLED_PACKAGES" | grep -P "^$1\$")
+    if [ -z $is_installed ]; then
+        printf "%s" "Installing $1 ..."
+        sudo apt-get -qq install --yes "$1" > /dev/null
+        printf "\n"
+    fi
+}
+
+update_haskell_stack () {
+    printf "%s" "Updating Haskell stack ..."
+    stack --verbosity silent update
+    printf "\n"
+}
+# }}}
+
+# Install necessary packages.
+INSTALLED_PACKAGES=$(apt list --installed 2> /dev/null \
+    | awk 'BEGIN { FS = "/" } ; { print $1 }')
+install_package libx11-dev
+install_package libxft-dev
+install_package libxinerama-dev
+install_package libxrandr-dev
+install_package libxss-dev
+install_package cabal-install
+
+# Update the Haskell stack.
+# update_haskell_stack
+
+# Clone the XMonad repositories.
+if [ ! -d $XMONAD_DIR ]; then
+    mkdir -p "$XMONAD_DIR"
+fi
+
+if [ ! -d $XMONAD_DIR/xmonad ]; then
+    git clone --branch "$XMONAD_VERSION" \
+        https://github.com/xmonad/xmonad "$XMONAD_DIR/xmonad"
+fi
+if [ ! -d $XMONAD_DIR/xmonad-contrib ]; then
+    git clone --branch "$XMONAD_VERSION" \
+        https://github.com/xmonad/xmonad-contrib "$XMONAD_DIR/xmonad-contrib"
+fi
+
+# Create the project.
+[ -f "$XMONAD_DIR/cabal.project" ] \
+    || echo "packages: */*.cabal" >> "$XMONAD_DIR/cabal.project"
+cabal update
+cabal install --package-env=$XMONAD_DIR --lib xmonad xmonad-contrib
+cabal install --package-env=$XMONAD_DIR xmonad
