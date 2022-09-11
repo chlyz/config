@@ -5,6 +5,10 @@ if exists("syntax_on")
 endif
 let g:colors_name="Modus Vivendi"
 
+if !exists("g:modus_vivendi_italic_constructs")
+    let g:modus_vivendi_italic_constructs = 0
+endif
+
 let s:bg_main           = "#000000"
 let s:bg_dim            = "#100f10"
 let s:bg_alt            = "#191a1b"
@@ -24,6 +28,8 @@ let s:red_alt_other     = "#ff9077"
 let s:green             = "#44bc44"
 let s:yellow            = "#d0bc00"
 let s:yellow_intense_bg = "#874900"
+let s:yellow_refine_bg  = "#693200"
+let s:yellow_refine_fg  = "#e2d980"
 let s:blue              = "#2fafff"
 let s:blue_alt          = "#79a8ff"
 let s:blue_alt_other    = "#00bcff"
@@ -35,14 +41,18 @@ let s:cyan              = "#00d3d0"
 let s:cyan_alt_other    = "#6ae4b9"
 let s:cyan_subtle_bg    = "#00415e"
 
-let s:bg_diff_heading               = "#304466"
-let s:fg_diff_heading               = "#dae7ff"
-let s:bg_diff_added_deuteran        = "#001a3f"
-let s:fg_diff_added_deuteran        = "#c4cdf2"
-let s:bg_diff_changed               = "#2a2000"
-let s:fg_diff_changed               = "#b0ba9f"
-let s:bg_diff_removed               = "#40160f"
-let s:fg_diff_removed               = "#c6adaa"
+let s:bg_diff_heading        = "#304466"
+let s:fg_diff_heading        = "#dae7ff"
+let s:bg_diff_added_deuteran = "#001a3f"
+let s:fg_diff_added_deuteran = "#c4cdf2"
+let s:bg_diff_changed        = "#2a2000"
+let s:fg_diff_changed        = "#b0ba9f"
+let s:bg_diff_removed        = "#40160f"
+let s:fg_diff_removed        = "#c6adaa"
+
+let s:fg_lang_error   = "#ef8690"
+let s:fg_lang_warning = "#b0aa00"
+let s:fg_lang_note    = "#9d9def"
 
 " Modus theme highlighting function
 function! g:ModusHighlight(group, guibg, guifg, gui)
@@ -95,7 +105,7 @@ call <SID>highlight("ModeMsg",      "None",               "None",               
 call <SID>highlight("MoreMsg",      "None",               "None",               "None")
 call <SID>highlight("Question",     "None",               "None",               "None")
 call <SID>highlight("Search",       s:cyan_subtle_bg,     s:fg_main,            "None")
-call <SID>highlight("Substitute",   "None",               "None",               "None")
+call <SID>highlight("Substitute",   s:yellow_refine_bg,   s:yellow_refine_fg,   "None")
 call <SID>highlight("SpecialKey",   "None",               "None",               "None")
 call <SID>highlight("TooLong",      "None",               "None",               "None")
 call <SID>highlight("Underlined",   "None",               "None",               "None")
@@ -149,7 +159,7 @@ call <SID>highlight("StorageClass", "None",               s:magenta_alt_other,  
 call <SID>highlight("String",       "None",               s:blue_alt,           "None")
 call <SID>highlight("Structure",    "None",               "None",               "None")
 call <SID>highlight("Tag",          "None",               "None",               "None")
-call <SID>highlight("Todo",         "None",               "None",               "None")
+call <SID>highlight("Todo",         "None",               s:magenta,          "italic")
 call <SID>highlight("Type",         "None",               s:cyan,               "None")
 call <SID>highlight("Typedef",      "None",               "None",               "None")
 
@@ -166,7 +176,7 @@ call <SID>highlight("CmpItemAbbrMatch",          "None",               s:magenta
 call <SID>highlight("CmpItemAbbrMatchFuzzy",     "None",               s:magenta_alt,        "None")
 
 " Matlab highlighting
-" TODO(chlyz): Improve highlight for `...`
+" TODO: Improve highlight for `...`
 
 " Tree sitter highlighting
 call <SID>highlight("TSConstant",        "None", s:blue,              "None")
@@ -176,9 +186,10 @@ call <SID>highlight("TSInclude",         "None", s:red_alt_other,     "bold")
 call <SID>highlight("TSKeyword",         "None", s:red_alt_other,     "bold")
 call <SID>highlight("TSKeywordFunction", "None", s:magenta_alt_other, "None")
 call <SID>highlight("TSKeywordOperator", "None", s:magenta_alt_other, "None")
-call <SID>highlight("TSNote",            "None", s:cyan,              "None")
 call <SID>highlight("TSNumber",          "None", s:blue,              "None")
-call <SID>highlight("TSWarning",         "None", s:yellow,            "None")
+call <SID>highlight("TSWarning",         "None", s:fg_lang_warning,   "None")
+call <SID>highlight("TSDanger",          "None", s:fg_lang_error,     "None")
+call <SID>highlight("TSNote",            "None", s:fg_lang_note,      "None")
 call <SID>highlight("TSType",            "None", s:cyan_alt_other,    "None")
 call <SID>highlight("TSVariable",        "None", s:cyan,              "None")
 call <SID>highlight("TSVariableBuiltin", "None", s:cyan,              "None")

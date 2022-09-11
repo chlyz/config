@@ -25,6 +25,8 @@ let s:green                  = "#005e00"
 let s:yellow                 = "#813e00"
 let s:yellow_intense_bg      = "#f5df23"
 let s:yellow_subtle_bg       = "#e4c340"
+let s:yellow_refine_bg       = "#fff29a"
+let s:yellow_refine_fg       = "#604000"
 let s:red_intense_bg         = "#ff9f9f"
 let s:green_subtle_bg        = "#aecf90"
 let s:green_intense_bg       = "#5ada88"
@@ -54,6 +56,10 @@ let s:bg_diff_changed        = "#fcefcf"
 let s:fg_diff_changed        = "#524200"
 let s:bg_diff_removed        = "#ffe8ef"
 let s:fg_diff_removed        = "#691616"
+
+let s:fg_lang_error   = "#9f004f"
+let s:fg_lang_warning = "#604f0f"
+let s:fg_lang_note    = "#4040ae"
 
 function! g:ModusHighlight(group, guibg, guifg, gui)
   exec "highlight " . a:group . " guibg=" . a:guibg . " guifg=" . a:guifg . " gui=" . a:gui
@@ -113,7 +119,7 @@ call <SID>highlight("ModeMsg",      "None",              "None",      "None")
 call <SID>highlight("MoreMsg",      "None",              "None",      "None")
 call <SID>highlight("Question",     "None",              "None",      "None")
 call <SID>highlight("Search",       s:cyan_subtle_bg,    s:fg_dim,    "None")
-call <SID>highlight("Substitute",   "None",              "None",      "None")
+call <SID>highlight("Substitute",   s:yellow_refine_bg,  s:yellow_refine_fg,    "None")
 call <SID>highlight("SpecialKey",   "None",              "None",      "None")
 call <SID>highlight("TooLong",      "None",              "None",      "None")
 call <SID>highlight("Underlined",   "None",              "None",      "None")
@@ -136,7 +142,7 @@ call <SID>highlight("CursorColumn", "None",              "None",      "None")
 call <SID>highlight("CursorLine",   s:bg_hl_line,        "None",      "None")
 call <SID>highlight("CursorLineNr", s:bg_active,         "None",      "bold")
 call <SID>highlight("QuickFixLine", "None",              "None",      "None")
-call <sid>highlight("PMenu",        s:bg_alt,            "None",      "None")
+call <SID>highlight("PMenu",        s:bg_alt,            "None",      "None")
 call <SID>highlight("PMenuSel",     s:bg_active,         "None",      "bold")
 call <SID>highlight("TabLine",      "None",              "None",      "None")
 call <SID>highlight("TabLineFill",  "None",              "None",      "None")
@@ -150,7 +156,7 @@ call <SID>highlight("Conditional",  "None",  s:magenta_alt_other,  "None")
 call <SID>highlight("Constant",     "None",  "None",               "None")
 call <SID>highlight("Define",       "None",  "None",               "None")
 call <SID>highlight("Delimiter",    "None",  "None",               "None")
-call <SID>highlight("Float", "       None",  "None",               "None")
+call <SID>highlight("Float",        "None",  "None",               "None")
 call <SID>highlight("Function",     "None",  s:magenta_alt_other,  "None")
 call <SID>highlight("Identifier",   "None",  "None",               "None")
 call <SID>highlight("Include",      "None",  s:red,                "None")
@@ -168,6 +174,7 @@ call <SID>highlight("String",       "None",  s:blue_alt,           "None")
 call <SID>highlight("Structure",    "None",  "None",               "None")
 call <SID>highlight("Tag",          "None",  "None",               "None")
 call <SID>highlight("Todo",         "None",  s:yellow,             "bold")
+" call <SID>highlight("Todo",         "None",               s:red_alt_other,      "italic")
 call <SID>highlight("Type",         "None",  s:cyan,               "None")
 call <SID>highlight("Typedef",      "None",  "None",               "None")
 
@@ -178,9 +185,10 @@ call <SID>highlight("TSFuncMacro",       "None", s:red,               "None")
 call <SID>highlight("TSInclude",         "None", s:red,               "None")
 call <SID>highlight("TSKeyword",         "None", s:magenta_alt_other, "None")
 call <SID>highlight("TSKeywordFunction", "None", s:magenta_alt_other, "None")
-call <SID>highlight("TSNote",            "None", s:cyan,              "None")
 call <SID>highlight("TSNumber",          "None", s:blue,              "None")
-call <SID>highlight("TSWarning",         "None", s:yellow,            "None")
+call <SID>highlight("TSWarning",         "None", s:fg_lang_warning,   "None")
+call <SID>highlight("TSDanger",          "None", s:fg_lang_error,     "None")
+call <SID>highlight("TSNote",            "None", s:fg_lang_note,      "None")
 call <SID>highlight("TSType",            "None", s:cyan,              "None")
 call <SID>highlight("TSVariable",        "None", s:cyan,              "None")
 call <SID>highlight("TSVariableBuiltin", "None", s:cyan,              "None")
