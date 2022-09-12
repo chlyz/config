@@ -1,7 +1,7 @@
 require('Comment').setup({
     ---Add a space b/w comment and the line
     ---@type boolean|fun():boolean
-    padding = true,
+--[[   ]]   padding = true,
 
     ---Whether the cursor should stay at its position
     ---NOTE: This only affects NORMAL mode mappings and doesn't work with dot-repeat
@@ -12,7 +12,7 @@ require('Comment').setup({
     ---Could be a regex string or a function that returns a regex string.
     ---Example: Use '^$' to ignore empty lines
     ---@type string|fun():string
-    ignore = nil,
+    ignore = '^$',
 
     ---LHS of toggle mappings in NORMAL + VISUAL mode
     ---@type table

@@ -4,6 +4,11 @@ require("lyzell.init")
 -- TODO: Rewrite in lua.
 vim.api.nvim_exec(
 [[
+
+let g:surround_no_insert_mappings = 1
+
+let g:modus_vivendi_italic_constructs = 1
+
 function CheckColors()
   if filereadable(expand("~/.local/share/.background"))
     for line in readfile(expand("~/.local/share/.background"), '', 1)
@@ -24,7 +29,7 @@ endfunction
 
 call CheckColors()
 
-autocmd FocusGained * call CheckColors()
+" autocmd FocusGained * call CheckColors()
 
 " Put these in an autocmd group, so that you can revert them with:
 " ":augroup vimStartup | exe 'au!' | augroup END"
@@ -44,7 +49,7 @@ augroup END
 
 augroup highlight_yank
     autocmd!
-    au TextYankPost * silent! lua vim.highlight.on_yank{higroup="IncSearch", timeout=100}
+    au TextYankPost * silent! lua vim.highlight.on_yank{higroup="TextYankPost", timeout=200}
 augroup END
 
 let g:gutentags_ctags_exclude = [
@@ -58,21 +63,21 @@ let g:CommandTPreferredImplementation='lua'
 true)
 
 vim.cmd("abbrev td TODO:")
-
+vim.cmd("abbrev tm TODO(chlyz):")
 
 -- You dont need to set any of these options. These are the default ones. Only
 -- the loading is important
-require('telescope').setup {
-  extensions = {
-    fzf = {
-      fuzzy = true,                    -- false will only do exact matching
-      override_generic_sorter = true,  -- override the generic sorter
-      override_file_sorter = true,     -- override the file sorter
-      case_mode = "smart_case",        -- or "ignore_case" or "respect_case"
-                                       -- the default case_mode is "smart_case"
-    }
-  }
-}
+-- require('telescope').setup {
+--   extensions = {
+--     fzf = {
+--       fuzzy = true,                    -- false will only do exact matching
+--       override_generic_sorter = true,  -- override the generic sorter
+--       override_file_sorter = true,     -- override the file sorter
+--       case_mode = "smart_case",        -- or "ignore_case" or "respect_case"
+--                                        -- the default case_mode is "smart_case"
+--     }
+--   }
+-- }
 -- To get fzf loaded and working with telescope, you need to call
 -- load_extension, somewhere after setup function:
-require('telescope').load_extension('fzf')
+-- require('telescope').load_extension('fzf')

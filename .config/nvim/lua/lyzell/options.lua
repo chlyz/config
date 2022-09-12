@@ -12,10 +12,14 @@ vim.o.termguicolors = true
 vim.o.cursorline = true
 -- set guicursor=n-c-v:blinkwait300-blinkon200-blinkoff150,i-ci-ve:blinkon1-ver25,r-cr-o:hor20-blinkon1
 -- set wildignore+=*.o,*.rej,*.so
+vim.o.wildignorecase = true
 vim.o.wildmode='longest:full,full'
 vim.o.emoji = false
 vim.opt.completeopt = { "menu", "menuone", "noselect" }
 vim.opt.shortmess:append "c"
+vim.opt.inccommand = 'split'
+vim.opt.textwidth = 100
+-- vim.opt.hidden = false
 
 -- vim.opt.linebreak = true                              -- wrap long lines at characters in 'breakat'
 
@@ -28,7 +32,7 @@ vim.opt.fillchars = {
   vert            = '┃',                              -- BOX DRAWINGS HEAVY VERTICAL (U+2503, UTF-8: E2 94 83)
 }
 
-vim.opt.list           = true
+vim.opt.list           = false
 vim.opt.listchars      = {
   eol                  = '↲',
   nbsp                 = '␣',

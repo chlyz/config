@@ -125,14 +125,16 @@ require("telescope").setup {
   --
   extensions = {
     fzy_native = {
+      fuzzy = false,
       override_generic_sorter = true,
       override_file_sorter = true,
+      case_mode = "smart_case",
     },
-
-    fzf_writer = {
-      use_highlighter = false,
-      minimum_grep_characters = 6,
-    },
+    --
+    -- fzf_writer = {
+    --   use_highlighter = false,
+    --   minimum_grep_characters = 6,
+    -- },
   --
   --   hop = {
   --     -- keys define your hop keys in order; defaults to roughly lower- and uppercased home row

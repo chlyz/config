@@ -9,6 +9,7 @@ return require('packer').startup(function()
         'nvim-treesitter/nvim-treesitter',
         run = ':TSUpdate'
     }
+    use 'nvim-treesitter/playground'
 
     use 'tpope/vim-dispatch'
     use 'tpope/vim-eunuch'
@@ -18,6 +19,8 @@ return require('packer').startup(function()
     use 'tpope/vim-unimpaired'
     use 'tpope/vim-vinegar'
 
+    use "TimUntersberger/neogit"
+
     -- Completion packages.
     -- use 'hrsh7th/cmp-nvim-lsp'
     use 'hrsh7th/cmp-buffer'
@@ -25,6 +28,18 @@ return require('packer').startup(function()
     use 'hrsh7th/cmp-cmdline'
     use 'hrsh7th/nvim-cmp'
     -- use 'quangnguyen30192/cmp-nvim-tags'
+
+    use 'nvim-lualine/lualine.nvim'
+
+    use 'wincent/loupe'
+
+    use 'dag/vim-fish'
+
+    use 'junegunn/fzf'
+    use 'junegunn/fzf.vim'
+
+    -- use 'ibhagwan/fzf-lua'
+    use 'wincent/command-t'
 
     use {
         'nvim-telescope/telescope.nvim',
@@ -35,14 +50,23 @@ return require('packer').startup(function()
         'nvim-telescope/telescope-fzf-native.nvim',
         run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build'
     }
-
-    -- use 'numToStr/Comment.nvim'
     use {
-        'numToStr/Comment.nvim',
+        "nvim-telescope/telescope-frecency.nvim",
         config = function()
-            require('Comment').setup()
-        end
+            require"telescope".load_extension("frecency")
+        end,
+        requires = {"tami5/sqlite.lua"}
     }
+    use { "tami5/sql.nvim", rocks = { "sqlite", "luv" } }
+
+    use {
+      "antoinemadec/FixCursorHold.nvim",
+      run = function()
+        vim.g.curshold_updatime = 1000
+      end,
+    }
+
+    use 'numToStr/Comment.nvim'
 
     use 'folke/tokyonight.nvim'
 
