@@ -15,7 +15,7 @@ function CheckColors()
       if line =~ "light"
         colorscheme modus-operandi
       else
-        colorscheme modus-vivendi
+        colorscheme tokyo-vivendi
       endif
     endfor
   endif
