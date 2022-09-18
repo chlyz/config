@@ -1,0 +1,35 @@
+# Modus Operandi
+colors:
+  # Default colors
+  primary:
+    background: '#ffffff'
+    foreground: '#000000'
+    dim_foreground: '#282828'
+    bright_foreground: '#505050' # fg-alt
+  normal:
+    black:   '#000000'
+    red:     '#a60000'
+    green:   '#005e00'
+    yellow:  '#813e00'
+    blue:    '#0031a9'
+    magenta: '#721045'
+    cyan:    '#00538b'
+    white:   '#ffffff'
+  bright:
+    black:   '#505050'
+    red:     '#ff9f9f' # intense
+    green:   '#315b00'
+    yellow:  '#70480f'
+    blue:    '#2544bb'
+    magenta: '#8f0075'
+    cyan:    '#30517f'
+    white:   '#505050'
+  #dim:
+  #  black:   '#f8f8f8'
+  #  red:     '#7f1010'
+  #  green:   '#104410'
+  #  yellow:  '#5f4400'
+  #  blue:    '#003497'
+  #  magenta: '#75617b'
+  #  cyan:    '#5b7d78'
+  #  white:   '#282828'
