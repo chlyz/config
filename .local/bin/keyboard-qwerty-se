@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-killall xcape 2&> /dev/null
-setxkbmap -layout se -option -option shift:both_capslock

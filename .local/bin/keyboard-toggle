@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
-layout=`setxkbmap -query | grep layout | awk '{print $2}'`
+variant=`setxkbmap -query | grep variant | awk '{print $2}'`
 
-if [ $layout = us ]; then
-    keyboard-qwerty-se
+if [ $variant = lyzell ]; then
+    setxkbmap -layout se -option -option shift:both_capslock
 else
-    keyboard-dvorak-us
+    setxkbmap -layout us -variant lyzell \
+        -option ctrl:nocaps -option shift:both_capslock \
+        -option altwin:prtsc_rwin -option altwin:menu_win
 fi

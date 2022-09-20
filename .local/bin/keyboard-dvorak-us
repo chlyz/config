@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-setxkbmap -layout us -variant lyzell \
-    -option ctrl:nocaps -option shift:both_capslock \
-    -option altwin:prtsc_rwin -option altwin:menu_win
