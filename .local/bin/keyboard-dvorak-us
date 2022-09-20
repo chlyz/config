@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-killall xcape 2&> /dev/null
-setxkbmap -layout us -variant rpd -option ctrl:nocaps -option shift:both_capslock
-xcape -e 'Control_L=Escape'
+setxkbmap -layout us -variant lyzell \
+    -option ctrl:nocaps -option shift:both_capslock \
+    -option altwin:prtsc_rwin -option altwin:menu_win

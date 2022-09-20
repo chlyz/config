@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# Build the mac2linux software.
+cmake -B build
+cmake --build build/
+sudo cmake --install build/
+
+# Copy the yaml-files.
+sudo mkdir -p /etc/interception
+sudo cp dual-function-keys.yaml /etc/interception/
+sudo cp udevmon.yaml /etc/interception/

@@ -1,0 +1,6 @@
+# <%= variables.figManaged %>
+
+- JOB: "intercept -g $DEVNODE | mac2linux | dual-function-keys -c /etc/interception/dual-function-keys.yaml | uinput -d $DEVNODE"
+  DEVICE:
+    EVENTS:
+      EV_KEY: [KEY_X, KEY_Y]
