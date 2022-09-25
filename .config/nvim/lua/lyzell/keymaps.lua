@@ -30,14 +30,6 @@ vim.keymap.set('n', 'L', '$')
 vim.keymap.set('v', 'L', '$')
 vim.keymap.set('n', 'yL', 'y$')
 
--- Replace awkward matching parenthesis.
--- vim.keymap.set('n', '<C-M>', 'M')
--- vim.keymap.set('n', 'M', '%')
--- vim.keymap.set('v', 'M', '%')
--- vim.keymap.set('n', 'yM', 'y%')
--- vim.keymap.set('n', 'cM', 'c%')
--- vim.keymap.set('n', 'dM', 'd%')
-
 -- Copy and pasting from the system clipboard.
 vim.keymap.set('n', 'gp', '"+pv`]=`>')
 vim.keymap.set('n', 'gP', '"+Pv`]=`>')
@@ -49,6 +41,10 @@ vim.keymap.set('v', 'gy', '"+y')
 -- Fugitive bindings.
 vim.keymap.set('n', 'gs', function () vim.cmd("G") end)
 vim.keymap.set('n', 'gl', function () vim.cmd("Git log") end)
+vim.keymap.set('n', 'gt', function ()
+    vim.cmd('silent Ggrep! TODO(chlyz)')
+    vim.cmd('copen')
+end)
 vim.keymap.set('n', '<C-G>s', function () vim.cmd("G") end)
 vim.keymap.set('n', '<leader>gs', function () vim.cmd("G") end)
 vim.keymap.set('n', '<leader>gb', function () vim.cmd("Git blame") end)
@@ -64,7 +60,7 @@ end)
 vim.keymap.set('n', '<Leader>.', '<Plug>(CommandTGit)', { remap = true })
 vim.keymap.set('n', '<Leader>>', '<Plug>(CommandTRipgrep)', { remap = true })
 vim.keymap.set('n', '<Leader>,', '<Plug>(CommandTBuffer)', { remap = true })
-vim.keymap.set('n', '<leader>;', function () require('telescope.builtin').current_buffer_tags() end)
+vim.keymap.set('n', '<Leader>;', function() vim.cmd("BTags") end)
 vim.keymap.set('n', '<leader>:', function () require('telescope.builtin').command_history() end)
 
 -- Harpoon for fast and "consistent" file access.
