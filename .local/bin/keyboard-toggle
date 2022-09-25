@@ -1,11 +1,27 @@
 #!/usr/bin/env bash
 
+# Check the variant of the current keyboard layout.
 variant=`setxkbmap -query | grep variant | awk '{print $2}'`
 
-if [ $variant = lyzell ]; then
-    setxkbmap -layout se -option -option shift:both_capslock
+# Reset the keyboard layout.
+setxkbmap -option ''
+
+if [ $variant = dvp ]; then
+    # Stop the udevmon service if running.
+    is_udevmon=`systemctl status udevmon.service | grep "active (running)"`
+    if [ ! -z "$is_udevmon" ]; then
+        sudo systemctl stop udevmon.service
+    fi
+    # Change to the swedish layout.
+    setxkbmap -layout se
 else
-    setxkbmap -layout us -variant lyzell \
-        -option ctrl:nocaps -option shift:both_capslock \
-        -option altwin:prtsc_rwin -option altwin:menu_win
+    # Start the udevmon service.
+    sudo systemctl start udevmon.service && sleep 1
+    # Change the layout to the programmers Dvorak layout.
+    setxkbmap -layout us -variant dvp \
+        -option ctrl:nocaps \
+        -option lv3:ralt_switch \
+        -option shift:both_capslock \
+        -option altwin:prtsc_rwin \
+        -option altwin:menu_win
 fi
