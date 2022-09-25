@@ -118,7 +118,15 @@ typedef struct mapping {
 
 const mapping mappings[] = {
     {
-        .from = {.code = DVORAK_D, .modifiers = { .alt = EITHER}},
+        .from = {.code = KEY_CAPSLOCK, .modifiers = { .alt = EITHER }},
+            .to = {.code = KEY_BACKSPACE, .modifiers = { .ctrl = EITHER }},
+    },
+    {
+        .from = {.code = DVORAK_C, .modifiers = { .alt = EITHER }},
+            .to = {.code = KEY_ESC },
+    },
+    {
+        .from = {.code = DVORAK_D, .modifiers = { .alt = EITHER }},
         .to = {.code = KEY_LEFT },
     },
     {
@@ -130,7 +138,7 @@ const mapping mappings[] = {
         .to = {.code = KEY_HOME, .modifiers = { .ctrl = EITHER }},
     },
     {
-        .from = {.code = DVORAK_H, .modifiers = {.alt = EITHER}},
+        .from = {.code = DVORAK_H, .modifiers = {.alt = EITHER }},
         .to = {.code = KEY_DOWN },
     },
     {
@@ -142,7 +150,7 @@ const mapping mappings[] = {
         .to = {.code = KEY_HOME, .modifiers = { .ctrl = EITHER }},
     },
     {
-        .from = {.code = DVORAK_T, .modifiers = { .alt = EITHER}},
+        .from = {.code = DVORAK_T, .modifiers = { .alt = EITHER }},
         .to = {.code = KEY_UP },
     },
     {
@@ -154,7 +162,7 @@ const mapping mappings[] = {
         .to = {.code = KEY_END, .modifiers = { .ctrl = EITHER }},
     },
     {
-        .from = {.code = DVORAK_N, .modifiers = { .alt = EITHER}},
+        .from = {.code = DVORAK_N, .modifiers = { .alt = EITHER }},
         .to = {.code = KEY_RIGHT },
     },
     {
