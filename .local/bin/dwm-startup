@@ -3,6 +3,7 @@
 killall picom > /dev/null
 killall slstatus > /dev/null
 
-picom &
+keyboard-toggle
+picom --backend glx --vsync &
 hsetroot #000000
 slstatus &
