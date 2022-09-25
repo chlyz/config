@@ -33,7 +33,7 @@
 
 #define DVORAK_D KEY_H
 #define DVORAK_H KEY_J
-#define DVORAK_T KEY_T
+#define DVORAK_T KEY_K
 #define DVORAK_N KEY_L
 #define DVORAK_S KEY_SEMICOLON
 
@@ -117,6 +117,58 @@ typedef struct mapping {
 } mapping;
 
 const mapping mappings[] = {
+    {
+        .from = {.code = DVORAK_D, .modifiers = { .alt = EITHER}},
+        .to = {.code = KEY_LEFT },
+    },
+    {
+        .from = {.code = DVORAK_D, .modifiers = {.alt = EITHER, .shift = EITHER }},
+        .to = {.code = KEY_HOME },
+    },
+    {
+        .from = {.code = DVORAK_D, .modifiers = {.alt = EITHER, .ctrl = EITHER }},
+        .to = {.code = KEY_HOME, .modifiers = { .ctrl = EITHER }},
+    },
+    {
+        .from = {.code = DVORAK_H, .modifiers = {.alt = EITHER}},
+        .to = {.code = KEY_DOWN },
+    },
+    {
+        .from = {.code = DVORAK_H, .modifiers = {.alt = EITHER, .shift = EITHER }},
+        .to = {.code = KEY_PAGEDOWN },
+    },
+    {
+        .from = {.code = DVORAK_H, .modifiers = {.alt = EITHER, .ctrl = EITHER }},
+        .to = {.code = KEY_HOME, .modifiers = { .ctrl = EITHER }},
+    },
+    {
+        .from = {.code = DVORAK_T, .modifiers = { .alt = EITHER}},
+        .to = {.code = KEY_UP },
+    },
+    {
+        .from = {.code = DVORAK_T, .modifiers = {.alt = EITHER, .shift = EITHER }},
+        .to = {.code = KEY_PAGEUP },
+    },
+    {
+        .from = {.code = DVORAK_T, .modifiers = {.alt = EITHER, .ctrl = EITHER }},
+        .to = {.code = KEY_END, .modifiers = { .ctrl = EITHER }},
+    },
+    {
+        .from = {.code = DVORAK_N, .modifiers = { .alt = EITHER}},
+        .to = {.code = KEY_RIGHT },
+    },
+    {
+        .from = {.code = DVORAK_N, .modifiers = {.alt = EITHER, .shift = EITHER }},
+        .to = {.code = KEY_END },
+    },
+    {
+        .from = {.code = DVORAK_N, .modifiers = {.alt = EITHER, .ctrl = EITHER }},
+        .to = {.code = KEY_END, .modifiers = { .ctrl = EITHER }},
+    },
+    {
+        .from = {.code = KEY_BACKSPACE, .modifiers = {.alt = LEFT}},
+        .to = {.code = KEY_BACKSPACE, .modifiers = {.ctrl = LEFT}},
+    },
     {
         .from = {.code = DVORAK_Q, .modifiers = {.alt = RIGHT}},
         .to = {.code = DVORAK_Q, .modifiers = {.ctrl = LEFT}},
@@ -216,14 +268,6 @@ const mapping mappings[] = {
         .to = {.code = KEY_LEFT, .modifiers = {.ctrl = LEFT}},
     },
     {
-        .from = {.code = KEY_LEFTBRACE, .modifiers = {.alt = EITHER}},
-        .to = {.code = KEY_LEFTBRACE, .modifiers = {.alt = RIGHT}},
-    },
-    {
-        .from = {.code = KEY_LEFTBRACE, .modifiers = {.alt = EITHER, .shift = EITHER}},
-        .to = {.code = KEY_LEFTBRACE, .modifiers = {.alt = RIGHT, .shift = EITHER}},
-    },
-    {
         .from = {.code = KEY_APOSTROPHE, .modifiers = {.alt = EITHER}},
         .to = {.code = KEY_APOSTROPHE, .modifiers = {.alt = RIGHT}},
     },
@@ -231,16 +275,16 @@ const mapping mappings[] = {
         .from = {.code = KEY_APOSTROPHE, .modifiers = {.alt = EITHER, .shift = EITHER}},
         .to = {.code = KEY_APOSTROPHE, .modifiers = {.alt = RIGHT, .shift = EITHER}},
     },
-    // {
-    //     // TODO: this one would be Chromium-specific
-    //     .from = {.code = KEY_LEFTBRACE, .modifiers = {.alt = EITHER}},
-    //     .to = {.code = KEY_LEFT, .modifiers = {.alt = LEFT}},
-    // },
-    // {
-    //     // TODO: this one would be Chromium-specific
-    //     .from = {.code = KEY_LEFTBRACE, .modifiers = {.alt = EITHER, .shift = EITHER}},
-    //     .to = {.code = KEY_TAB, .modifiers = {.ctrl = LEFT, .shift = LEFT}},
-    // },
+    {
+        // TODO: this one would be Chromium-specific
+        .from = {.code = KEY_LEFTBRACE, .modifiers = {.alt = EITHER}},
+        .to = {.code = KEY_LEFT, .modifiers = {.alt = LEFT}},
+    },
+    {
+        // TODO: this one would be Chromium-specific
+        .from = {.code = KEY_LEFTBRACE, .modifiers = {.alt = EITHER, .shift = EITHER}},
+        .to = {.code = KEY_TAB, .modifiers = {.ctrl = LEFT, .shift = LEFT}},
+    },
     {
         .from = {.code = KEY_RIGHT, .modifiers = {.alt = EITHER}},
         .to = {.code = KEY_END, .modifiers = {}},
@@ -249,16 +293,16 @@ const mapping mappings[] = {
         .from = {.code = KEY_RIGHT, .modifiers = {.meta = EITHER}},
         .to = {.code = KEY_RIGHT, .modifiers = {.ctrl = LEFT}},
     },
-    // {
-    //     // TODO: this one would be Chromium-specific
-    //     .from = {.code = KEY_RIGHTBRACE, .modifiers = {.alt = EITHER}},
-    //     .to = {.code = KEY_RIGHT, .modifiers = {.alt = LEFT}},
-    // },
-    // {
-    //     // TODO: this one would be Chromium-specific
-    //     .from = {.code = KEY_RIGHTBRACE, .modifiers = {.alt = EITHER, .shift = EITHER}},
-    //     .to = {.code = KEY_TAB, .modifiers = {.ctrl = LEFT}},
-    // },
+    {
+        // TODO: this one would be Chromium-specific
+        .from = {.code = KEY_RIGHTBRACE, .modifiers = {.alt = EITHER}},
+        .to = {.code = KEY_RIGHT, .modifiers = {.alt = LEFT}},
+    },
+    {
+        // TODO: this one would be Chromium-specific
+        .from = {.code = KEY_RIGHTBRACE, .modifiers = {.alt = EITHER, .shift = EITHER}},
+        .to = {.code = KEY_TAB, .modifiers = {.ctrl = LEFT}},
+    },
     {
         .from = {.code = KEY_1, .modifiers = {.alt = RIGHT}},
         .to = {.code = KEY_1, .modifiers = {.alt = LEFT}},
@@ -278,6 +322,10 @@ const mapping mappings[] = {
     {
         .from = {.code = KEY_5, .modifiers = {.alt = RIGHT}},
         .to = {.code = KEY_5, .modifiers = {.alt = LEFT}},
+    },
+    {
+        .from = {.code = KEY_6, .modifiers = {.alt = RIGHT}},
+        .to = {.code = KEY_6, .modifiers = {.alt = LEFT}},
     },
 };
 

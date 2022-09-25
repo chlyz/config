@@ -3,6 +3,7 @@
 tags
 tags\.lock
 tags\.temp
+keyboard
 ^/nira-install
 ^/modus-theme-colors.md
 ^/LICENSE
