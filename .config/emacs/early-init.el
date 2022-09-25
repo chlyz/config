@@ -8,6 +8,7 @@
 (setq modus-themes-mode-line '(padded))
 ;; (setq modus-themes-syntax '(yellow-comments))
 (setq modus-themes-syntax nil)
+;; (setq modus-themes-deuteranopia t)
 (load-theme 'modus-vivendi t nil)
 ;; Prefer loading newest compiled .el file.
 (customize-set-variable 'load-prefer-newer noninteractive)

@@ -1,17 +1,27 @@
 ;;; lyzell-programming.el -*- lexical-binding; t: -*-
 
 ;;; Install dependencies.
-;; (straight-use-package 'tree-sitter)
-;; (straight-use-package 'tree-sitter-langs)
+(straight-use-package 'tree-sitter)
+(straight-use-package 'tree-sitter-langs)
 (straight-use-package 'evil-nerd-commenter)
+(straight-use-package 'jenkinsfile-mode)
 (straight-use-package '(matlab-emacs
                         :type git
                         :repo "https://git.code.sf.net/p/matlab-emacs/src"))
 (straight-use-package '(global-tags
                         :type git
                         :repo "https://github.com/emacsmirror/global-tags.git"))
-(straight-use-package 'jenkinsfile-mode)
+(straight-use-package '(emacs-bazel-mode
+                        :type git
+                        :repo "https://github.com/bazelbuild/emacs-bazel-mode.git"))
+
 (require 'jenkinsfile-mode)
+;; (require 'bazel-mode)
+;; (require 'bazel-build-mode)
+;; (require 'bazel-workspace-mode)
+;; (require 'bazelrc-mode)
+;; (require 'bazelignore-mode)
+;; (require 'bazel-starlark-mode)
 
 (add-hook 'c-mode-hook #'global-tags-exclusive-backend-mode)
 
@@ -62,8 +72,8 @@
 ;;       (list (list nil octave-function-header-regexp 3)))
 
 ;;; Bazel
-(add-to-list 'auto-mode-alist '("\\.bazel\\'" . python-mode))
-(add-to-list 'auto-mode-alist '("\\.bzl\\'" . python-mode))
+;; (add-to-list 'auto-mode-alist '("\\.bazel\\'" . python-mode))
+;; (add-to-list 'auto-mode-alist '("\\.bzl\\'" . python-mode))
 
 ;;; SCons
 (add-to-list 'auto-mode-alist '("\\SConscript*\\'" . python-mode))
@@ -101,9 +111,9 @@
 (define-key evil-normal-state-map (kbd "gc") 'evilnc-comment-operator)
 
 ;;; Setup treesitter highlightning.
-; (require 'tree-sitter)
-; (require 'tree-sitter-langs)
-; (global-tree-sitter-mode)
-; (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+(require 'tree-sitter)
+(require 'tree-sitter-langs)
+(global-tree-sitter-mode)
+(add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
 
 (provide 'lyzell-programming)

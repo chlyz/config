@@ -168,6 +168,7 @@
 (evil-define-key 'normal 'global (kbd "<leader>at")    'lyzell-open-terminal-here)
 (evil-define-key 'normal 'global (kbd "<leader>ad")    'dired)
 (evil-define-key 'normal 'global (kbd "<leader>aw")    'eww)
+(evil-define-key 'normal 'global (kbd "<leader>ax")    'execute-extended-command)
 (evil-define-key 'normal 'global (kbd "<leader>p.")    'project-find-file)
 (evil-define-key 'normal 'global (kbd "<leader>p,")    'project-switch-to-buffer)
 (evil-define-key 'normal 'global (kbd "<leader>pc")    'project-compile)

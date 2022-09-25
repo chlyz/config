@@ -22,6 +22,7 @@
       '((sequence "NEXT(n)" "TODO(t)" "START(s)" "MEET(m)" "WAIT(w)" "IDEA(i)" "PROJECT(p)" "|" "DONE(d)" "DROP(c)")))
 (evil-define-key 'normal 'org-mode-map (kbd "<leader>oh")  'consult-org-heading)
 (evil-define-key 'normal 'org-mode-map (kbd "<leader>oa")  'org-agenda)
+(evil-define-key 'normal 'org-mode-map (kbd "gh")  'outline-up-heading)
 
 (add-hook 'org-mode-hook 'org-indent-mode)
 

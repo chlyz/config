@@ -1,16 +1,19 @@
 ;;; init.el --- Init File -*- lexical-binding: t -*-
 
 ;;; Improvement suggestions
+;; TODO: BAZEL      - How to make Emacs aware of the ./bazelw command
 ;; TODO: COMPLETION - How to make completion better, work more like nvim?
-;; TODO: MAGIT      - Better git blame?
-;; TODO: PROJECT    - Compile commands selection using vertico?
-;; TODO: HARPOON    - How to do with Harpoon? The available package is not working
-;;                    as expected by separating the files per project.
 ;; TODO: EDIFF      - How to setup ediff to work more in the way I am used to and like?
-;; TODO: VDIFF      - This seems to be the tool that I want to use, make sure it works like I expect.
+;; TODO: HARPOON    - How to do with Harpoon? The available package is not working as expected by separating the files per project.
+;; TODO: KEYBOARD   - Make caps-lock also shift symbols instead of escape? Can it still work as a ctrl key? https://gist.github.com/jatcwang/ae3b7019f219b8cdc6798329108c9aee
+;; TODO: MAGIT      - Better git blame?
+;; TODO: MATLAB     - How to change the imenu items to find all functions?
+;; TODO: MATLAB     - How to start Matlab correctly for a certain project, i.e., setting the Mesa settings?
 ;; TODO: OUTLINE    - Make the cursor move to the place where the visual cursor is positioned.
-;; TODO: KEYBINDS   - How to do with the AltGr key?
-;; TODO: ESHELL     - How to make git not use a pager?
+;; TODO: PROJECT    - Compile commands selection using vertico?
+;; TODO: PROJECT    - Open a real terminal in the project root?
+;; TODO: TAGS       - Make automatic TAGS file and load at start of project.
+;; TODO: VDIFF      - This seems to be the tool that I want to use, make sure it works like I expect.
 
 ;;; Start-up time
 ;; Measure the start-up time.
@@ -47,9 +50,24 @@
 (require 'lyzell-terminal)
 (require 'lyzell-org)
 
-(when 'native-comp-compiler-options
-  (setq native-comp-speed 3
-        native-comp-compiler-options '("-O3" "-mtune=native")))
+;; Tags generation
+(setq path-to-ctags "/usr/bin/ctags")
+
+;; ctags -f TAGS -e -R --exclude="bazel-*" --exclude=".git" --exclude="Build" \
+;; --exclude="sqlite3.*" --exclude="ProtoBuf" --exclude="Protobuf" \
+;; --exclude="MDF4" --exclude="HDF5" --exclude=".ccls-cache" --exclude="Rte_*.*" \
+;; --exclude="VehicleModel"
+
+(defun create-tags (dir-name)
+  "Create tags file."
+  (interactive "DDirectory: ")
+  (shell-command
+   (format "%s -f TAGS -e -R %s" path-to-ctags (directory-file-name dir-name)))
+  )
+
+;; (when 'native-comp-compiler-options
+;;   (setq native-comp-speed 3
+;;         native-comp-compiler-options '("-O3" "-mtune=native")))
 
 ;;; Settings
 (customize-set-variable 'global-auto-revert-non-file-buffers t)
@@ -75,10 +93,11 @@
 ;; This needs to be explored.
 (straight-use-package 'perspective)
 (setq persp-suppress-no-prefix-key-warning t)
+(setq persp-initial-frame-name "misc")
 (persp-mode)
 (evil-define-key 'normal 'global (kbd "<leader>ps")    'persp-switch)
 (evil-define-key 'normal 'global (kbd "<leader>pl")    'persp-switch-last)
-(evil-define-key 'normal 'global (kbd "<leader>pk")    'persp-kill)
+(evil-define-key 'normal 'global (kbd "<leader>pc")    'persp-kill)
 
 ;; (defun lyzell/git-merge-base ()
   ;; "Find the merge-base."
@@ -92,9 +111,12 @@
 (setq corfu-auto t
       corfu-quit-no-match 'separator) ;; or t
 (global-corfu-mode)
+(define-key corfu-map (kbd "RET") nil)
+
 ;; (setq-local completion-at-point-functions
 ;;             (mapcar #'cape-company-to-capf
 ;;                     (list #'company-files #'company-ispell #'company-dabbrev)))
+
 (add-hook 'eshell-mode-hook
           (lambda ()
             (setq-local corfu-auto nil)
@@ -121,12 +143,13 @@
 (setq help-window-select nil)
 
 ;;; Theme
-(straight-use-package '(modus-themes
-                        :type git
-                        :repo "https://github.com/protesilaos/modus-themes"))
+;; (straight-use-package '(modus-themes
+;;                         :type git
+;;                         :repo "https://git.sr.ht/~protesilaos/modus-themes"))
 
 (setq modus-themes-italic-constructs nil)
 (setq modus-themes-mode-line '(padded))
+(setq modus-themes-deuteranopia nil)
 ;; (setq modus-themes-syntax '(yellow-comments))
 (setq modus-themes-syntax nil)
 (load-theme 'modus-vivendi t nil)
@@ -137,7 +160,7 @@
 ;; - `Sauce Code Pro Nerd Font'
 ;; - `Iosevka Comfy Wide Fixed'
 (set-face-attribute 'default nil
-                    :font "Iosevka Comfy Wide Fixed:antialias=subpixel"
+                    :font "JetBrainsMono Nerd Font:antialias=subpixel"
                     :weight 'regular
                     :height 110)
 
@@ -582,6 +605,8 @@ if one already exists."
 ;;; Pulsar
 ;; This is mostly due to that pulsar does not respect evil or maybe more likely
 ;; the other way around.
+(straight-use-package 'lua-mode)
+(require 'lua-mode)
 (straight-use-package 'pulsar)
 (require 'pulsar)
 
