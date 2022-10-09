@@ -67,6 +67,8 @@ augroup highlight_yank
     au TextYankPost * silent! lua vim.highlight.on_yank{higroup="TextYankPost", timeout=200}
 augroup END
 
+autocmd BufRead,BufNewFile Jenkinsfile set filetype=groovy
+
 let g:gutentags_ctags_exclude = [
       \ '*bazel-*', '.git', 'Build', '.ccls-cache', 'MDF4', 'HDF5',
       \ 'Compiler', 'sqlite3.*', 'Rte_*.*', 'VehicleModel', 'ProtoBuf',
