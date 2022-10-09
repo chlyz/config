@@ -5,6 +5,21 @@ require("lyzell.init")
 vim.api.nvim_exec(
 [[
 
+set diffopt+=iwhite
+set diffexpr=DiffW()
+
+function DiffW()
+    let opt = ""
+    if &diffopt =~ "icase"
+        let opt = opt . "-i "
+    endif
+    if &diffopt =~ "iwhite"
+        let opt = opt . "-w "
+    endif
+    silent execute "!diff -a --binary " . opt .
+        \ v:fname_in . " " . v:fname_new .  " > " . v:fname_out
+endfunction
+
 let g:surround_no_insert_mappings = 1
 
 let g:modus_vivendi_italic_constructs = 1
