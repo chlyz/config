@@ -76,6 +76,7 @@ let g:gutentags_ctags_exclude = [
             \]
 
 let g:CommandTPreferredImplementation='lua'
+let g:fzf_preview_window = []
 ]],
 true)
 
