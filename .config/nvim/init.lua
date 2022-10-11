@@ -44,6 +44,7 @@ endfunction
 
 call CheckColors()
 
+let g:LoupeCenterResults=0
 " autocmd FocusGained * call CheckColors()
 
 " Put these in an autocmd group, so that you can revert them with:
