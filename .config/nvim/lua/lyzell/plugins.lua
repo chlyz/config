@@ -35,12 +35,6 @@ return require('packer').startup(function()
 
     use 'dag/vim-fish'
 
-    use 'junegunn/fzf'
-    use 'junegunn/fzf.vim'
-
-    -- use 'ibhagwan/fzf-lua'
-    use 'wincent/command-t'
-
     use {
         'nvim-telescope/telescope.nvim',
         requires = { {'nvim-lua/plenary.nvim'} }
@@ -50,14 +44,6 @@ return require('packer').startup(function()
         'nvim-telescope/telescope-fzf-native.nvim',
         run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build'
     }
-    use {
-        "nvim-telescope/telescope-frecency.nvim",
-        config = function()
-            require"telescope".load_extension("frecency")
-        end,
-        requires = {"tami5/sqlite.lua"}
-    }
-    use { "tami5/sql.nvim", rocks = { "sqlite", "luv" } }
 
     use {
       "antoinemadec/FixCursorHold.nvim",

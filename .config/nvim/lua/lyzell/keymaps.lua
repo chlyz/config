@@ -56,26 +56,71 @@ vim.keymap.set('n', '<leader>gw', function ()
 end)
 
 -- Fuzzy search files and buffers.
--- TODO: Is it possible to replace the remaining telescope functions that I use with Command-T?
-vim.keymap.set('n', '<Leader>.', '<Plug>(CommandTGit)', { remap = true })
-vim.keymap.set('n', '<Leader>>', '<Plug>(CommandTRipgrep)', { remap = true })
-vim.keymap.set('n', '<Leader>,', '<Plug>(CommandTBuffer)', { remap = true })
-vim.keymap.set('n', '<Leader>;', function() vim.cmd("BTags") end)
-vim.keymap.set('n', '<leader>:', function () require('telescope.builtin').command_history() end)
+vim.keymap.set('n', '<Leader>.', function()
+    require'telescope.builtin'.git_files(require('telescope.themes').get_dropdown({
+        layout_config = {
+            width = 0.8,
+            height = 0.5,
+        },
+    }))
+end)
+vim.keymap.set('n', '<Leader>>', function()
+    require'telescope.builtin'.find_files(require('telescope.themes').get_dropdown({
+        layout_config = {
+            width = 0.8,
+            height = 0.5,
+        },
+    }))
+end)
+vim.keymap.set('n', '<Leader>,', function()
+    require'telescope.builtin'.buffers(require('telescope.themes').get_dropdown({
+        layout_config = {
+            width = 0.8,
+            height = 0.5,
+        },
+    }))
+end)
+vim.keymap.set('n', '<Leader><', function()
+    vim.cmd("Telescope")
+end)
+vim.keymap.set('n', '<Leader>;', function()
+    require'telescope.builtin'.current_buffer_tags(require('telescope.themes').get_dropdown({
+        layout_config = {
+            width = 0.8,
+            height = 0.5,
+        },
+    }))
+end)
+vim.keymap.set('n', '<Leader>:', function()
+    require'telescope.builtin'.command_history(require('telescope.themes').get_dropdown({
+        layout_config = {
+            width = 0.8,
+            height = 0.5,
+        },
+    }))
+end)
+vim.keymap.set('n', '<Leader>/', function()
+    require'telescope.builtin'.live_grep(require('telescope.themes').get_dropdown({
+        layout_config = {
+            width = 0.8,
+            height = 0.5,
+        },
+    }))
+end)
 
 -- Harpoon for fast and "consistent" file access.
-vim.keymap.set('n', '<leader>ha', function() require("harpoon.mark").add_file() end)
-vim.keymap.set('n', '<leader>hc', function() require("harpoon.mark").clear_all() end)
-vim.keymap.set('n', '<leader>hr', function() require("harpoon.mark").rm_file() end)
-vim.keymap.set('n', '<leader>hl', function() require("harpoon.ui").toggle_quick_menu() end)
-vim.keymap.set('n', '<leader>hh', function() require("harpoon.ui").nav_file(1) end)
-vim.keymap.set('n', '<leader>ht', function() require("harpoon.ui").nav_file(2) end)
-vim.keymap.set('n', '<leader>hn', function() require("harpoon.ui").nav_file(3) end)
-vim.keymap.set('n', '<leader>hs', function() require("harpoon.ui").nav_file(4) end)
-vim.keymap.set('n', '<M-h>', function() require("harpoon.ui").nav_file(1) end)
-vim.keymap.set('n', '<M-t>', function() require("harpoon.ui").nav_file(2) end)
-vim.keymap.set('n', '<M-n>', function() require("harpoon.ui").nav_file(3) end)
-vim.keymap.set('n', '<M-s>', function() require("harpoon.ui").nav_file(4) end)
+vim.keymap.set('n', '<leader>aa', function() require("harpoon.mark").add_file() end)
+vim.keymap.set('n', '<leader>ac', function() require("harpoon.mark").clear_all() end)
+vim.keymap.set('n', '<leader>ar', function() require("harpoon.mark").rm_file() end)
+vim.keymap.set('n', '<leader>am', function() require("harpoon.ui").toggle_quick_menu() end)
+vim.keymap.set('n', '<leader>ah', function() require("harpoon.ui").nav_file(1) end)
+vim.keymap.set('n', '<leader>at', function() require("harpoon.ui").nav_file(2) end)
+vim.keymap.set('n', '<leader>an', function() require("harpoon.ui").nav_file(3) end)
+vim.keymap.set('n', '<leader>as', function() require("harpoon.ui").nav_file(4) end)
+vim.keymap.set('n', '<M-g>', function() require("harpoon.ui").nav_file(1) end)
+vim.keymap.set('n', '<M-c>', function() require("harpoon.ui").nav_file(2) end)
+vim.keymap.set('n', '<M-r>', function() require("harpoon.ui").nav_file(3) end)
+vim.keymap.set('n', '<M-l>', function() require("harpoon.ui").nav_file(4) end)
 
 -- TODO: Everything from here on needs some organization and commenting.
 vim.keymap.set('n', '<leader>dt', function() vim.cmd("windo diffthis") end)
