@@ -17,7 +17,9 @@ return require('packer').startup(function()
     use 'tpope/vim-repeat'
     use 'tpope/vim-surround'
     use 'tpope/vim-unimpaired'
-    use 'tpope/vim-vinegar'
+
+    -- File browser
+    use 'justinmk/vim-dirvish'
 
     use "TimUntersberger/neogit"
 
