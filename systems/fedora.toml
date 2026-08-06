@@ -1,0 +1,27 @@
+# Packages intentionally installed for this dotfiles setup on Fedora 44.
+# This is not a full image export: Fedora's base packages and their dependency
+# closure are deliberately omitted.  Package versions stay unconstrained so a
+# current Fedora release can resolve supported builds.
+
+[system]
+distribution = "fedora"
+release = 44
+
+[packages]
+bootstrap = ["curl", "git", "stow"]
+shell = ["bash-completion", "fzf", "tmux", "zoxide"]
+editors = ["emacs", "neovim"]
+terminals = ["alacritty", "foot", "kitty"]
+desktop = [
+  "NetworkManager",
+  "lxqt-policykit",
+  "network-manager-applet",
+  "nm-connection-editor",
+  "rofi",
+  "sway",
+  "swayidle",
+  "swaylock",
+  "waybar",
+]
+wayland_tools = ["grim", "jq", "slurp", "wl-clipboard"]
+applications = ["zathura"]

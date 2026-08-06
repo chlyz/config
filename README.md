@@ -20,6 +20,13 @@ stow --dotfiles --delete files scripts
 Files whose names begin with `dot-` are mapped to dotfiles by `--dotfiles`:
 for example, `files/dot-bashrc` becomes `~/.bashrc`.
 
+## System packages
+
+Platform manifests live in `systems/`. They list the packages intentionally
+installed for this setup, grouped by purpose. They do not export Fedora's base
+image or dependency closure. The current machine is captured in
+[`systems/fedora.toml`](systems/fedora.toml) for Fedora 44.
+
 ## Network menu
 
 `Super+N` opens a Rofi menu for connecting to, disconnecting from, or toggling
