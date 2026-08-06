@@ -10,4 +10,8 @@ theme = "modus-current"
 # Terminal emulators encode Ctrl+Backspace differently: Foot is configured to
 # emit Ctrl+W, while GNOME Terminal commonly reports Ctrl+H.  Keep the physical
 # shortcut consistent across both.
+delete_backward = "backspace"
 delete_backward_word = ["ctrl-backspace", "ctrl-w", "ctrl-h"]
+
+[projects."/home/chrly/config"]
+trust_level = "trusted"
