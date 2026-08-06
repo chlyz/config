@@ -143,6 +143,14 @@
   :config
   (marginalia-mode 1))
 
+;; Markdown receives the same restrained, semantic treatment as Org: structural
+;; markup and code are distinct without adding custom faces or decoration.
+(use-package markdown-mode
+  :mode (("\\.md\\'" . gfm-mode)
+         ("\\.markdown\\'" . gfm-mode))
+  :custom
+  (markdown-fontify-code-blocks-natively t))
+
 ;; Fontaine manages persistent font presets using the installed Aporetic Nerd
 ;; Font for code and the Aporetic Sans family for variable-pitch text.
 (use-package fontaine
