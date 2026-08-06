@@ -27,3 +27,11 @@
 
 - Use a 100-character line-length guideline for Markdown and normal text.
 - Run Rumdl for changed Markdown before a commit when it is available.
+
+## Emacs configuration
+
+- Prefer a minimal, built-in-first setup with a restrained, semantic interface.
+- Use [Protesilaos Stavrou's Emacs configuration][prot-dotemacs] as a style and
+  inspiration reference; adapt its ideas deliberately rather than copying it wholesale.
+
+[prot-dotemacs]: https://protesilaos.com/emacs/dotemacs
