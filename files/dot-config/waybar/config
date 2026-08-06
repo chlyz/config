@@ -1,0 +1,50 @@
+{
+  "layer": "top",
+  "position": "bottom",
+  "height": 32,
+  "spacing": 8,
+  "modules-left": ["sway/workspaces", "sway/window"],
+  "modules-center": ["clock"],
+  "modules-right": ["network", "pulseaudio", "battery", "tray"],
+
+  "sway/workspaces": {
+    "disable-scroll": true,
+    "all-outputs": false,
+    "format": "{name}"
+  },
+  "sway/window": {
+    "max-length": 72,
+    "separate-outputs": true
+  },
+  "clock": {
+    "format": "{:%a %d %b  %H:%M}",
+    "tooltip-format": "<big>{:%B %Y}</big>\n<tt><small>{calendar}</small></tt>"
+  },
+  "network": {
+    "format-wifi": "Wi-Fi  {essid}  {signalStrength}%",
+    "format-ethernet": "Ethernet  {ipaddr}/{cidr}",
+    "format-disconnected": "Offline",
+    "tooltip-format-wifi": "{essid}\n{ipaddr}/{cidr}\nSignal: {signalStrength}%",
+    "tooltip-format-ethernet": "{ifname}\n{ipaddr}/{cidr}",
+    "on-click": "$HOME/.local/bin/network-menu",
+    "on-click-right": "nm-connection-editor"
+  },
+  "pulseaudio": {
+    "format": "Volume  {volume}%",
+    "format-muted": "Muted",
+    "on-click": "pavucontrol"
+  },
+  "battery": {
+    "format": "Battery  {capacity}%",
+    "format-charging": "Charging  {capacity}%",
+    "format-full": "Charged",
+    "states": {
+      "warning": 25,
+      "critical": 10
+    }
+  },
+  "tray": {
+    "icon-size": 20,
+    "spacing": 8
+  }
+}

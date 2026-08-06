@@ -1,0 +1,14 @@
+# Stow may create bookkeeping files while operating on a package.
+.stow-local-ignore
+
+# Editor-generated backups and logs.
+*~
+.#*
+#*#
+*.log
+
+# Cargo build artifacts.
+target/
+
+# rumdl cache.
+.rumdl_cache/

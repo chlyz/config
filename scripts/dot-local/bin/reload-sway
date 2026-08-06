@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+set -eu
+
+# Compatibility name retained for the existing Sway keybinding.  The shared
+# implementation also handles i3/X11 when called as reload-wm.
+exec "$HOME/.local/bin/reload-wm" "$@"

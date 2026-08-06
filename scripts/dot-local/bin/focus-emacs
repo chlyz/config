@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if command -v swaymsg >/dev/null 2>&1 &&
+        swaymsg -t get_version >/dev/null 2>&1; then
+    wm_command=swaymsg
+elif command -v i3-msg >/dev/null 2>&1 &&
+        i3-msg -t get_version >/dev/null 2>&1; then
+    wm_command=i3-msg
+else
+    printf 'focus-emacs: neither Sway nor i3 is running\n' >&2
+    exit 1
+fi
+
+container_id=$(
+    "$wm_command" -t get_tree |
+        jq -r '
+            first(
+                .. | objects
+                | select(.type? == "con")
+                | select(
+                    ((.app_id? // "") | ascii_downcase) == "emacs"
+                    or
+                    ((.window_properties?.class? // "") | ascii_downcase) == "emacs"
+                )
+                | .id
+            ) // empty
+        '
+)
+
+if [[ -n $container_id ]]; then
+    "$wm_command" "[con_id=\"$container_id\"] focus" >/dev/null
+else
+    exec emacsclient --create-frame --no-wait --alternate-editor=""
+fi

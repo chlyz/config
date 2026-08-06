@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly font_dir="${XDG_DATA_HOME:-$HOME/.local/share}/fonts/aporetic"
+readonly work_dir="$(mktemp -d)"
+trap 'rm -rf "$work_dir"' EXIT
+
+for command in curl unzip fc-cache; do
+    command -v "$command" >/dev/null 2>&1 || {
+        printf 'error: required command not found: %s\n' "$command" >&2
+        exit 1
+    }
+done
+
+mkdir -p "$font_dir"
+
+printf 'Downloading the official Aporetic font repository...\n'
+archive="$work_dir/aporetic.zip"
+curl -fL --progress-bar \
+    https://github.com/protesilaos/aporetic/archive/refs/heads/main.zip \
+    -o "$archive"
+unzip -q "$archive" -d "$work_dir/source"
+
+printf 'Installing Aporetic fonts...\n'
+find "$work_dir" -type f \( -iname '*.otf' -o -iname '*.ttf' \) -exec cp -f {} "$font_dir/" \;
+
+printf 'Downloading Aporetic Nerd Font files...\n'
+nerd_archive="$work_dir/aporetic-nerd-font.zip"
+curl -fL --progress-bar \
+    https://github.com/Echinoidea/Aporetic-Nerd-Font/archive/refs/heads/master.zip \
+    -o "$nerd_archive"
+unzip -q "$nerd_archive" -d "$work_dir/nerd"
+find "$work_dir/nerd" -type f \( -iname '*.otf' -o -iname '*.ttf' \) \
+    -exec cp -f {} "$font_dir/" \;
+
+fc-cache -f "$font_dir"
+printf 'Installed fonts in %s\n' "$font_dir"

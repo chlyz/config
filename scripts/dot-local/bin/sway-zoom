@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Promote a tiled window to the left-most (master) position, like dwm's zoom.
+set -euo pipefail
+
+ids="$(swaymsg -t get_tree -r | jq -r '
+  def tiled_descendants: recurse(.nodes[]?);
+
+  ([recurse(.nodes[]?, .floating_nodes[]?) | select(.focused)] | .[0]) as $focused
+  | ([recurse(.nodes[]?)
+      | select(.type == "workspace")
+      | select([recurse(.nodes[]?, .floating_nodes[]?) | select(.focused)] | length > 0)]
+      | .[0]) as $workspace
+  | if $focused == null or $workspace == null then empty else
+      [$workspace | tiled_descendants
+       | select(.type == "con"
+                and (.nodes | length == 0)
+                and (.floating_nodes | length == 0))] as $leaves
+      | if ($leaves | length) < 2
+           or ([ $leaves[] | select(.id == $focused.id) ] | length == 0)
+        then empty
+        else ($leaves | min_by(.rect.x)) as $master
+        | if $focused.id == $master.id
+          then ($leaves | map(select(.id != $master.id)) | min_by([.rect.x, .rect.y])) as $candidate
+          | "\($candidate.id) \($master.id)"
+          else "\($focused.id) \($master.id)"
+          end
+        end
+    end
+')"
+
+if [[ -n "$ids" ]]; then
+    read -r source target <<< "$ids"
+    swaymsg "[con_id=$source] swap container with con_id $target"
+    swaymsg "[con_id=$source] focus"
+fi

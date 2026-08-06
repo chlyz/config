@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# Validate the Markdown content that is actually staged for this commit.
+set -euo pipefail
+
+if ! command -v rumdl >/dev/null 2>&1; then
+    printf '%s\n' 'pre-commit: rumdl is required; run config update first.' >&2
+    exit 1
+fi
+
+staged_files=()
+while IFS= read -r -d '' file; do
+    staged_files+=("$file")
+done < <(git diff --cached --name-only -z --diff-filter=ACMR -- '*.md' '*.markdown')
+
+for file in "${staged_files[@]}"; do
+    git show ":$file" |
+        rumdl check --deny-config-warnings --stdin-filename "$file" -
+done

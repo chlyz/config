@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Modus Vivendi Tinted for Codex.
+
+  The palette and semantic mappings mirror Emacs 30's built-in
+  modus-vivendi-tinted-theme.el, especially its diff-mode faces.  TextMate
+  scope names are intentionally broad because Codex renders several language
+  grammars and diff views through this one theme format.
+-->
+<plist version="1.0">
+<dict>
+  <key>name</key>
+  <string>Modus Vivendi Tinted</string>
+  <key>settings</key>
+  <array>
+    <!-- default, region, cursor, and current-line treatment -->
+    <dict>
+      <key>settings</key>
+      <dict>
+        <key>background</key><string>#0d0e1c</string>
+        <key>foreground</key><string>#ffffff</string>
+        <key>caret</key><string>#ff66ff</string>
+        <key>invisibles</key><string>#61647a</string>
+        <key>lineHighlight</key><string>#303a6f</string>
+        <key>selection</key><string>#555a66</string>
+      </dict>
+    </dict>
+
+    <!-- Emacs font-lock mappings -->
+    <dict><key>scope</key><string>comment, punctuation.definition.comment</string><key>settings</key><dict><key>foreground</key><string>#ff9f80</string><key>fontStyle</key><string>italic</string></dict></dict>
+    <dict><key>scope</key><string>comment.block.documentation, comment.documentation, string.quoted.docstring</string><key>settings</key><dict><key>foreground</key><string>#9ac8e0</string><key>fontStyle</key><string>italic</string></dict></dict>
+    <dict><key>scope</key><string>string, string.quoted, string.interpolated</string><key>settings</key><dict><key>foreground</key><string>#79a8ff</string></dict></dict>
+    <dict><key>scope</key><string>constant, constant.numeric, constant.language, constant.character, constant.other</string><key>settings</key><dict><key>foreground</key><string>#00bcff</string></dict></dict>
+    <dict><key>scope</key><string>keyword, keyword.control, storage, storage.type, storage.modifier</string><key>settings</key><dict><key>foreground</key><string>#b6a0ff</string><key>fontStyle</key><string>bold</string></dict></dict>
+    <dict><key>scope</key><string>support, support.function, support.constant, entity.name.builtin, variable.language</string><key>settings</key><dict><key>foreground</key><string>#f78fe7</string><key>fontStyle</key><string>bold</string></dict></dict>
+    <dict><key>scope</key><string>entity.name.function, meta.function-call, meta.function-call.generic</string><key>settings</key><dict><key>foreground</key><string>#feacd0</string></dict></dict>
+    <dict><key>scope</key><string>entity.name.type, entity.name.class, support.type, support.class, entity.other.inherited-class</string><key>settings</key><dict><key>foreground</key><string>#6ae4b9</string><key>fontStyle</key><string>bold</string></dict></dict>
+    <dict><key>scope</key><string>variable, variable.other, variable.other.property, entity.other.attribute-name</string><key>settings</key><dict><key>foreground</key><string>#00d3d0</string></dict></dict>
+    <dict><key>scope</key><string>keyword.operator, punctuation.separator, punctuation.accessor</string><key>settings</key><dict><key>foreground</key><string>#c6daff</string></dict></dict>
+    <dict><key>scope</key><string>meta.preprocessor, keyword.control.import, keyword.control.directive</string><key>settings</key><dict><key>foreground</key><string>#ff7f9f</string></dict></dict>
+    <dict><key>scope</key><string>string.regexp, string.regexp.character-class, meta.regexp</string><key>settings</key><dict><key>foreground</key><string>#00c06f</string></dict></dict>
+    <dict><key>scope</key><string>entity.name.tag, entity.other.attribute-name.html, markup.heading</string><key>settings</key><dict><key>foreground</key><string>#6ae4b9</string><key>fontStyle</key><string>bold</string></dict></dict>
+    <dict><key>scope</key><string>markup.bold</string><key>settings</key><dict><key>foreground</key><string>#ffffff</string><key>fontStyle</key><string>bold</string></dict></dict>
+    <dict><key>scope</key><string>markup.italic</string><key>settings</key><dict><key>foreground</key><string>#feacd0</string><key>fontStyle</key><string>italic</string></dict></dict>
+    <dict><key>scope</key><string>markup.quote, markup.underline.link, string.other.link</string><key>settings</key><dict><key>foreground</key><string>#79a8ff</string><key>underline</key><string>1</string></dict></dict>
+    <dict><key>scope</key><string>invalid, invalid.illegal</string><key>settings</key><dict><key>background</key><string>#9d1f1f</string><key>foreground</key><string>#ffffff</string></dict></dict>
+
+    <!-- Exact Modus diff-mode palette: diff-added/changed/removed. -->
+    <dict><key>scope</key><string>markup.inserted, markup.inserted.diff, diff.inserted, diff.added, meta.diff.added, punctuation.definition.inserted</string><key>settings</key><dict><key>background</key><string>#003a2f</string><key>foreground</key><string>#a0e0a0</string></dict></dict>
+    <dict><key>scope</key><string>markup.deleted, markup.deleted.diff, diff.deleted, diff.removed, meta.diff.removed, punctuation.definition.deleted</string><key>settings</key><dict><key>background</key><string>#4f1127</string><key>foreground</key><string>#ffbfbf</string></dict></dict>
+    <dict><key>scope</key><string>markup.changed, markup.changed.diff, diff.changed, diff.modified, meta.diff.changed, punctuation.definition.changed</string><key>settings</key><dict><key>background</key><string>#363300</string><key>foreground</key><string>#efef80</string></dict></dict>
+
+    <!-- Refined diff text and +/- indicators use the intense Modus colors. -->
+    <dict><key>scope</key><string>diff.inserted.refined, diff.refine-added, meta.diff.refine.added, punctuation.definition.inserted.diff</string><key>settings</key><dict><key>background</key><string>#035542</string><key>foreground</key><string>#80e080</string></dict></dict>
+    <dict><key>scope</key><string>diff.deleted.refined, diff.refine-removed, meta.diff.refine.removed, punctuation.definition.deleted.diff</string><key>settings</key><dict><key>background</key><string>#781a3a</string><key>foreground</key><string>#ff9095</string></dict></dict>
+    <dict><key>scope</key><string>diff.changed.refined, diff.refine-changed, meta.diff.refine.changed, punctuation.definition.changed.diff</string><key>settings</key><dict><key>background</key><string>#4a4a00</string><key>foreground</key><string>#c0b05f</string></dict></dict>
+
+    <!-- Diff headers, hunks, context, and file metadata. -->
+    <dict><key>scope</key><string>meta.diff.header, meta.diff.header.from-file, meta.diff.header.to-file, diff.file-header, diff.header</string><key>settings</key><dict><key>foreground</key><string>#ffffff</string><key>fontStyle</key><string>bold</string></dict></dict>
+    <dict><key>scope</key><string>meta.diff.index, diff.index</string><key>settings</key><dict><key>foreground</key><string>#9ac8e0</string><key>fontStyle</key><string>italic</string></dict></dict>
+    <dict><key>scope</key><string>meta.diff.range, meta.diff.hunk-header, diff.hunk-header, diff.range</string><key>settings</key><dict><key>background</key><string>#2b3045</string><key>foreground</key><string>#c6daff</string><key>fontStyle</key><string>bold</string></dict></dict>
+    <dict><key>scope</key><string>meta.diff.function, diff.function</string><key>settings</key><dict><key>background</key><string>#2b3045</string><key>foreground</key><string>#c6daff</string></dict></dict>
+    <dict><key>scope</key><string>diff.context, meta.diff.context, diff.normal</string><key>settings</key><dict><key>background</key><string>#1a1f30</string><key>foreground</key><string>#c6daff</string></dict></dict>
+    <dict><key>scope</key><string>constant.numeric.line-number, meta.diff.line-number</string><key>settings</key><dict><key>foreground</key><string>#989898</string></dict></dict>
+
+    <!-- Diagnostics and status semantics from the Modus mappings. -->
+    <dict><key>scope</key><string>markup.warning, diagnostic.warning, invalid.deprecated</string><key>settings</key><dict><key>foreground</key><string>#fec43f</string><key>fontStyle</key><string>bold</string></dict></dict>
+    <dict><key>scope</key><string>markup.error, diagnostic.error, invalid.unexpected</string><key>settings</key><dict><key>foreground</key><string>#ff5f59</string><key>fontStyle</key><string>bold</string></dict></dict>
+    <dict><key>scope</key><string>markup.info, diagnostic.info</string><key>settings</key><dict><key>foreground</key><string>#6ae4b9</string></dict></dict>
+    <dict><key>scope</key><string>markup.inserted, diff.inserted</string><key>settings</key><dict><key>foreground</key><string>#a0e0a0</string></dict></dict>
+    <dict><key>scope</key><string>markup.deleted, diff.deleted</string><key>settings</key><dict><key>foreground</key><string>#ffbfbf</string></dict></dict>
+    <dict><key>scope</key><string>markup.changed, diff.changed</string><key>settings</key><dict><key>foreground</key><string>#efef80</string></dict></dict>
+  </array>
+</dict>
+</plist>

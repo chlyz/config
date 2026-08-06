@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Promote the specified tiled container to the left-most master position.
+set -euo pipefail
+
+source_id="${1:?missing Sway container ID}"
+ids="$(swaymsg -t get_tree -r | jq -r --argjson source_id "$source_id" '
+  def tiled_descendants: recurse(.nodes[]?);
+
+  ([recurse(.nodes[]?, .floating_nodes[]?) | select(.id == $source_id)] | .[0]) as $source
+  | ([recurse(.nodes[]?)
+      | select(.type == "workspace")
+      | select([recurse(.nodes[]?, .floating_nodes[]?) | select(.id == $source_id)] | length > 0)]
+      | .[0]) as $workspace
+  | if $source == null or $workspace == null then empty else
+      [$workspace | tiled_descendants
+       | select(.type == "con"
+                and (.nodes | length == 0)
+                and (.floating_nodes | length == 0))] as $leaves
+      | if ($leaves | length) < 2
+           or ([ $leaves[] | select(.id == $source_id) ] | length == 0)
+        then empty
+        else ($leaves | min_by(.rect.x)) as $master
+        | "\($source_id) \($master.id)"
+        end
+    end
+')"
+
+if [[ -n "$ids" ]]; then
+    read -r source target <<< "$ids"
+    if [[ "$source" != "$target" ]]; then
+        swaymsg "[con_id=$source] swap container with con_id $target"
+    fi
+    swaymsg "[con_id=$source] focus"
+fi

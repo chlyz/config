@@ -1,0 +1,21 @@
+# Legacy Alacritty configuration (used by the version shipped with some
+# Ubuntu 22.04 installations).  Newer Alacritty versions use alacritty.toml.
+import:
+  - ~/.config/modus-theme/alacritty.yml
+
+live_config_reload: true
+
+font:
+  size: 14.0
+  normal:
+    family: monospace
+
+window:
+  padding:
+    x: 16
+    y: 12
+  dynamic_title: false
+  opacity: 1.0
+
+selection:
+  save_to_clipboard: true

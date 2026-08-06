@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+set -eu
+
+window_name='dropdown-terminal'
+was_visible=false
+
+if command -v swaymsg >/dev/null 2>&1 && swaymsg -t get_version >/dev/null 2>&1; then
+    wm='sway'
+elif command -v i3-msg >/dev/null 2>&1 && i3-msg -t get_version >/dev/null 2>&1; then
+    wm='i3'
+else
+    printf 'reload-wm: neither Sway nor i3 is running\n' >&2
+    exit 1
+fi
+
+if [[ $wm == sway ]]; then
+    if swaymsg -t get_tree | jq -e --arg name "$window_name" \
+        '.. | objects | select((.app_id? // "") == $name and .visible == true)' >/dev/null; then
+        swaymsg "[app_id=\"$window_name\"] move scratchpad" >/dev/null
+        was_visible=true
+    fi
+    swaymsg reload >/dev/null
+else
+    if i3-msg -t get_tree | jq -e --arg name "$window_name" \
+        '.. | objects | select((.window_properties?.class? // "") == $name and .visible == true)' >/dev/null; then
+        i3-msg "[class=\"$window_name\"] move scratchpad" >/dev/null
+        was_visible=true
+    fi
+    i3-msg reload >/dev/null
+fi
+
+if [[ $was_visible == true ]]; then
+    sleep 0.1
+    # Restore the existing dropdown without recomputing its size or position.
+    "$HOME/.local/bin/toggle-terminal" --preserve-geometry
+fi

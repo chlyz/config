@@ -1,0 +1,56 @@
+@import url("../modus-theme/waybar.css");
+
+* {
+  border: none;
+  border-radius: 0;
+  font-family: sans-serif;
+  font-size: 16px;
+  min-height: 0;
+}
+
+window#waybar {
+  background: @theme-bg;
+  color: @theme-fg;
+  border-top: 2px solid @theme-border;
+}
+
+#workspaces button {
+  padding: 0 8px;
+  color: @theme-dim;
+  background: transparent;
+}
+
+#workspaces button.focused {
+  color: @theme-bg;
+  background: @theme-accent;
+}
+
+#workspaces button.urgent,
+#battery.critical:not(.charging) {
+  color: @theme-bg;
+  background: @theme-urgent;
+}
+
+#window {
+  color: @theme-dim;
+}
+
+#clock,
+#network,
+#pulseaudio,
+#battery,
+#tray {
+  padding: 0 10px;
+  margin: 4px 0;
+  background: transparent;
+}
+
+#network.disconnected,
+#pulseaudio.muted {
+  color: @theme-dim;
+}
+
+#battery.charging,
+#network {
+  color: @theme-fg;
+}

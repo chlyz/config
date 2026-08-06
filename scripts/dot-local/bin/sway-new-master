@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Listen for new Sway windows and promote newly tiled ones to master.
+set -euo pipefail
+
+lock_file="${XDG_RUNTIME_DIR:-/tmp}/sway-new-master.lock"
+exec 9>"$lock_file"
+flock -n 9 || exit 0
+
+swaymsg -t subscribe -m '["window"]' | while IFS= read -r event; do
+    container_id="$(jq -r '
+      select(.change == "new")
+      | select(.container.type == "con")
+      | select(.container.floating == "auto_off" or .container.floating == "user_off")
+      | .container.id
+    ' <<< "$event")"
+
+    if [[ -n "$container_id" ]]; then
+        # Let Sway finish placing the window before reading the tree.
+        sleep 0.05
+        "$HOME/.local/bin/sway-promote-master" "$container_id"
+    fi
+done

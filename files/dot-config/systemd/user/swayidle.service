@@ -1,0 +1,13 @@
+[Unit]
+Description=Idle management for Sway
+Documentation=man:swayidle(1)
+PartOf=sway-session.target
+After=sway-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/swayidle -w timeout 900 '/usr/bin/swaylock -f -c 0d0e1c' timeout 1200 '/usr/bin/swaymsg "output * power off"' resume '/usr/bin/swaymsg "output * power on"' before-sleep '/usr/bin/swaylock -f -c 0d0e1c'
+Restart=on-failure
+
+[Install]
+WantedBy=sway-session.target

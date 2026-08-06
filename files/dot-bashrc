@@ -1,0 +1,65 @@
+# .bashrc
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+    . /etc/bashrc
+fi
+
+# User specific environment
+if ! [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]]; then
+    PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+fi
+export PATH
+
+# Keep interactive editing, including sudoedit, in the configured Neovim setup.
+export EDITOR=nvim
+export VISUAL=nvim
+export SUDO_EDITOR=nvim
+export TERMINAL=alacritty
+alias e=nvim
+
+# Learn frequently visited directories and provide the `z` jump command.
+if command -v zoxide >/dev/null 2>&1; then
+    eval "$(zoxide init bash)"
+fi
+
+# Fuzzy history search (Ctrl-R), file insertion (Ctrl-T), directory jumping
+# (Alt-C), and path completion after typing `**` and pressing Tab.
+if command -v fzf >/dev/null 2>&1; then
+    # A compact, top-down finder in the Modus Vivendi Tinted palette.
+    export FZF_DEFAULT_OPTS='--layout=reverse --height=~12 --prompt="› " --pointer="▸" --marker="•" --color=bg:#0d0e1c,bg+:#1d2235,fg:#c6daff,fg+:#ffffff,hl:#2fafff,hl+:#2fafff,header:#989898,info:#989898,prompt:#2fafff,pointer:#2fafff,marker:#2fafff,spinner:#2fafff,separator:#61647a,gutter:#0d0e1c,query:#ffffff,scrollbar:#61647a,selected-bg:#2fafff,selected-fg:#0d0e1c'
+    . /usr/share/fzf/shell/key-bindings.bash
+    . /etc/bash_completion.d/fzf
+fi
+
+# Open lf with Ctrl-O and adopt its final directory when it exits.
+if command -v lf >/dev/null 2>&1; then
+    lfcd() {
+        local dir tmp
+        tmp=$(mktemp) || return
+        command lf -last-dir-path="$tmp" "$@"
+        dir=$(<"$tmp")
+        rm -f "$tmp"
+        [ -d "$dir" ] && cd -- "$dir"
+    }
+    bind -x '"\C-o":lfcd'
+fi
+
+# Zathura's command-line option and document-path completion.
+if [ -r /usr/share/bash-completion/completions/zathura ]; then
+    . /usr/share/bash-completion/completions/zathura
+fi
+
+# Uncomment the following line if you don't like systemctl's auto-paging feature:
+# export SYSTEMD_PAGER=
+
+# User specific aliases and functions
+if [ -d ~/.bashrc.d ]; then
+    for rc in ~/.bashrc.d/*; do
+        if [ -f "$rc" ]; then
+            . "$rc"
+        fi
+    done
+fi
+unset rc
+. "$HOME/.cargo/env"

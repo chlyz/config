@@ -1,0 +1,160 @@
+# Keep the distribution's standard Sway configuration and add local settings
+# after it so they take precedence.
+include /etc/sway/config
+
+# Let D-Bus- and systemd-activated applications use the keyring that GDM
+# unlocks during login, rather than starting a second locked keyring daemon.
+exec dbus-update-activation-environment --systemd GNOME_KEYRING_CONTROL SSH_AUTH_SOCK
+
+# Keep NetworkManager's tray indicator available in Sway's default swaybar.
+exec nm-applet --indicator
+
+# Provide the PolicyKit password/authorization prompt needed by nm-applet.
+exec /usr/libexec/lxqt-policykit-agent
+
+# Waybar provides an interactive StatusNotifier tray; Swaybar's tray shows the
+# nm-applet icon but does not reliably deliver its click/menu events.  Reload
+# the existing Waybar on every Sway reload instead of starting a duplicate.
+exec_always sh -c 'if pgrep -x waybar >/dev/null; then pkill -USR2 -x waybar; else exec waybar; fi'
+
+# Scale UI and text for a large/high-resolution TV display.
+output * scale 2
+
+# Keep Emacs as the primary workspace-1 environment.  An empty alternate
+# editor makes emacsclient start a daemon when necessary; --no-wait leaves the
+# GUI frame owned by that daemon after this startup command exits.
+assign [app_id="emacs"] workspace number 1
+exec emacsclient --create-frame --no-wait --alternate-editor=""
+
+# Use a neutral desktop backdrop so the Modus window chrome stands out.
+output * bg #000000 solid_color
+
+# US Dvorak primary and Swedish secondary layout for all keyboards.
+input type:keyboard {
+    xkb_layout "us,se"
+    xkb_variant "dvorak,"
+    xkb_options "ctrl:swap_lalt_lctl,ctrl:swap_ralt_rctl,caps:swapescape"
+}
+
+# Replace the distribution's focus-mode binding and switch keyboard layouts
+# between US Dvorak and Swedish with Super+Space.
+unbindsym $mod+space
+bindsym $mod+space input type:keyboard xkb_switch_layout next
+
+# Close the focused window with Super+C.
+bindsym $mod+c kill
+
+# Reload Sway with Super+Shift+R instead of the distribution default.
+unbindsym $mod+Shift+c
+bindsym $mod+Shift+r exec ~/.local/bin/reload-wm
+
+# Open Rofi's desktop-application launcher with the remapped Alt+P.
+bindsym Alt+p exec rofi -show drun
+
+# Override the distribution terminal choice (Foot) with Alacritty.  The
+# distribution binding was already parsed by the included config, so replace
+# it explicitly rather than only changing the variable afterward.
+set $term alacritty
+unbindsym $mod+Return
+bindsym $mod+Return exec alacritty
+
+# Toggle the persistent dropdown terminal. Emacs calls the same script via
+# SPC t, while Sway owns this global shortcut so it works everywhere.
+bindsym $mod+t exec ~/.local/bin/toggle-terminal
+
+# Jump to the existing Emacs frame, or create one through the daemon.
+unbindsym $mod+h
+bindsym $mod+h exec ~/.local/bin/focus-emacs
+
+# Keep the dropdown terminal floating and centered rather than tiled.
+for_window [app_id="dropdown-terminal"] floating enable
+
+# Hardware audio keys via PipeWire/WirePlumber. These replace the PulseAudio
+# commands inherited from /etc/sway/config.
+unbindsym --locked XF86AudioMute
+unbindsym --locked XF86AudioLowerVolume
+unbindsym --locked XF86AudioRaiseVolume
+unbindsym --locked XF86AudioMicMute
+bindsym --locked XF86AudioMute exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+bindsym --locked XF86AudioLowerVolume exec wpctl set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%-
+bindsym --locked XF86AudioRaiseVolume exec wpctl set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%+
+bindsym --locked XF86AudioMicMute exec wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
+
+# Manage NetworkManager Wi-Fi connections with a Rofi menu.
+bindsym $mod+n exec ~/.local/bin/network-menu
+
+# Select a screenshot region and copy it as a PNG to the Wayland clipboard.
+# This replaces Sway's default Super+S stacking-layout shortcut.
+unbindsym $mod+s
+bindsym $mod+s exec grim -g "$(slurp)" - | wl-copy
+
+# Lock the session manually.
+unbindsym $mod+Shift+$right
+bindsym $mod+Shift+l exec swaylock -f -c 0d0e1c
+
+# Toggle the focused container between tabbed (monocle) and horizontal split.
+bindsym Alt+u layout toggle tabbed splith
+
+# Toggle to the previously focused workspace.
+bindsym Alt+o workspace back_and_forth
+
+# Focus adjacent containers with the remapped right Alt (AltGr) modifier.
+bindsym Alt+comma focus left
+bindsym Alt+period focus right
+
+# Switch to workspaces 1 through 6 with the remapped Right Alt modifier.
+bindsym Alt+1 workspace number 1
+bindsym Alt+2 workspace number 2
+bindsym Alt+3 workspace number 3
+bindsym Alt+4 workspace number 4
+bindsym Alt+5 workspace number 5
+bindsym Alt+6 workspace number 6
+bindsym Alt+Shift+1 move container to workspace number 1
+bindsym Alt+Shift+2 move container to workspace number 2
+bindsym Alt+Shift+3 move container to workspace number 3
+bindsym Alt+Shift+4 move container to workspace number 4
+bindsym Alt+Shift+5 move container to workspace number 5
+bindsym Alt+Shift+6 move container to workspace number 6
+
+# DWM-style zoom: promote a slave to the left-most master position.
+bindsym Alt+e exec ~/.local/bin/sway-zoom
+
+# New tiled windows are promoted to the left-most master position.
+exec_always ~/.local/bin/sway-new-master
+
+# Keep a single tiled window edge-to-edge. Once a workspace has multiple
+# windows, show compact separation around and between them.
+default_border pixel 1
+smart_borders on
+smart_gaps on
+gaps inner 6
+gaps outer 6
+
+# Modus Operandi Tinted fallback palette.  These declarations follow the distribution
+# configuration above so that both window decorations and swaybar share the
+# same appearance as the rest of the desktop before set-theme has run.
+set $modus-bg #fbf7f0
+set $modus-bg-alt #efe9dd
+set $modus-fg-main #000000
+set $modus-fg #193668
+set $modus-fg-dim #595959
+set $modus-border #9f9690
+set $modus-accent #005e8b
+set $modus-accent-bg #c9b9b0
+set $modus-urgent #a60000
+
+# class                 border          background      text             indicator       child_border
+client.focused          $modus-accent   $modus-accent-bg $modus-fg-main   $modus-accent   $modus-accent
+client.focused_inactive $modus-border   $modus-bg-alt   $modus-fg        $modus-border   $modus-border
+client.unfocused        $modus-border   $modus-bg       $modus-fg-dim    $modus-border   $modus-border
+client.urgent           $modus-urgent   $modus-urgent   $modus-fg-main   $modus-urgent   $modus-urgent
+client.placeholder      $modus-border   $modus-bg-alt   $modus-fg-dim    $modus-border   $modus-border
+client.background       $modus-bg
+
+# Hide the bar created by /etc/sway/config: Waybar supplies the panel instead.
+bar bar-0 {
+    mode invisible
+}
+
+# Global Modus theme overrides generated by set-theme.
+include ~/.config/modus-theme/sway.conf

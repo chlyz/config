@@ -1,0 +1,412 @@
+#!/usr/bin/env bash
+
+set -eu
+
+theme=${1:-modus-operandi-tinted}
+config_home=${XDG_CONFIG_HOME:-$HOME/.config}
+theme_dir="$config_home/modus-theme"
+
+usage() {
+    printf 'Usage: %s [THEME]\n' "${0##*/}" >&2
+    printf 'Preferred: modus-operandi-tinted modus-vivendi-tinted\n' >&2
+    printf 'Also:     modus-operandi modus-vivendi\n' >&2
+    printf '          modus-operandi-deuteranopia modus-vivendi-deuteranopia\n' >&2
+    printf '          modus-operandi-tritanopia modus-vivendi-tritanopia\n' >&2
+    exit 2
+}
+
+case "$theme" in
+    modus-vivendi-tinted)
+        bg='#0d0e1c'; bg_dim='#1d2235'; fg='#ffffff'; fg_dim='#989898'; fg_alt='#c6daff'
+        bg_active='#4a4f69'; bg_inactive='#2b3045'; border='#61647a'
+        red='#ff5f59'; red_warmer='#ff6b55'
+        green='#44bc44'; green_cooler='#00c06f'
+        yellow='#d0bc00'; yellow_warmer='#fec43f'
+        blue='#2fafff'; blue_warmer='#79a8ff'
+        magenta='#feacd0'; magenta_cooler='#b6a0ff'
+        cyan='#00d3d0'; cyan_cooler='#6ae4b9'
+        bg_region='#555a66'; fg_region='#ffffff'; cursor='#ff66ff'
+        accent="$cyan"; urgent="$red"
+        ;;
+    modus-vivendi)
+        bg='#000000'; bg_dim='#1e1e1e'; fg='#ffffff'; fg_dim='#989898'; fg_alt='#c6daff'
+        bg_active='#535353'; bg_inactive='#303030'; border='#646464'; accent='#2fafff'; urgent='#ff5f59'
+        ;;
+    modus-vivendi-deuteranopia)
+        bg='#000000'; bg_dim='#1e1e1e'; fg='#ffffff'; fg_dim='#989898'; fg_alt='#c6daff'
+        bg_active='#535353'; bg_inactive='#303030'; border='#646464'; accent='#ffa00f'; urgent='#ff5f59'
+        ;;
+    modus-vivendi-tritanopia)
+        bg='#000000'; bg_dim='#1e1e1e'; fg='#ffffff'; fg_dim='#989898'; fg_alt='#a0d7f2'
+        bg_active='#535353'; bg_inactive='#303030'; border='#646464'; accent='#00d3d0'; urgent='#ff5f59'
+        ;;
+    modus-operandi-tinted)
+        bg='#fbf7f0'; bg_dim='#efe9dd'; fg='#000000'; fg_dim='#595959'; fg_alt='#193668'
+        bg_active='#c9b9b0'; bg_inactive='#dfd5cf'; border='#9f9690'
+        red='#a60000'; red_warmer='#972500'
+        green='#006800'; green_cooler='#00663f'
+        yellow='#6f5500'; yellow_warmer='#884900'
+        blue='#0031a9'; blue_warmer='#3548cf'
+        magenta='#721045'; magenta_cooler='#531ab6'
+        cyan='#005e8b'; cyan_cooler='#005f5f'
+        bg_region='#c2bcb5'; fg_region='#000000'; cursor='#d00000'
+        accent="$cyan"; urgent="$red"
+        ;;
+    modus-operandi)
+        bg='#ffffff'; bg_dim='#f2f2f2'; fg='#000000'; fg_dim='#595959'; fg_alt='#193668'
+        bg_active='#c4c4c4'; bg_inactive='#e0e0e0'; border='#9f9f9f'; accent='#0031a9'; urgent='#a60000'
+        ;;
+    modus-operandi-deuteranopia)
+        bg='#ffffff'; bg_dim='#f2f2f2'; fg='#000000'; fg_dim='#595959'; fg_alt='#193668'
+        bg_active='#c4c4c4'; bg_inactive='#e0e0e0'; border='#9f9f9f'; accent='#973300'; urgent='#a60000'
+        ;;
+    modus-operandi-tritanopia)
+        bg='#ffffff'; bg_dim='#f2f2f2'; fg='#000000'; fg_dim='#595959'; fg_alt='#193668'
+        bg_active='#c4c4c4'; bg_inactive='#e0e0e0'; border='#9f9f9f'; accent='#005e8b'; urgent='#a60000'
+        ;;
+    *) usage ;;
+esac
+
+# The two Tinted themes above use their exact built-in Emacs palette.  Keep
+# the other supported variants coherent by filling the same semantic roles.
+red=${red:-$urgent}; red_warmer=${red_warmer:-$urgent}
+green=${green:-$accent}; green_cooler=${green_cooler:-$accent}
+yellow=${yellow:-$fg_alt}; yellow_warmer=${yellow_warmer:-$fg_alt}
+blue=${blue:-$accent}; blue_warmer=${blue_warmer:-$accent}
+magenta=${magenta:-$accent}; magenta_cooler=${magenta_cooler:-$accent}
+cyan=${cyan:-$accent}; cyan_cooler=${cyan_cooler:-$accent}
+bg_region=${bg_region:-$bg_active}; fg_region=${fg_region:-$fg}
+cursor=${cursor:-$accent}
+
+# Compatibility aliases used by the generated application snippets.
+bg_alt=$bg_dim
+dim=$fg_dim
+accent_bg=$bg_active
+
+case "$theme" in
+    modus-operandi*) foot_theme='/usr/share/foot/themes/modus-operandi' ;;
+    *) foot_theme='/usr/share/foot/themes/modus-vivendi-tinted' ;;
+esac
+
+# Kitty's default DIM opacity is 0.4, which washes Codex tool output and
+# deleted syntax text into the background.  These values approximate each
+# Modus family's fg-dim when the terminal blends its main foreground.
+case "$theme" in
+    modus-operandi*) kitty_dim_opacity='0.64' ;;
+    *) kitty_dim_opacity='0.58' ;;
+esac
+
+mkdir -p "$theme_dir"
+stage_dir=$(mktemp -d "$theme_dir/.set-theme.XXXXXX")
+cleanup_stage() {
+    if [[ -n ${stage_dir:-} && -d $stage_dir ]]; then
+        rm -rf -- "$stage_dir"
+    fi
+}
+trap cleanup_stage EXIT
+printf '%s\n' "$theme" > "$stage_dir/current"
+
+cat > "$stage_dir/sway.conf" <<EOF
+set \$modus-bg $bg
+set \$modus-bg-alt $bg_alt
+set \$modus-fg-main $fg
+set \$modus-fg $fg_alt
+set \$modus-fg-dim $dim
+set \$modus-border $border
+set \$modus-accent $accent
+set \$modus-accent-bg $accent_bg
+set \$modus-urgent $urgent
+output * bg $bg solid_color
+client.focused          \$modus-accent   \$modus-accent-bg \$modus-fg-main   \$modus-accent   \$modus-accent
+client.focused_inactive \$modus-border   \$modus-bg-alt    \$modus-fg        \$modus-border   \$modus-border
+client.unfocused        \$modus-border   \$modus-bg       \$modus-fg-dim    \$modus-border   \$modus-border
+client.urgent           \$modus-urgent   \$modus-urgent   \$modus-fg-main   \$modus-urgent   \$modus-urgent
+client.placeholder      \$modus-border   \$modus-bg-alt   \$modus-fg-dim    \$modus-border   \$modus-border
+client.background       \$modus-bg
+EOF
+
+cat > "$stage_dir/foot.ini" <<EOF
+include=$foot_theme
+
+[colors-dark]
+background=${bg#\#}
+foreground=${fg#\#}
+selection-foreground=${fg_region#\#}
+selection-background=${bg_region#\#}
+cursor=${fg_region#\#} ${cursor#\#}
+regular0=000000
+regular1=${red#\#}
+regular2=${green#\#}
+regular3=${yellow#\#}
+regular4=${blue#\#}
+regular5=${magenta#\#}
+regular6=${cyan#\#}
+regular7=a6a6a6
+bright0=595959
+bright1=${red_warmer#\#}
+bright2=${green_cooler#\#}
+bright3=${yellow_warmer#\#}
+bright4=${blue_warmer#\#}
+bright5=${magenta_cooler#\#}
+bright6=${cyan_cooler#\#}
+bright7=ffffff
+alpha=1.0
+EOF
+
+cat > "$stage_dir/kitty.conf" <<EOF
+foreground $fg
+background $bg
+dim_opacity $kitty_dim_opacity
+selection_foreground $fg_region
+selection_background $bg_region
+cursor $cursor
+cursor_text_color $fg_region
+color0 #000000
+color1 $red
+color2 $green
+color3 $yellow
+color4 $blue
+color5 $magenta
+color6 $cyan
+color7 #a6a6a6
+color8 #595959
+color9 $red_warmer
+color10 $green_cooler
+color11 $yellow_warmer
+color12 $blue_warmer
+color13 $magenta_cooler
+color14 $cyan_cooler
+color15 #ffffff
+EOF
+
+cat > "$stage_dir/alacritty.toml" <<EOF
+[colors.primary]
+background = "$bg"
+foreground = "$fg"
+dim_foreground = "$fg_dim"
+
+[colors.cursor]
+cursor = "$cursor"
+text = "$fg_region"
+
+[colors.selection]
+background = "$bg_region"
+text = "$fg_region"
+
+[colors.normal]
+black = "#000000"
+red = "$red"
+green = "$green"
+yellow = "$yellow"
+blue = "$blue"
+magenta = "$magenta"
+cyan = "$cyan"
+white = "#a6a6a6"
+
+[colors.bright]
+black = "#595959"
+red = "$red_warmer"
+green = "$green_cooler"
+yellow = "$yellow_warmer"
+blue = "$blue_warmer"
+magenta = "$magenta_cooler"
+cyan = "$cyan_cooler"
+white = "#ffffff"
+EOF
+
+cat > "$stage_dir/alacritty.yml" <<EOF
+colors:
+  primary:
+    background: "$bg"
+    foreground: "$fg"
+    dim_foreground: "$fg_dim"
+  cursor:
+    cursor: "$cursor"
+    text: "$fg_region"
+  selection:
+    background: "$bg_region"
+    text: "$fg_region"
+  normal:
+    black: "#000000"
+    red: "$red"
+    green: "$green"
+    yellow: "$yellow"
+    blue: "$blue"
+    magenta: "$magenta"
+    cyan: "$cyan"
+    white: "#a6a6a6"
+  bright:
+    black: "#595959"
+    red: "$red_warmer"
+    green: "$green_cooler"
+    yellow: "$yellow_warmer"
+    blue: "$blue_warmer"
+    magenta: "$magenta_cooler"
+    cyan: "$cyan_cooler"
+    white: "#ffffff"
+EOF
+
+cat > "$stage_dir/i3.conf" <<EOF
+# Generated by set-theme; included by ~/.config/i3/dropdown-terminal.conf.
+client.focused          $accent   $accent_bg $fg        $accent   $accent
+client.focused_inactive $border   $bg_alt   $fg_alt    $border   $border
+client.unfocused        $border   $bg       $dim       $border   $border
+client.urgent           $urgent   $urgent   $fg        $urgent   $urgent
+client.placeholder     $border   $bg_alt   $dim       $border   $border
+EOF
+
+cat > "$stage_dir/tmux.conf" <<EOF
+set -g status-style "bg=$bg_dim,fg=$fg_alt"
+set -g status-left-style "bg=$bg_dim,fg=$accent,bold"
+set -g status-right-style "bg=$bg_dim,fg=$fg_dim"
+set -g window-status-style "bg=$bg_dim,fg=$fg_dim"
+set -g window-status-current-style "bg=$bg_active,fg=$fg,bold"
+set -g message-style "bg=$bg_active,fg=$fg"
+set -g pane-border-style "fg=$border"
+set -g pane-active-border-style "fg=$accent"
+set -g status-left " #[fg=$accent,bold][#S]"
+set -g status-right "#[fg=$fg_dim]%Y-%m-%d %H:%M "
+EOF
+
+cat > "$stage_dir/rofi-palette.rasi" <<EOF
+* {
+    background:     $bg;
+    background-alt: $bg_alt;
+    foreground:     $fg;
+    foreground-dim: $dim;
+    border:         $border;
+    accent:         $accent;
+    urgent:         $urgent;
+}
+EOF
+{
+    cat "$stage_dir/rofi-palette.rasi"
+    sed '/^@import /d' "$HOME/.config/rofi/modus-vivendi-tinted.rasi"
+} > "$stage_dir/rofi.rasi"
+
+cat > "$stage_dir/waybar.css" <<EOF
+@define-color theme-bg $bg;
+@define-color theme-bg-alt $bg_alt;
+@define-color theme-fg $fg;
+@define-color theme-dim $dim;
+@define-color theme-border $border;
+@define-color theme-accent $accent;
+@define-color theme-urgent $urgent;
+EOF
+
+# Publish complete files at their stable paths.  Each rename stays on the same
+# filesystem, so applications never observe a partially written theme.
+for generated_file in \
+    sway.conf foot.ini kitty.conf alacritty.toml alacritty.yml i3.conf \
+    tmux.conf rofi-palette.rasi rofi.rasi waybar.css; do
+    mv -f -- "$stage_dir/$generated_file" "$theme_dir/$generated_file"
+done
+# The state marker moves last, after every consumer file is ready.
+mv -f -- "$stage_dir/current" "$theme_dir/current"
+rmdir -- "$stage_dir"
+stage_dir=
+trap - EXIT
+
+if command -v swaymsg >/dev/null 2>&1 && [[ -n "${SWAYSOCK:-}" ]]; then
+    "$HOME/.local/bin/reload-wm" >/dev/null 2>&1 || true
+elif command -v i3-msg >/dev/null 2>&1; then
+    "$HOME/.local/bin/reload-wm" >/dev/null 2>&1 || true
+fi
+tmux source-file "$HOME/.config/modus-theme/tmux.conf" 2>/dev/null || true
+pkill -USR1 -u "$(id -u)" -x kitty 2>/dev/null || true
+pkill -USR2 -x waybar 2>/dev/null || true
+
+# The state file above selects Emacs' next startup theme.  If an Emacs server
+# is already running, apply the same choice immediately without starting one
+# or writing a second copy of the selection to Emacs' custom file.
+if command -v emacsclient >/dev/null 2>&1; then
+    emacsclient --alternate-editor=false \
+        --eval "(when (fboundp 'my-modus-theme-apply) (my-modus-theme-apply '$theme))" \
+        >/dev/null 2>&1 || true
+fi
+
+# Codex reads a TextMate theme into memory rather than watching it.  Keep one
+# stable theme name so new Codex sessions always follow the global selection;
+# existing sessions can reload it through /theme or by restarting.
+codex_theme_dir="$HOME/.codex/themes"
+codex_theme_file="$codex_theme_dir/modus-current.tmTheme"
+codex_template="$codex_theme_dir/modus-vivendi-tinted.tmTheme"
+codex_config="$HOME/.codex/config.toml"
+if [[ -d "$HOME/.codex" ]]; then
+    mkdir -p "$codex_theme_dir"
+    case "$theme" in
+        modus-vivendi) codex_display_name='Modus Vivendi' ;;
+        modus-vivendi-tinted) codex_display_name='Modus Vivendi Tinted' ;;
+        modus-vivendi-deuteranopia) codex_display_name='Modus Vivendi Deuteranopia' ;;
+        modus-vivendi-tritanopia) codex_display_name='Modus Vivendi Tritanopia' ;;
+        modus-operandi) codex_display_name='Modus Operandi' ;;
+        modus-operandi-tinted) codex_display_name='Modus Operandi Tinted' ;;
+        modus-operandi-deuteranopia) codex_display_name='Modus Operandi Deuteranopia' ;;
+        modus-operandi-tritanopia) codex_display_name='Modus Operandi Tritanopia' ;;
+    esac
+    codex_display_name="Modus Current ($codex_display_name)"
+    if [[ -f "$codex_template" ]]; then
+        codex_stage=$(mktemp "$codex_theme_dir/.modus-current.XXXXXX.tmTheme")
+        cleanup_codex_stage() {
+            if [[ -n ${codex_stage:-} && -f $codex_stage ]]; then
+                rm -f -- "$codex_stage"
+            fi
+        }
+        trap cleanup_codex_stage EXIT
+        cp -- "$codex_template" "$codex_stage"
+        sed -i \
+            -e "s/Modus Vivendi Tinted for Codex/$codex_display_name for Codex/" \
+            -e "0,/<string>Modus Vivendi Tinted<\\/string>/s//<string>$codex_display_name<\\/string>/" \
+            "$codex_stage"
+        if [[ $theme == modus-operandi* ]]; then
+            # Exact Modus Operandi Tinted values from Emacs' built-in theme.
+            codex_fg='#000000'; codex_region='#c2bcb5'; codex_line='#f1d5d0'; codex_alt='#193668'
+            codex_caret='#d00000'; codex_comment='#7f0000'; codex_string='#3548cf'
+            codex_constant='#0000b0'; codex_keyword='#531ab6'; codex_builtin='#8f0075'
+            codex_function='#721045'; codex_type='#005f5f'; codex_variable='#005e8b'
+            codex_preprocessor='#a0132f'; codex_regex='#00663f'; codex_docstring='#005077'
+            codex_hunk_bg='#dfd5cf'; codex_warning='#884900'; codex_error='#a60000'
+            codex_info='#005f5f'; codex_invalid_bg='#f4d0cf'
+            codex_added_bg='#c3ebc1'; codex_added_fg='#005000'; codex_added_refine='#acd6a5'; codex_added_intense='#006700'
+            codex_changed_bg='#ffdfa9'; codex_changed_fg='#553d00'; codex_changed_refine='#fac090'; codex_changed_intense='#655000'
+            codex_removed_bg='#f4d0cf'; codex_removed_fg='#8f1313'; codex_removed_refine='#f3b5a7'; codex_removed_intense='#aa2222'; codex_context='#efe9df'
+        else
+            # Dark variants share the same semantic relationships; the core
+            # background and foreground come from the selected palette above.
+            codex_fg='#ffffff'; codex_region='#555a66'; codex_line='#303a6f'; codex_alt="$fg_alt"
+            codex_caret='#ff66ff'; codex_comment='#ff9f80'; codex_string='#79a8ff'
+            codex_constant='#00bcff'; codex_keyword='#b6a0ff'; codex_builtin='#f78fe7'
+            codex_function='#feacd0'; codex_type='#6ae4b9'; codex_variable='#00d3d0'
+            codex_preprocessor='#ff7f9f'; codex_regex='#00c06f'; codex_docstring='#9ac8e0'
+            codex_hunk_bg='#2b3045'; codex_warning='#fec43f'; codex_error='#ff5f59'
+            codex_info='#6ae4b9'; codex_invalid_bg='#9d1f1f'
+            codex_added_bg='#003a2f'; codex_added_fg='#a0e0a0'; codex_added_refine='#035542'; codex_added_intense='#80e080'
+            codex_changed_bg='#363300'; codex_changed_fg='#efef80'; codex_changed_refine='#4a4a00'; codex_changed_intense='#c0b05f'
+            codex_removed_bg='#4f1127'; codex_removed_fg='#ffbfbf'; codex_removed_refine='#781a3a'; codex_removed_intense='#ff9095'; codex_context='#1a1f30'
+        fi
+        sed -i \
+            -e "s|#0d0e1c|$bg|g" -e "s|#ffffff|$codex_fg|g" -e "s|#ff66ff|$codex_caret|g" \
+            -e "s|#61647a|$border|g" -e "s|#303a6f|$codex_line|g" -e "s|#555a66|$codex_region|g" \
+            -e "s|#c6daff|$codex_alt|g" -e "s|#ff9f80|$codex_comment|g" -e "s|#79a8ff|$codex_string|g" \
+            -e "s|#00bcff|$codex_constant|g" -e "s|#b6a0ff|$codex_keyword|g" -e "s|#f78fe7|$codex_builtin|g" \
+            -e "s|#feacd0|$codex_function|g" -e "s|#6ae4b9|$codex_type|g" -e "s|#00d3d0|$codex_variable|g" \
+            -e "s|#ff7f9f|$codex_preprocessor|g" -e "s|#00c06f|$codex_regex|g" -e "s|#9ac8e0|$codex_docstring|g" \
+            -e "s|#2b3045|$codex_hunk_bg|g" -e "s|#fec43f|$codex_warning|g" -e "s|#ff5f59|$codex_error|g" \
+            -e "s|#6ae4b9|$codex_info|g" -e "s|#9d1f1f|$codex_invalid_bg|g" \
+            -e "s|#003a2f|$codex_added_bg|g" -e "s|#a0e0a0|$codex_added_fg|g" -e "s|#035542|$codex_added_refine|g" -e "s|#80e080|$codex_added_intense|g" \
+            -e "s|#363300|$codex_changed_bg|g" -e "s|#efef80|$codex_changed_fg|g" -e "s|#4a4a00|$codex_changed_refine|g" -e "s|#c0b05f|$codex_changed_intense|g" \
+            -e "s|#4f1127|$codex_removed_bg|g" -e "s|#ffbfbf|$codex_removed_fg|g" -e "s|#781a3a|$codex_removed_refine|g" -e "s|#ff9095|$codex_removed_intense|g" \
+            -e "s|#1a1f30|$codex_context|g" \
+            "$codex_stage"
+        mv -f -- "$codex_stage" "$codex_theme_file"
+        codex_stage=
+        trap - EXIT
+    fi
+    if [[ -f "$codex_theme_file" && -f "$codex_config" ]]; then
+        sed -i -E 's|^theme = .*|theme = "modus-current"|' "$codex_config"
+    elif [[ ! -f "$codex_template" ]]; then
+        printf 'Codex theme template is missing; leaving its current theme unchanged\n' >&2
+    fi
+fi
+
+printf 'Theme set to %s\n' "$theme"

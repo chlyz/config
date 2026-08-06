@@ -1,0 +1,200 @@
+#!/usr/bin/env bash
+
+set -eu
+
+window_name='dropdown-terminal'
+session='dropdown'
+terminal_choice=${DROPDOWN_TERMINAL:-auto}
+preserve_geometry=false
+
+if [[ ${1:-} == --preserve-geometry ]]; then
+    preserve_geometry=true
+    shift
+fi
+
+if (( $# > 0 )); then
+    printf 'Usage: %s [--preserve-geometry]\n' "${0##*/}" >&2
+    exit 2
+fi
+
+if command -v swaymsg >/dev/null 2>&1 && swaymsg -t get_version >/dev/null 2>&1; then
+    wm='sway'
+elif command -v i3-msg >/dev/null 2>&1 && i3-msg -t get_version >/dev/null 2>&1; then
+    wm='i3'
+else
+    printf 'toggle-terminal: neither Sway nor i3 is running\n' >&2
+    exit 1
+fi
+
+tree() {
+    if [[ $wm == sway ]]; then
+        swaymsg -t get_tree
+    else
+        i3-msg -t get_tree
+    fi
+}
+
+has_window() {
+    if [[ $wm == sway ]]; then
+        jq -e --arg name "$window_name" \
+            '.. | objects | select((.app_id? // "") == $name)' >/dev/null
+    else
+        jq -e --arg name "$window_name" \
+            '.. | objects | select((.window_properties?.class? // "") == $name)' >/dev/null
+    fi
+}
+
+is_visible() {
+    if [[ $wm == sway ]]; then
+        jq -e --arg name "$window_name" \
+            '.. | objects | select((.app_id? // "") == $name and .visible == true)' >/dev/null
+    else
+        jq -e --arg name "$window_name" \
+            '.. | objects | select((.window_properties?.class? // "") == $name and .visible == true)' >/dev/null
+    fi
+}
+
+selector() {
+    if [[ $wm == sway ]]; then
+        printf '[app_id="%s"]' "$window_name"
+    else
+        printf '[class="%s"]' "$window_name"
+    fi
+}
+
+position_dropdown() {
+    local output screen_width screen_height width height
+    if [[ $wm == sway ]]; then
+        output=$(swaymsg -t get_outputs | jq -r \
+            '[.[] | select(.focused)][0].rect | "\(.width) \(.height)"')
+    else
+        output=$(i3-msg -t get_outputs | jq -r \
+            '[.[] | select(.focused)][0].rect | "\(.width) \(.height)"')
+    fi
+    read -r screen_width screen_height <<< "$output"
+
+    if [[ ! $screen_width =~ ^[0-9]+$ || ! $screen_height =~ ^[0-9]+$ ]]; then
+        printf 'toggle-terminal: unable to determine focused output size\n' >&2
+        return 1
+    fi
+
+    # Use 80% of the current output height and derive a golden-ratio width.
+    height=$((screen_height * 80 / 100))
+    width=$((height * 1618 / 1000))
+    if (( width > screen_width * 95 / 100 )); then
+        width=$((screen_width * 95 / 100))
+    fi
+
+    if [[ $wm == sway ]]; then
+        swaymsg "$(selector) resize set width ${width}px height ${height}px, move position center" >/dev/null
+    else
+        i3-msg "$(selector) floating enable, resize set width ${width} px height ${height} px, move position center" >/dev/null
+    fi
+}
+
+choose_terminal() {
+    if [[ $terminal_choice != auto ]]; then
+        printf '%s\n' "$terminal_choice"
+        return
+    fi
+
+    # Alacritty is the primary terminal: tmux owns tabs, panes, and sessions.
+    # Retain Kitty and Foot as portable fallbacks.
+    if command -v alacritty >/dev/null 2>&1; then
+        printf 'alacritty\n'
+    elif command -v kitty >/dev/null 2>&1; then
+        printf 'kitty\n'
+    elif command -v foot >/dev/null 2>&1; then
+        printf 'foot\n'
+    else
+        printf 'toggle-terminal: install alacritty, kitty, or foot\n' >&2
+        exit 1
+    fi
+}
+
+launch_terminal() {
+    local terminal columns lines status
+    local -a alacritty_dimensions=()
+    terminal=$(choose_terminal)
+    case "$terminal" in
+        kitty)
+            if [[ $wm == sway ]]; then
+                kitty --app-id="$window_name" --title="$window_name" \
+                    tmux new-session -A -s "$session" &
+            else
+                kitty --class="$window_name" --title="$window_name" \
+                    tmux new-session -A -s "$session" &
+            fi
+            ;;
+        alacritty)
+            # A detached tmux session retains its last grid size.  Give a new
+            # Alacritty surface that same grid so it does not visibly start at
+            # 800x600 before Sway applies the final pixel dimensions.
+            if tmux has-session -t "$session" 2>/dev/null; then
+                read -r columns lines < <(
+                    tmux display-message -p -t "$session:" \
+                        '#{window_width} #{window_height}'
+                )
+                status=$(tmux show-options -gqv -t "$session" status 2>/dev/null || true)
+                if [[ $status != off && $status != 0 ]]; then
+                    ((lines += 1))
+                fi
+                if [[ $columns =~ ^[1-9][0-9]*$ && $lines =~ ^[1-9][0-9]*$ ]]; then
+                    alacritty_dimensions=(
+                        --option "window.dimensions.columns=$columns"
+                        --option "window.dimensions.lines=$lines"
+                    )
+                fi
+            fi
+            alacritty "${alacritty_dimensions[@]}" \
+                --class "$window_name" --title "$window_name" \
+                -e tmux new-session -A -s "$session" &
+            ;;
+        foot)
+            foot --app-id="$window_name" --title="$window_name" \
+                -e tmux new-session -A -s "$session" &
+            ;;
+        *)
+            printf 'toggle-terminal: unsupported terminal %s\n' "$terminal" >&2
+            exit 1
+            ;;
+    esac
+    printf '%s\n' "$!"
+}
+
+# If the dropdown is visible, hide it. Otherwise show the existing window.
+if tree | is_visible; then
+    if [[ $wm == sway ]]; then
+        swaymsg "$(selector) move scratchpad" >/dev/null
+    else
+        i3-msg "$(selector) move scratchpad" >/dev/null
+    fi
+    exit 0
+fi
+
+if tree | has_window; then
+    # With one managed dropdown, the unfiltered command reliably restores it
+    # from the scratchpad on both Sway and i3.
+    if [[ $wm == sway ]]; then
+        swaymsg 'scratchpad show' >/dev/null
+    else
+        i3-msg 'scratchpad show' >/dev/null
+    fi
+    if [[ $preserve_geometry == false ]]; then
+        position_dropdown
+    fi
+    exit 0
+fi
+
+terminal_pid=$(launch_terminal)
+
+# Wait briefly for the compositor to register the new terminal before sizing.
+for _ in {1..50}; do
+    if tree | has_window; then
+        position_dropdown
+        break
+    fi
+    sleep 0.05
+done
+
+wait "$terminal_pid"

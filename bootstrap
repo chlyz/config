@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+# Initialize a clean system with Rustup and the stable Rust toolchain. No sudo
+# required. Existing Rust installations are intentionally left untouched.
+set -euo pipefail
+
+toolchain=stable
+rumdl_version=0.2.52
+cargo_home=${CARGO_HOME:-"$HOME/.cargo"}
+rustup_home=${RUSTUP_HOME:-"$HOME/.rustup"}
+repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+config_bin="$HOME/.local/bin/config"
+
+if [[ -e $config_bin || -L $config_bin ]]; then
+    printf 'bootstrap: refusing to overwrite existing %s\n' "$config_bin" >&2
+    exit 1
+fi
+
+if command -v rustup >/dev/null 2>&1 || command -v cargo >/dev/null 2>&1 \
+    || [[ -e $cargo_home || -e $rustup_home ]]; then
+    printf '%s\n' 'bootstrap: Rust state already exists; this script is for clean systems only.' >&2
+    printf '%s\n' 'Use `rustup update stable` to update an existing installation.' >&2
+    exit 1
+fi
+
+if ! command -v curl >/dev/null 2>&1; then
+    printf '%s\n' 'bootstrap: curl is required to install Rustup' >&2
+    exit 1
+fi
+
+if ! git -C "$repo_root" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    printf '%s\n' 'bootstrap: run this script from a Git checkout.' >&2
+    exit 1
+fi
+
+installer=$(mktemp "${TMPDIR:-/tmp}/rustup-init.XXXXXX")
+trap 'rm -f "$installer"' EXIT
+
+curl --proto '=https' --tlsv1.2 --fail --location --show-error \
+    https://sh.rustup.rs -o "$installer"
+sh "$installer" -y --profile minimal --default-toolchain "$toolchain"
+"$cargo_home/bin/cargo" install rumdl --version "$rumdl_version" --locked
+
+mkdir -p "${config_bin%/*}"
+ln -s "$repo_root/config" "$config_bin"
+git -C "$repo_root" config core.hooksPath "$repo_root/.githooks"
+
+case ":$PATH:" in
+    *":$cargo_home/bin:"*) ;;
+    *)
+        printf '\nRust is installed, but %s is not on PATH in this shell.\n' "$cargo_home/bin"
+        printf 'Restart your shell or run: export PATH="%s:$PATH"\n' "$cargo_home/bin"
+        ;;
+esac
+
+"$cargo_home/bin/rustc" --version
+printf '\nInstalled config at %s\n' "$config_bin"
+printf 'Installed rumdl %s and enabled the repository pre-commit hook.\n' \
+    "$rumdl_version"
+printf 'Run config update to update the stable toolchain later.\n'
