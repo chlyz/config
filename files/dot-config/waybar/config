@@ -5,7 +5,7 @@
   "spacing": 8,
   "modules-left": ["sway/workspaces", "sway/window"],
   "modules-center": ["clock"],
-  "modules-right": ["network", "pulseaudio", "battery", "tray"],
+  "modules-right": ["network", "pulseaudio", "custom/game-mode", "battery", "tray"],
 
   "sway/workspaces": {
     "disable-scroll": true,
@@ -33,6 +33,12 @@
     "format": "Volume  {volume}%",
     "format-muted": "Muted",
     "on-click": "pavucontrol"
+  },
+  "custom/game-mode": {
+    "exec": "$HOME/.local/bin/sway-game-mode-status",
+    "return-type": "json",
+    "interval": 2,
+    "on-click": "$HOME/.local/bin/sway-game-mode"
   },
   "battery": {
     "format": "Battery  {capacity}%",

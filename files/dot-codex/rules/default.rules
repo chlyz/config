@@ -1,0 +1,40 @@
+# Read-only JSON inspection is safe in this trusted configuration repository.
+prefix_rule(
+    pattern = ["jq"],
+    decision = "allow",
+    justification = "Allow read-only JSON inspection without an approval prompt.",
+)
+
+# Read-only source inspection.
+prefix_rule(pattern = ["rg"], decision = "allow")
+prefix_rule(pattern = ["pgrep"], decision = "allow")
+prefix_rule(pattern = ["git", "status"], decision = "allow")
+prefix_rule(pattern = ["git", "diff"], decision = "allow")
+prefix_rule(pattern = ["git", "log"], decision = "allow")
+prefix_rule(pattern = ["git", "show"], decision = "allow")
+prefix_rule(pattern = ["swaymsg", "-t", "get_tree"], decision = "allow")
+prefix_rule(pattern = ["swaymsg", "-t", "get_binding_modes"], decision = "allow")
+prefix_rule(pattern = ["journalctl", "--user", "-u"], decision = "allow")
+prefix_rule(pattern = ["systemctl", "--user", "status"], decision = "allow")
+prefix_rule(pattern = ["systemctl", "--user", "is-active"], decision = "allow")
+prefix_rule(pattern = ["systemctl", "--user", "is-enabled"], decision = "allow")
+prefix_rule(pattern = ["systemctl", "--user", "show-environment"], decision = "allow")
+
+# Rust verification commands may create build artefacts, but do not alter source.
+prefix_rule(pattern = ["cargo", "test"], decision = "allow")
+prefix_rule(pattern = ["cargo", "clippy"], decision = "allow")
+prefix_rule(pattern = ["cargo", "fmt", "--check"], decision = "allow")
+prefix_rule(pattern = ["cargo", "check"], decision = "allow")
+
+# Re-link the trusted dotfiles package without an approval prompt.
+prefix_rule(
+    pattern = ["config", "link"],
+    decision = "allow",
+    justification = "Install this repository's managed dotfiles and command rules.",
+)
+prefix_rule(pattern=["sed", "-n", "430,540p", "src/main.rs"], decision="allow")
+prefix_rule(pattern=["/home/chrly/.local/bin/i3ipc-dynamic-tiling", "--workspace", "4", "--monocle"], decision="allow")
+prefix_rule(pattern=["jq", "-r", ".. | objects | select(.type? == \"workspace\" and .name? == \"4\") | {layout,representation}"], decision="allow")
+prefix_rule(pattern=["curl", "--fail", "--silent", "--show-error"], decision="allow")
+prefix_rule(pattern=["sed", "-n", "1,290p", "tools/ferrichess/src/main.rs"], decision="allow")
+prefix_rule(pattern=["sed", "-n"], decision="allow")

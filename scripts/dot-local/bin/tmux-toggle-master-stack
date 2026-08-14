@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Toggle the active pane between maximized and master-and-stack layouts.
+set -euo pipefail
+
+socket_path="${1:?missing tmux socket path}"
+pane_id="${2:?missing tmux pane ID}"
+tmux_command=(tmux -S "$socket_path")
+window_id="$("${tmux_command[@]}" display-message -p -t "$pane_id" '#{window_id}')"
+zoomed="$("${tmux_command[@]}" display-message -p -t "$pane_id" '#{window_zoomed_flag}')"
+
+"${tmux_command[@]}" resize-pane -Z -t "$pane_id"
+if [[ "$zoomed" == "1" ]]; then
+    "${tmux_command[@]}" select-layout -t "$window_id" main-vertical
+fi

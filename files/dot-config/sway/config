@@ -92,8 +92,19 @@ bindsym $mod+s exec grim -g "$(slurp)" - | wl-copy
 unbindsym $mod+Shift+$right
 bindsym $mod+Shift+l exec swaylock -f -c 0d0e1c
 
-# Toggle the focused container between tabbed (monocle) and horizontal split.
-bindsym Alt+u layout toggle tabbed splith
+# Game mode prevents controller-only play from reaching the swayidle lock and
+# display-off timers. Toggle it off again when you are done playing.
+bindsym $mod+Shift+g exec ~/.local/bin/sway-game-mode
+
+# Steam games run through Xwayland and expose a class such as
+# steam_app_292030.  Let Sway handle their idle inhibition directly, without
+# a polling process; it is released automatically when the game is hidden or
+# closed.
+for_window [class="^steam_app_[0-9]+$"] inhibit_idle visible
+
+# Toggle workspace 4 between tabbed monocle and the managed master/stack layout.
+# Right Ctrl is mapped to Right Alt by the keyboard options above.
+bindsym Alt+u exec ~/.local/bin/i3ipc-dynamic-tiling --workspace 4 --monocle
 
 # Toggle to the previously focused workspace.
 bindsym Alt+o workspace back_and_forth
@@ -119,8 +130,10 @@ bindsym Alt+Shift+6 move container to workspace number 6
 # DWM-style zoom: promote a slave to the left-most master position.
 bindsym Alt+e exec ~/.local/bin/sway-zoom
 
-# New tiled windows are promoted to the left-most master position.
-exec_always ~/.local/bin/sway-new-master
+# The Rust i3ipc-dynamic-tiling prototype owns dynamic master/stack placement.
+# Keep the legacy sway-new-master helper disabled so the two do not compete.
+# exec_always ~/.local/bin/sway-new-master
+exec_always sh -c 'systemctl --user import-environment SWAYSOCK I3SOCK; systemctl --user restart i3ipc-dynamic-tiling.service'
 
 # Keep a single tiled window edge-to-edge. Once a workspace has multiple
 # windows, show compact separation around and between them.

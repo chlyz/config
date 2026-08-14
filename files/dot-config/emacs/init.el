@@ -45,12 +45,36 @@
           kept-new-versions 5
           kept-old-versions 2)))
 
+;; Keep file-visiting buffers in sync when another program edits their files.
+;; Emacs uses file-notification events where they are available, and otherwise
+;; checks the file periodically without interrupting the user.  Also check as
+;; soon as Emacs regains focus after an external editor, such as Codex, writes
+;; to a visited file.
+(use-package autorevert
+  :ensure nil
+  :config
+  (setq auto-revert-verbose nil)
+  (global-auto-revert-mode 1)
+  (defun my-auto-revert-on-focus ()
+    "Refresh externally changed buffers when Emacs regains focus."
+    (let ((auto-revert-stop-on-user-input nil))
+      (auto-revert-buffers)))
+  (add-hook 'focus-in-hook #'my-auto-revert-on-focus))
+
 ;; Evil supplies Vim/Neovim editing states, motions, operators, registers,
 ;; text objects, and normal-mode commands across Emacs.
 (use-package evil
   :demand t
   :config
-  (evil-mode 1))
+  (evil-mode 1)
+  (defun my-save-buffer-and-normal-state ()
+    "Save the current buffer and return to Evil normal state."
+    (interactive)
+    (save-buffer)
+    (evil-normal-state))
+  (evil-define-key 'normal 'global (kbd "C-s") #'save-buffer)
+  (evil-define-key 'insert 'global (kbd "C-s")
+    #'my-save-buffer-and-normal-state))
 
 ;; Use the familiar Vim comment operator: gc{motion}, with gcc for a line.
 (use-package evil-nerd-commenter
@@ -81,7 +105,13 @@
           (interactive)
           (start-process "toggle-terminal" nil
                         (expand-file-name ".local/bin/toggle-terminal"
-                                          (getenv "HOME"))))))
+                                          (getenv "HOME")))))
+  (evil-leader/set-key-for-mode 'org-mode
+    "oi" #'org-clock-in
+    "oo" #'org-clock-out
+    "or" #'org-clock-report
+    "ot" #'org-todo
+    "os" #'org-schedule))
 
 ;; Add Evil bindings to built-in and third-party Emacs modes without adding a
 ;; separate integration package for each mode.
@@ -89,6 +119,28 @@
   :after evil
   :config
   (evil-collection-init))
+
+;; Evil uses Emacs' paragraph variables for `ip' and `ap'.  Org changes those
+;; variables for structural navigation, so advise only these text objects to
+;; use the same blank-line paragraph boundaries as a plain-text buffer.
+(defun my-org-plain-text-paragraph (original count &optional beg end type)
+  "Use plain-text paragraph bounds for Evil text objects in Org buffers."
+  (if (derived-mode-p 'org-mode)
+      (let ((paragraph-start "\f\\|[ \t]*$")
+            (paragraph-separate "[ \t\f]*$"))
+        (funcall original count beg end type))
+    (funcall original count beg end type)))
+
+(dolist (function '(evil-inner-paragraph evil-a-paragraph))
+  (unless (advice-member-p #'my-org-plain-text-paragraph function)
+    (advice-add function :around #'my-org-plain-text-paragraph)))
+
+;; Keep Org entries readable on open while folding drawers such as LOGBOOK.
+(use-package org
+  :ensure nil
+  :custom
+  (org-startup-folded 'nofold)
+  (org-cycle-hide-drawer-startup t))
 
 ;; Minimal completion stack: Vertico UI, Orderless matching, persistent
 ;; minibuffer history, and Marginalia annotations.
@@ -142,6 +194,58 @@
   :after vertico
   :config
   (marginalia-mode 1))
+
+;; A Perspective is a named, persistent workspace with its own buffer list and
+;; window layout.  This makes a project feel like a tmux session: files,
+;; compilation buffers, and shells from other projects stay out of the way.
+(use-package perspective
+  :bind (("C-x b" . persp-switch-to-buffer*)
+         ("C-x C-b" . persp-list-buffers))
+  :custom
+  (persp-mode-prefix-key (kbd "C-c M-p"))
+  (persp-nil-name "main")
+  (persp-modestring-short t)
+  (persp-sort 'created)
+  (persp-state-default-file
+   (expand-file-name
+    "perspectives.el"
+    (expand-file-name "emacs/"
+                      (or (getenv "XDG_CONFIG_HOME") "~/.config/"))))
+  :config
+  (persp-mode 1)
+  (setq switch-to-prev-buffer-skip
+        (lambda (_window buffer _bury-or-kill)
+          (not (persp-is-current-buffer buffer))))
+  (when (file-exists-p persp-state-default-file)
+    (persp-state-load persp-state-default-file))
+  (add-hook 'kill-emacs-hook #'persp-state-save))
+
+;; Project.el locates the project root while Perspective preserves its working
+;; context.  Space-p opens a known project (or accepts a new directory), then
+;; switches to its workspace and prompts for a project file.
+(use-package project
+  :ensure nil
+  :config
+  (defun my-project-open-perspective ()
+    "Open the current project in its named Perspective workspace."
+    (let* ((root (project-root (project-current t)))
+           (name (concat "project:"
+                         (abbreviate-file-name (directory-file-name root)))))
+      (let ((default-directory root))
+        (persp-switch name)
+        (project-find-file))))
+
+  (setq project-switch-commands
+        '((my-project-open-perspective "Open project workspace")))
+
+  (defun my-project-switch ()
+    "Select a project and open its Perspective workspace."
+    (interactive)
+    (project-switch-project (project-prompt-project-dir)))
+
+  (evil-leader/set-key
+    "p" #'my-project-switch
+    "," #'persp-switch-to-buffer*))
 
 ;; Markdown receives the same restrained, semantic treatment as Org: structural
 ;; markup and code are distinct without adding custom faces or decoration.

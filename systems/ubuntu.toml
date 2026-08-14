@@ -1,0 +1,22 @@
+# Packages intentionally installed for this dotfiles setup on Ubuntu 22.04.
+# This captures the platform packages needed by the portable user-level tools;
+# Alacritty itself is installed at a pinned version by ./bootstrap.
+
+[system]
+distribution = "ubuntu"
+release = "22.04"
+
+[packages]
+bootstrap = ["curl", "git"]
+shell = ["fzf", "tmux", "zoxide", "zsh"]
+alacritty_build = [
+  "build-essential",
+  "cmake",
+  "fontconfig",
+  "libfontconfig1-dev",
+  "libxcb-xfixes0-dev",
+  "libxkbcommon-dev",
+  "ncurses-bin",
+  "pkg-config",
+  "python3",
+]

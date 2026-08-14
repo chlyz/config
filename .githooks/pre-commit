@@ -3,6 +3,22 @@
 # Validate the Markdown content that is actually staged for this commit.
 set -euo pipefail
 
+rust_files_changed=false
+while IFS= read -r -d '' file; do
+    case "$file" in
+        Cargo.toml|Cargo.lock|src/*.rs)
+            rust_files_changed=true
+            break
+            ;;
+    esac
+done < <(git diff --cached --name-only -z --diff-filter=ACMR)
+
+if $rust_files_changed; then
+    cargo fmt --all --check
+    cargo clippy -- -D warnings
+    cargo test
+fi
+
 if ! command -v rumdl >/dev/null 2>&1; then
     printf '%s\n' 'pre-commit: rumdl is required; run config update first.' >&2
     exit 1

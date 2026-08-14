@@ -1,48 +1,103 @@
 #!/usr/bin/env bash
 
-# Initialize a clean system with Rustup and the stable Rust toolchain. No sudo
-# required. Existing Rust installations are intentionally left untouched.
+# Install this repository's managed Rust tools and launcher.  The script is
+# safe to rerun: an existing Rust installation is reused instead of replaced.
 set -euo pipefail
 
 toolchain=stable
 rumdl_version=0.2.52
+alacritty_version=0.17.0
+zsh_vi_mode_version=v0.12.0
 cargo_home=${CARGO_HOME:-"$HOME/.cargo"}
-rustup_home=${RUSTUP_HOME:-"$HOME/.rustup"}
 repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
-config_bin="$HOME/.local/bin/config"
 
-if [[ -e $config_bin || -L $config_bin ]]; then
-    printf 'bootstrap: refusing to overwrite existing %s\n' "$config_bin" >&2
-    exit 1
-fi
+install_alacritty_assets() {
+    local source_directory=
+    local candidate
 
-if command -v rustup >/dev/null 2>&1 || command -v cargo >/dev/null 2>&1 \
-    || [[ -e $cargo_home || -e $rustup_home ]]; then
-    printf '%s\n' 'bootstrap: Rust state already exists; this script is for clean systems only.' >&2
-    printf '%s\n' 'Use `rustup update stable` to update an existing installation.' >&2
-    exit 1
-fi
+    for candidate in "$cargo_home"/registry/src/*/alacritty-"$alacritty_version"; do
+        if [[ -d $candidate ]]; then
+            source_directory=$candidate
+            break
+        fi
+    done
 
-if ! command -v curl >/dev/null 2>&1; then
-    printf '%s\n' 'bootstrap: curl is required to install Rustup' >&2
-    exit 1
-fi
+    if [[ -z $source_directory ]]; then
+        printf '%s\n' 'bootstrap: could not locate Alacritty sources from Cargo.' >&2
+        exit 1
+    fi
+
+    if ! command -v tic >/dev/null 2>&1; then
+        printf '%s\n' 'bootstrap: tic is required to install Alacritty terminfo.' >&2
+        exit 1
+    fi
+
+    tic -x -o "$HOME/.terminfo" "$source_directory/extra/alacritty.info"
+    install -Dm644 "$source_directory/extra/linux/Alacritty.desktop" \
+        "$HOME/.local/share/applications/Alacritty.desktop"
+    install -Dm644 "$source_directory/extra/logo/compat/Alacritty.svg" \
+        "$HOME/.local/share/icons/hicolor/scalable/apps/Alacritty.svg"
+    install -Dm644 "$source_directory/extra/completions/alacritty.bash" \
+        "$HOME/.local/share/bash-completion/completions/alacritty"
+
+    if [[ -d $HOME/.config/fish ]]; then
+        install -Dm644 "$source_directory/extra/completions/alacritty.fish" \
+            "$HOME/.config/fish/completions/alacritty.fish"
+    fi
+}
+
+install_zsh_vi_mode() {
+    local destination="$HOME/.local/share/zsh-vi-mode"
+    local repository=https://github.com/jeffreytse/zsh-vi-mode.git
+
+    if [[ -e $destination ]]; then
+        if [[ ! -d $destination/.git ]]; then
+            printf 'bootstrap: refusing to replace existing %s.\n' "$destination" >&2
+            exit 1
+        fi
+        return
+    fi
+
+    install -d "${destination%/*}"
+    git clone --depth 1 --branch "$zsh_vi_mode_version" "$repository" "$destination"
+    printf 'Installed Zsh Vi Mode %s.\n' "$zsh_vi_mode_version"
+}
 
 if ! git -C "$repo_root" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     printf '%s\n' 'bootstrap: run this script from a Git checkout.' >&2
     exit 1
 fi
 
-installer=$(mktemp "${TMPDIR:-/tmp}/rustup-init.XXXXXX")
-trap 'rm -f "$installer"' EXIT
+if command -v rustup >/dev/null 2>&1; then
+    rustup toolchain install "$toolchain"
+    cargo_command=(rustup run "$toolchain" cargo)
+    rustc_command=(rustup run "$toolchain" rustc)
+elif command -v cargo >/dev/null 2>&1; then
+    cargo_command=(cargo)
+    rustc_command=(rustc)
+else
+    if ! command -v curl >/dev/null 2>&1; then
+        printf '%s\n' 'bootstrap: curl is required to install Rustup.' >&2
+        exit 1
+    fi
 
-curl --proto '=https' --tlsv1.2 --fail --location --show-error \
-    https://sh.rustup.rs -o "$installer"
-sh "$installer" -y --profile minimal --default-toolchain "$toolchain"
-"$cargo_home/bin/cargo" install rumdl --version "$rumdl_version" --locked
+    installer=$(mktemp "${TMPDIR:-/tmp}/rustup-init.XXXXXX")
+    trap 'rm -f "$installer"' EXIT
 
-mkdir -p "${config_bin%/*}"
-ln -s "$repo_root/config" "$config_bin"
+    curl --proto '=https' --tlsv1.2 --fail --location --show-error \
+        https://sh.rustup.rs -o "$installer"
+    sh "$installer" -y --profile minimal --default-toolchain "$toolchain"
+    cargo_command=("$cargo_home/bin/cargo")
+    rustc_command=("$cargo_home/bin/rustc")
+fi
+
+"${cargo_command[@]}" install rumdl --version "$rumdl_version" --locked
+"${cargo_command[@]}" install alacritty --version "$alacritty_version" --locked
+install_alacritty_assets
+install_zsh_vi_mode
+
+"$repo_root/config" link
+
 git -C "$repo_root" config core.hooksPath "$repo_root/.githooks"
 
 case ":$PATH:" in
@@ -53,8 +108,9 @@ case ":$PATH:" in
         ;;
 esac
 
-"$cargo_home/bin/rustc" --version
-printf '\nInstalled config at %s\n' "$config_bin"
+"${rustc_command[@]}" --version
+printf '\nLinked the repository configuration; config is available on PATH.\n'
 printf 'Installed rumdl %s and enabled the repository pre-commit hook.\n' \
     "$rumdl_version"
-printf 'Run config update to update the stable toolchain later.\n'
+printf 'Installed Alacritty %s with user-level integration files.\n' \
+    "$alacritty_version"

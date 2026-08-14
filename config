@@ -1,18 +1,7 @@
 #!/usr/bin/env bash
 
-# Run this repository's Rust configuration CLI without a global installation.
+# Bootstrap the stowable `config` command from a fresh repository clone.
 set -euo pipefail
 
-script_path=${BASH_SOURCE[0]}
-while [[ -L $script_path ]]; do
-    script_dir=$(cd -- "$(dirname -- "$script_path")" && pwd -P)
-    link_target=$(readlink "$script_path")
-    if [[ $link_target = /* ]]; then
-        script_path=$link_target
-    else
-        script_path="$script_dir/$link_target"
-    fi
-done
-
-repo_root=$(cd -- "$(dirname -- "$script_path")" && pwd -P)
-exec cargo run --quiet --manifest-path "$repo_root/Cargo.toml" -- "$@"
+repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+exec "$repo_root/scripts/dot-local/bin/config" "$@"

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if swaymsg -t get_tree -r 2>/dev/null | jq -e '
+    .. | objects | select(.idle_inhibitors?.user? == "visible")
+' >/dev/null; then
+    printf '%s\n' \
+        '{"text":"GAME","tooltip":"Game mode: a visible game is inhibiting idle handling.","class":"active"}'
+elif ! systemctl --user is-active --quiet swayidle.service; then
+    printf '%s\n' \
+        '{"text":"GAME","tooltip":"Game mode: idle locking and display sleep are disabled.","class":"active"}'
+else
+    printf '%s\n' '{"text":"","class":"inactive"}'
+fi

@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Promote a tmux pane to the left-most master position, like dwm's zoom.
+set -euo pipefail
+
+socket_path="${1:?missing tmux socket path}"
+pane_id="${2:?missing tmux pane ID}"
+tmux_command=(tmux -S "$socket_path")
+window_id="$("${tmux_command[@]}" display-message -p -t "$pane_id" '#{window_id}')"
+
+if (( $("${tmux_command[@]}" display-message -p -t "$pane_id" '#{window_panes}') < 2 )); then
+    exit 0
+fi
+
+"${tmux_command[@]}" select-layout -t "$window_id" main-vertical
+
+master_pane="${window_id}.0"
+if [[ "$("${tmux_command[@]}" display-message -p -t "$pane_id" '#{pane_index}')" == "0" ]]; then
+    target_pane="${window_id}.1"
+else
+    target_pane="$master_pane"
+fi
+
+"${tmux_command[@]}" swap-pane -d -s "$pane_id" -t "$target_pane"
+"${tmux_command[@]}" select-pane -t "$master_pane"

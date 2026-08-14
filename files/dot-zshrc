@@ -1,0 +1,112 @@
+# .zshrc -- a small, Vi-oriented interactive shell.
+#
+# This intentionally uses Zsh's built-ins instead of a plugin framework. Keep
+# additions here motivated by a repeated interactive need.
+
+[[ -o interactive ]] || return
+
+# Keep user-installed commands ahead of system commands without duplicating
+# entries when this file is sourced more than once.
+path=("$HOME/.local/bin" "$HOME/bin" $path)
+typeset -U path PATH
+
+export EDITOR=nvim
+export VISUAL=nvim
+export SUDO_EDITOR=nvim
+export TERMINAL=alacritty
+
+[[ -r "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
+
+alias e=nvim
+alias p=project
+
+# Share useful history between interactive shells without retaining duplicate
+# or accidental commands that start with a space.
+history_directory="${XDG_STATE_HOME:-$HOME/.local/state}/zsh"
+mkdir -p -- "$history_directory"
+HISTFILE="$history_directory/history"
+HISTSIZE=10000
+SAVEHIST=10000
+setopt append_history
+setopt extended_history
+setopt hist_expire_dups_first
+setopt hist_ignore_dups
+setopt hist_ignore_space
+setopt hist_reduce_blanks
+setopt hist_save_no_dups
+setopt inc_append_history
+setopt share_history
+
+# Native completion is deliberately enabled before optional tool integrations.
+autoload -Uz compinit
+completion_directory="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
+mkdir -p -- "$completion_directory"
+compinit -d "$completion_directory/zcompdump"
+zstyle ':completion:*' auto-description 'specify: %d'
+zstyle ':completion:*' completer _complete _match _approximate
+zstyle ':completion:*' format 'Completing %d'
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':completion:*' menu select
+zstyle ':completion:*' verbose yes
+
+# Work from directories by name, without adding a prompt framework.
+setopt auto_cd
+setopt auto_pushd
+setopt pushd_ignore_dups
+setopt pushd_minus
+
+# A quiet prompt: current directory on the left, repository branch on the
+# right, and a visible distinction between successful and failed commands.
+autoload -Uz add-zsh-hook colors vcs_info
+colors
+setopt prompt_subst
+setopt transient_rprompt
+zstyle ':vcs_info:git:*' formats '%F{blue}%b%f'
+
+update_vcs_info() {
+    vcs_info
+}
+
+add-zsh-hook precmd update_vcs_info
+PROMPT='%F{blue}%1~%f %(?.%F{green}❯%f.%F{yellow}❯%f) '
+RPROMPT='${vcs_info_msg_0_}'
+
+# ZVM owns the Vi keymaps and modal-editing experience. Its cursor-shape and
+# clipboard integration use the terminal and Wayland tools already in use.
+ZVM_VI_EDITOR=$EDITOR
+ZVM_SYSTEM_CLIPBOARD_ENABLED=true
+zvm_plugin="$HOME/.local/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh"
+[[ -r $zvm_plugin ]] && source "$zvm_plugin"
+
+# Open lf and adopt its final directory. Ctrl-O is available in insert mode.
+if (( $+commands[lf] )); then
+    lfcd() {
+        local directory temporary_file
+        temporary_file=$(mktemp) || return
+        command lf -last-dir-path="$temporary_file" "$@"
+        directory=$(<"$temporary_file")
+        rm -f -- "$temporary_file"
+        [[ -d $directory ]] && cd -- "$directory"
+    }
+
+    lfcd-widget() {
+        zle -I
+        lfcd
+        zle reset-prompt
+    }
+
+    zle -N lfcd-widget
+    bindkey -M viins '^O' lfcd-widget
+fi
+
+if (( $+commands[zoxide] )); then
+    eval "$(zoxide init zsh)"
+fi
+
+if (( $+commands[fzf] )); then
+    export FZF_DEFAULT_OPTS='--layout=reverse --height=~12 --prompt="› " --pointer="▸" --marker="•" --color=bg:#0d0e1c,bg+:#1d2235,fg:#c6daff,fg+:#ffffff,hl:#2fafff,hl+:#2fafff,header:#989898,info:#989898,prompt:#2fafff,pointer:#2fafff,marker:#2fafff,spinner:#2fafff,separator:#61647a,gutter:#0d0e1c,query:#ffffff,scrollbar:#61647a,selected-bg:#2fafff,selected-fg:#0d0e1c'
+    fzf_shell_directory=/usr/share/fzf/shell
+    [[ -r "$fzf_shell_directory/key-bindings.zsh" ]] && source "$fzf_shell_directory/key-bindings.zsh"
+    [[ -r "$fzf_shell_directory/completion.zsh" ]] && source "$fzf_shell_directory/completion.zsh"
+fi

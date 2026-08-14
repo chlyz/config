@@ -15,3 +15,12 @@ delete_backward_word = ["ctrl-backspace", "ctrl-w", "ctrl-h"]
 
 [projects."/home/chrly/config"]
 trust_level = "trusted"
+
+[projects."/home/chrly/source/i3ipc-dynamic-tiling"]
+trust_level = "trusted"
+
+[projects."/home/chrly/Documents/chess"]
+trust_level = "trusted"
+
+[projects."/home/chrly/source/ferrichess"]
+trust_level = "trusted"

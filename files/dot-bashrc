@@ -17,6 +17,7 @@ export VISUAL=nvim
 export SUDO_EDITOR=nvim
 export TERMINAL=alacritty
 alias e=nvim
+alias p=project
 
 # Learn frequently visited directories and provide the `z` jump command.
 if command -v zoxide >/dev/null 2>&1; then

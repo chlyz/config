@@ -1,0 +1,3 @@
+# Dwm-style placement policy.
+master_position = "left"
+new_window = "master"

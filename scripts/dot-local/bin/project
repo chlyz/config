@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# Open a project workspace with Neovim and a Codex companion window.
+set -euo pipefail
+
+usage() {
+    printf '%s\n' 'Usage: project [DIRECTORY]'
+}
+
+if [[ ${1:-} == -h || ${1:-} == --help ]]; then
+    usage
+    exit 0
+fi
+
+if (( $# > 1 )); then
+    usage >&2
+    exit 2
+fi
+
+for command in tmux nvim codex; do
+    if ! command -v "$command" >/dev/null 2>&1; then
+        printf 'project: %s is required.\n' "$command" >&2
+        exit 1
+    fi
+done
+
+project_directory=${1:-.}
+if ! cd -- "$project_directory"; then
+    printf 'project: could not enter %s.\n' "$project_directory" >&2
+    exit 1
+fi
+project_directory=$(pwd -P)
+
+project_name=${project_directory##*/}
+if [[ -z $project_name ]]; then
+    project_name=root
+fi
+project_name=$(printf '%s' "$project_name" | tr -cs '[:alnum:]_.-' '-')
+session_name="project-$project_name"
+
+attach_session() {
+    if [[ -n ${TMUX:-} ]]; then
+        exec tmux switch-client -t "$session_name"
+    else
+        exec tmux attach-session -t "$session_name"
+    fi
+}
+
+if tmux has-session -t "=$session_name" 2>/dev/null; then
+    session_directory=$(tmux show-environment -t "$session_name" PROJECT_DIRECTORY 2>/dev/null || true)
+    if [[ $session_directory != "PROJECT_DIRECTORY=$project_directory" ]]; then
+        printf 'project: tmux session %q already belongs to another directory.\n' "$session_name" >&2
+        printf 'project: expected %s, found %s.\n' "$project_directory" "${session_directory#PROJECT_DIRECTORY=}" >&2
+        exit 1
+    fi
+    attach_session
+fi
+
+tmux new-session -d -s "$session_name" -c "$project_directory" -n editor nvim
+tmux set-environment -t "$session_name" PROJECT_DIRECTORY "$project_directory"
+tmux new-window -t "$session_name:" -c "$project_directory" -n codex \
+    codex --model gpt-5.6-terra --cd "$project_directory"
+tmux select-window -t "$session_name:editor"
+
+attach_session

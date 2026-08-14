@@ -8,10 +8,20 @@ distribution = "fedora"
 release = 44
 
 [packages]
-bootstrap = ["curl", "git", "stow"]
-shell = ["bash-completion", "fzf", "tmux", "zoxide"]
+bootstrap = ["curl", "git"]
+shell = ["bash-completion", "fzf", "tmux", "zoxide", "zsh"]
 editors = ["emacs", "neovim"]
-terminals = ["alacritty", "foot", "kitty"]
+terminals = ["foot", "kitty"]
+alacritty_build = [
+  "cmake",
+  "fontconfig-devel",
+  "freetype-devel",
+  "gcc",
+  "libxcb-devel",
+  "libxkbcommon-devel",
+  "ncurses",
+  "pkgconf-pkg-config",
+]
 desktop = [
   "NetworkManager",
   "lxqt-policykit",

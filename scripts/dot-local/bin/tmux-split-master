@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Split the active pane horizontally and promote the new pane to master.
+set -euo pipefail
+
+socket_path="${1:?missing tmux socket path}"
+pane_id="${2:?missing tmux pane ID}"
+tmux_command=(tmux -S "$socket_path")
+working_directory="$("${tmux_command[@]}" display-message -p -t "$pane_id" '#{pane_current_path}')"
+new_pane_id="$("${tmux_command[@]}" split-window -h -P -F '#{pane_id}' \
+  -t "$pane_id" -c "$working_directory")"
+
+exec "$(dirname "$0")/tmux-zoom-master" "$socket_path" "$new_pane_id"
