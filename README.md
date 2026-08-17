@@ -90,6 +90,26 @@ installed for this setup, grouped by purpose. They do not export Fedora's base
 image or dependency closure. The current machine is captured in
 [`systems/fedora.toml`](systems/fedora.toml) for Fedora 44.
 
+Install every package declared for the current Fedora or Ubuntu system with:
+
+```sh
+config packages install
+```
+
+The command detects the distribution from `/etc/os-release`, selects the matching
+manifest, and runs the system package manager through `sudo`. Preview the command
+without making changes with:
+
+```sh
+config packages install --dry-run
+```
+
+To update all system packages, including those outside this configuration, run:
+
+```sh
+config packages upgrade
+```
+
 ## Network menu
 
 `Super+N` opens a Rofi menu for connecting to, disconnecting from, or toggling

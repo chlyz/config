@@ -20,6 +20,25 @@ export TERMINAL=alacritty
 alias e=nvim
 alias p=project
 
+_config_completion() {
+    if (( CURRENT == 2 )); then
+        _describe -t commands command \
+            'link:link this repository into $HOME' \
+            'unlink:remove links owned by this repository' \
+            'status:show the state of managed links' \
+            'update:update stable Rust and repository tools' \
+            'packages:manage system packages' \
+            'help:show help'
+    elif [[ $words[2] == packages && $CURRENT == 3 ]]; then
+        _describe -t commands command \
+            'install:install packages declared for this distribution' \
+            'upgrade:upgrade all system packages'
+    elif [[ $CURRENT -eq 3 || $CURRENT -eq 4 ]]; then
+        _arguments '--dry-run[print commands without running them]'
+    fi
+}
+compdef _config_completion config
+
 # Share useful history between interactive shells without retaining duplicate
 # or accidental commands that start with a space.
 history_directory="${XDG_STATE_HOME:-$HOME/.local/state}/zsh"

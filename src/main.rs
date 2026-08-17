@@ -1,3 +1,4 @@
+use std::collections::BTreeSet;
 use std::env;
 use std::ffi::OsStr;
 use std::fs;
@@ -6,12 +7,25 @@ use std::os::unix::fs::symlink;
 use std::path::{Path, PathBuf};
 use std::process::{Command, ExitCode};
 
+use serde::Deserialize;
+
 const PACKAGES: [&str; 2] = ["files", "scripts"];
 
 #[derive(Debug)]
 struct Link {
     source: PathBuf,
     destination: PathBuf,
+}
+
+#[derive(Deserialize)]
+struct SystemManifest {
+    system: System,
+    packages: toml::Table,
+}
+
+#[derive(Deserialize)]
+struct System {
+    distribution: String,
 }
 
 enum LinkState {
@@ -22,7 +36,7 @@ enum LinkState {
 
 fn usage() {
     println!(
-        "Usage: config <command> [--dry-run]\n\nCommands:\n  link      Link this repository into $HOME\n  unlink    Remove links owned by this repository\n  status    Show the state of managed links\n  update    Update stable Rust and repository tools\n  help      Show this help"
+        "Usage: config <command> [--dry-run]\n\nCommands:\n  link                    Link this repository into $HOME\n  unlink                  Remove links owned by this repository\n  status                  Show the state of managed links\n  update                  Update stable Rust and repository tools\n  packages install        Install packages for the current distribution\n  packages upgrade        Upgrade all system packages\n  packages <command> --dry-run\n                          Print package-manager commands without running them\n  help                    Show this help"
     );
 }
 
@@ -46,6 +60,140 @@ fn update() -> ExitCode {
     } else {
         ExitCode::FAILURE
     }
+}
+
+fn current_distribution() -> Result<String, String> {
+    let os_release = fs::read_to_string("/etc/os-release")
+        .map_err(|error| format!("could not read /etc/os-release: {error}"))?;
+    let distribution = os_release
+        .lines()
+        .find_map(|line| line.strip_prefix("ID="))
+        .ok_or_else(|| "could not find ID in /etc/os-release".to_owned())?;
+    Ok(distribution.trim_matches('"').to_owned())
+}
+
+fn package_manager(distribution: &str) -> Option<(&str, &[&str])> {
+    match distribution {
+        "fedora" => Some(("dnf", &["install", "--refresh", "--assumeyes"])),
+        "ubuntu" => Some(("apt-get", &["install", "--yes"])),
+        _ => None,
+    }
+}
+
+fn package_names(manifest: &SystemManifest) -> Result<BTreeSet<String>, String> {
+    let mut names = BTreeSet::new();
+    for (group, packages) in &manifest.packages {
+        let packages = packages
+            .as_array()
+            .ok_or_else(|| format!("packages.{group} must be an array"))?;
+        for package in packages {
+            let package = package
+                .as_str()
+                .ok_or_else(|| format!("packages.{group} must contain only strings"))?;
+            names.insert(package.to_owned());
+        }
+    }
+    Ok(names)
+}
+
+fn install_packages(dry_run: bool) -> ExitCode {
+    let distribution = match current_distribution() {
+        Ok(distribution) => distribution,
+        Err(error) => {
+            eprintln!("config: {error}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let Some((manager, manager_arguments)) = package_manager(&distribution) else {
+        eprintln!("config: unsupported distribution: {distribution}");
+        return ExitCode::FAILURE;
+    };
+
+    let manifest_path = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("systems")
+        .join(format!("{distribution}.toml"));
+    let manifest = match fs::read_to_string(&manifest_path)
+        .map_err(|error| format!("could not read {}: {error}", manifest_path.display()))
+        .and_then(|contents| {
+            toml::from_str::<SystemManifest>(&contents)
+                .map_err(|error| format!("could not parse {}: {error}", manifest_path.display()))
+        }) {
+        Ok(manifest) => manifest,
+        Err(error) => {
+            eprintln!("config: {error}");
+            return ExitCode::FAILURE;
+        }
+    };
+    if manifest.system.distribution != distribution {
+        eprintln!(
+            "config: {} declares {}, not {distribution}",
+            manifest_path.display(),
+            manifest.system.distribution
+        );
+        return ExitCode::FAILURE;
+    }
+    let packages = match package_names(&manifest) {
+        Ok(packages) => packages,
+        Err(error) => {
+            eprintln!("config: {error}");
+            return ExitCode::FAILURE;
+        }
+    };
+
+    let mut arguments: Vec<&str> = manager_arguments.to_vec();
+    arguments.extend(packages.iter().map(String::as_str));
+    if dry_run {
+        println!("sudo {manager} {}", arguments.join(" "));
+        return ExitCode::SUCCESS;
+    }
+
+    match run(
+        "sudo",
+        &[manager]
+            .iter()
+            .chain(arguments.iter())
+            .copied()
+            .collect::<Vec<_>>(),
+    ) {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(()) => ExitCode::FAILURE,
+    }
+}
+
+fn upgrade_packages(dry_run: bool) -> ExitCode {
+    let distribution = match current_distribution() {
+        Ok(distribution) => distribution,
+        Err(error) => {
+            eprintln!("config: {error}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let commands: &[(&str, &[&str])] = match distribution.as_str() {
+        "fedora" => &[("dnf", &["upgrade", "--refresh", "--assumeyes"])],
+        "ubuntu" => &[("apt-get", &["update"]), ("apt-get", &["upgrade", "--yes"])],
+        _ => {
+            eprintln!("config: unsupported distribution: {distribution}");
+            return ExitCode::FAILURE;
+        }
+    };
+
+    for (program, arguments) in commands {
+        if dry_run {
+            println!("sudo {program} {}", arguments.join(" "));
+        } else if run(
+            "sudo",
+            &[*program]
+                .iter()
+                .chain(arguments.iter())
+                .copied()
+                .collect::<Vec<_>>(),
+        )
+        .is_err()
+        {
+            return ExitCode::FAILURE;
+        }
+    }
+    ExitCode::SUCCESS
 }
 
 fn mapped_component(component: &OsStr) -> PathBuf {
@@ -246,6 +394,26 @@ mod tests {
 
         fs::remove_dir_all(&temporary_directory).expect("remove temporary directory");
     }
+
+    #[test]
+    fn collects_and_deduplicates_manifest_packages() {
+        let manifest: SystemManifest = toml::from_str(
+            r#"
+                [system]
+                distribution = "fedora"
+
+                [packages]
+                editors = ["neovim", "emacs"]
+                shell = ["fzf", "neovim"]
+            "#,
+        )
+        .expect("parse manifest");
+
+        assert_eq!(
+            package_names(&manifest).expect("collect packages"),
+            BTreeSet::from(["emacs".to_owned(), "fzf".to_owned(), "neovim".to_owned()])
+        );
+    }
 }
 
 fn unlink(dry_run: bool) -> ExitCode {
@@ -342,6 +510,19 @@ fn command_with_dry_run(arguments: &[String], action: fn(bool) -> ExitCode) -> E
     }
 }
 
+fn packages(arguments: &[String]) -> ExitCode {
+    match arguments {
+        [command] if command == "install" => install_packages(false),
+        [command, flag] if command == "install" && flag == "--dry-run" => install_packages(true),
+        [command] if command == "upgrade" => upgrade_packages(false),
+        [command, flag] if command == "upgrade" && flag == "--dry-run" => upgrade_packages(true),
+        _ => {
+            eprintln!("config: expected packages install|upgrade [--dry-run]");
+            ExitCode::FAILURE
+        }
+    }
+}
+
 fn main() -> ExitCode {
     let arguments: Vec<String> = env::args().skip(1).collect();
     match arguments.first().map(String::as_str) {
@@ -349,6 +530,7 @@ fn main() -> ExitCode {
         Some("unlink") => command_with_dry_run(&arguments[1..], unlink),
         Some("status") if arguments.len() == 1 => status(),
         Some("update") if arguments.len() == 1 => update(),
+        Some("packages") => packages(&arguments[1..]),
         Some("help" | "--help" | "-h") | None => {
             usage();
             ExitCode::SUCCESS
