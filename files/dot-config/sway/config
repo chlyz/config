@@ -13,9 +13,9 @@ exec nm-applet --indicator
 exec /usr/libexec/lxqt-policykit-agent
 
 # Waybar provides an interactive StatusNotifier tray; Swaybar's tray shows the
-# nm-applet icon but does not reliably deliver its click/menu events.  Reload
-# the existing Waybar on every Sway reload instead of starting a duplicate.
-exec_always sh -c 'if pgrep -x waybar >/dev/null; then pkill -USR2 -x waybar; else exec waybar; fi'
+# nm-applet icon but does not reliably deliver its click/menu events.  Restart
+# Waybar on every Sway reload so a stale duplicate cannot persist.
+exec_always sh -c 'pkill -x waybar; exec waybar'
 
 # Scale UI and text for a large/high-resolution TV display.
 output * scale 2
