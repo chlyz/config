@@ -38,3 +38,4 @@ prefix_rule(pattern=["jq", "-r", ".. | objects | select(.type? == \"workspace\" 
 prefix_rule(pattern=["curl", "--fail", "--silent", "--show-error"], decision="allow")
 prefix_rule(pattern=["sed", "-n", "1,290p", "tools/ferrichess/src/main.rs"], decision="allow")
 prefix_rule(pattern=["sed", "-n"], decision="allow")
+prefix_rule(pattern=["curl", "--fail", "--silent", "--show-error", "--location"], decision="allow")
