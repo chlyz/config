@@ -22,6 +22,7 @@ vim.pack.add({
   "https://github.com/nvim-lua/plenary.nvim",
   "https://github.com/nvim-telescope/telescope.nvim",
   "https://github.com/nvim-telescope/telescope-fzf-native.nvim",
+  "https://github.com/crispgm/telescope-heading.nvim",
   "https://github.com/nvim-treesitter/nvim-treesitter",
   "https://github.com/tpope/vim-fugitive",
   "https://github.com/stevearc/oil.nvim",
@@ -75,6 +76,7 @@ require("telescope").setup({
 })
 
 require("telescope").load_extension("fzf")
+require("telescope").load_extension("heading")
 
 local telescope = require("telescope.builtin")
 
@@ -84,6 +86,16 @@ vim.keymap.set("n", "<leader>.", telescope.git_files, {
 
 vim.keymap.set("n", "<leader>,", telescope.buffers, {
   desc = "Switch buffer",
+})
+
+vim.keymap.set("n", "<leader>'", function()
+  if vim.bo.filetype == "markdown" then
+    vim.cmd("Telescope heading")
+  else
+    telescope.treesitter()
+  end
+end, {
+  desc = "Jump to heading or symbol",
 })
 
 vim.keymap.set("n", "-", "<cmd>Oil<cr>", {

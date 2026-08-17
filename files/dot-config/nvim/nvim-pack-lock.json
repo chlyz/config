@@ -16,6 +16,10 @@
       "rev": "b25b749b9db64d375d782094e2b9dce53ad53a40",
       "src": "https://github.com/nvim-telescope/telescope-fzf-native.nvim"
     },
+    "telescope-heading.nvim": {
+      "rev": "fb60fb08ea37849f79af21c2265cb77dc9687a20",
+      "src": "https://github.com/crispgm/telescope-heading.nvim"
+    },
     "telescope.nvim": {
       "rev": "40aedd8a68c78a656a10a8d62d80c54af59420fb",
       "src": "https://github.com/nvim-telescope/telescope.nvim"
