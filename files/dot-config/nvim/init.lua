@@ -24,9 +24,12 @@ vim.pack.add({
   "https://github.com/nvim-telescope/telescope-fzf-native.nvim",
   "https://github.com/nvim-treesitter/nvim-treesitter",
   "https://github.com/tpope/vim-fugitive",
+  "https://github.com/stevearc/oil.nvim",
 })
 
 require("nvim-treesitter").install({ "markdown" })
+
+require("oil").setup()
 
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "markdown",
@@ -68,6 +71,10 @@ vim.keymap.set("n", "<leader>.", telescope.git_files, {
 
 vim.keymap.set("n", "<leader>,", telescope.buffers, {
   desc = "Switch buffer",
+})
+
+vim.keymap.set("n", "-", "<cmd>Oil<cr>", {
+  desc = "Browse parent directory",
 })
 
 vim.keymap.set("n", "<leader>gs", "<cmd>Git<cr>", {
