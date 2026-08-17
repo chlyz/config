@@ -38,6 +38,19 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+vim.api.nvim_create_autocmd("BufReadPost", {
+  callback = function(args)
+    if vim.bo[args.buf].buftype ~= "" then
+      return
+    end
+
+    local position = vim.api.nvim_buf_get_mark(args.buf, '"')
+    if position[1] > 0 and position[1] <= vim.api.nvim_buf_line_count(args.buf) then
+      vim.api.nvim_win_set_cursor(0, position)
+    end
+  end,
+})
+
 require("telescope").setup({
   defaults = {
     border = true,
