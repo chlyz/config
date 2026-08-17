@@ -19,6 +19,7 @@ alacritty_build = [
   "gcc",
   "libxcb-devel",
   "libxkbcommon-devel",
+  "make",
   "ncurses",
   "pkgconf-pkg-config",
 ]

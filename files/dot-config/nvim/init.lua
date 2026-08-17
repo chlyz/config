@@ -7,6 +7,13 @@ vim.api.nvim_create_autocmd("PackChanged", {
         vim.cmd.packadd("nvim-treesitter")
       end
       require("nvim-treesitter").update({ "markdown" })
+    elseif event.data.spec.name == "telescope-fzf-native.nvim"
+      and (event.data.kind == "install" or event.data.kind == "update")
+    then
+      local result = vim.system({ "make" }, { cwd = event.data.path }):wait()
+      if result.code ~= 0 then
+        error("Could not build telescope-fzf-native.nvim: " .. result.stderr)
+      end
     end
   end,
 })
@@ -14,6 +21,7 @@ vim.api.nvim_create_autocmd("PackChanged", {
 vim.pack.add({
   "https://github.com/nvim-lua/plenary.nvim",
   "https://github.com/nvim-telescope/telescope.nvim",
+  "https://github.com/nvim-telescope/telescope-fzf-native.nvim",
   "https://github.com/nvim-treesitter/nvim-treesitter",
   "https://github.com/tpope/vim-fugitive",
 })
@@ -40,7 +48,17 @@ require("telescope").setup({
     preview = false,
     sorting_strategy = "ascending",
   },
+  extensions = {
+    fzf = {
+      case_mode = "smart_case",
+      fuzzy = true,
+      override_file_sorter = true,
+      override_generic_sorter = true,
+    },
+  },
 })
+
+require("telescope").load_extension("fzf")
 
 local telescope = require("telescope.builtin")
 
