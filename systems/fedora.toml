@@ -35,4 +35,4 @@ desktop = [
   "waybar",
 ]
 wayland_tools = ["grim", "jq", "slurp", "wl-clipboard"]
-applications = ["zathura"]
+applications = ["task", "zathura"]

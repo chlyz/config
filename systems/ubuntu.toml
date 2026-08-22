@@ -9,6 +9,7 @@ release = "22.04"
 [packages]
 bootstrap = ["curl", "git"]
 shell = ["fzf", "tmux", "zoxide", "zsh"]
+applications = ["taskwarrior"]
 alacritty_build = [
   "build-essential",
   "cmake",

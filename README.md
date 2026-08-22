@@ -45,6 +45,17 @@ project
 
 In Bash, `p` is an alias for `project`.
 
+## Taskwarrior
+
+Taskwarrior stores tasks and hooks under `~/.task` and follows the active Modus
+theme. Weeks start on Monday; confirmations and bulk-change safeguards retain
+their upstream defaults. Install it with the rest of the declared system
+packages:
+
+```sh
+config packages install
+```
+
 The session name is based on the directory name. The command refuses to reuse a same-named session
 that belongs to a different directory.
 
