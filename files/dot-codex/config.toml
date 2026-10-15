@@ -1,4 +1,4 @@
-model = "gpt-5.6-terra"
+model = "gpt-5.6-sol"
 model_reasoning_effort = "medium"
 
 [tui]
@@ -23,4 +23,13 @@ trust_level = "trusted"
 trust_level = "trusted"
 
 [projects."/home/chrly/source/ferrichess"]
+trust_level = "trusted"
+
+[projects."/home/chrly"]
+trust_level = "trusted"
+
+[projects."/home/chrly/source/orderless"]
+trust_level = "trusted"
+
+[projects."/home/chrly/source/nvim-modus-themes"]
 trust_level = "trusted"
