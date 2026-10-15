@@ -61,6 +61,16 @@
       (auto-revert-buffers)))
   (add-hook 'focus-in-hook #'my-auto-revert-on-focus))
 
+;; Scroll graphical windows by pixels so tall lines and inline images move
+;; continuously instead of jumping by a full display row.
+(use-package pixel-scroll
+  :ensure nil
+  :custom
+  (pixel-scroll-precision-use-momentum t)
+  (pixel-scroll-precision-interpolate-page t)
+  :config
+  (pixel-scroll-precision-mode 1))
+
 ;; Evil supplies Vim/Neovim editing states, motions, operators, registers,
 ;; text objects, and normal-mode commands across Emacs.
 (use-package evil
@@ -138,9 +148,13 @@
 ;; Keep Org entries readable on open while folding drawers such as LOGBOOK.
 (use-package org
   :ensure nil
+  :hook
+  (org-mode . abbrev-mode)
   :custom
   (org-startup-folded 'nofold)
-  (org-cycle-hide-drawer-startup t))
+  (org-cycle-hide-drawer-startup t)
+  :config
+  (define-abbrev org-mode-abbrev-table "emd" "—"))
 
 ;; Minimal completion stack: Vertico UI, Orderless matching, persistent
 ;; minibuffer history, and Marginalia annotations.
