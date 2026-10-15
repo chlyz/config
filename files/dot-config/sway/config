@@ -102,9 +102,9 @@ bindsym $mod+Shift+g exec ~/.local/bin/sway-game-mode
 # closed.
 for_window [class="^steam_app_[0-9]+$"] inhibit_idle visible
 
-# Toggle workspace 4 between tabbed monocle and the managed master/stack layout.
-# Right Ctrl is mapped to Right Alt by the keyboard options above.
-bindsym Alt+u exec ~/.local/bin/i3ipc-dynamic-tiling --workspace 4 --monocle
+# Toggle the focused workspace between the managed master/stack and tabbed
+# monocle layouts with right Alt/AltGr.  The helper restores the 55/45 split.
+bindsym Alt+u exec ~/.local/bin/i3ipc-dynamic-tiling --focused-workspace --monocle
 
 # Toggle to the previously focused workspace.
 bindsym Alt+o workspace back_and_forth
@@ -127,8 +127,8 @@ bindsym Alt+Shift+4 move container to workspace number 4
 bindsym Alt+Shift+5 move container to workspace number 5
 bindsym Alt+Shift+6 move container to workspace number 6
 
-# DWM-style zoom: promote a slave to the left-most master position.
-bindsym Alt+e exec ~/.local/bin/sway-zoom
+# DWM-style zoom through the Rust IPC helper, targeting the focused workspace.
+bindsym Alt+e exec ~/.local/bin/i3ipc-dynamic-tiling --focused-workspace --zoom
 
 # The Rust i3ipc-dynamic-tiling prototype owns dynamic master/stack placement.
 # Keep the legacy sway-new-master helper disabled so the two do not compete.
