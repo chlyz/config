@@ -19,29 +19,6 @@ export TERMINAL=alacritty
 alias e=nvim
 alias p=project
 
-_config_completion() {
-    local current=${COMP_WORDS[COMP_CWORD]}
-
-    case $COMP_CWORD in
-        1)
-            COMPREPLY=($(compgen -W 'link unlink status update packages help' -- "$current"))
-            ;;
-        2)
-            if [[ ${COMP_WORDS[1]} == packages ]]; then
-                COMPREPLY=($(compgen -W 'install upgrade' -- "$current"))
-            else
-                COMPREPLY=($(compgen -W '--dry-run' -- "$current"))
-            fi
-            ;;
-        3)
-            if [[ ${COMP_WORDS[1]} == packages ]]; then
-                COMPREPLY=($(compgen -W '--dry-run' -- "$current"))
-            fi
-            ;;
-    esac
-}
-complete -F _config_completion config
-
 # Learn frequently visited directories and provide the `z` jump command.
 if command -v zoxide >/dev/null 2>&1; then
     eval "$(zoxide init bash)"

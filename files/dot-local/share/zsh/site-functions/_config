@@ -1,0 +1,49 @@
+#compdef config
+
+_config() {
+  local -a commands themes
+  commands=(
+    'link:link this repository into HOME'
+    'unlink:remove links owned by this repository'
+    'status:show the state of managed links'
+    'theme:select and apply a theme to all applications'
+    'update:update stable Rust and repository tools'
+    'packages:install or upgrade system packages and user tools'
+    'help:show command help'
+  )
+  themes=(
+    modus-operandi-tinted
+    modus-vivendi-tinted
+    modus-operandi
+    modus-vivendi
+    modus-operandi-deuteranopia
+    modus-vivendi-deuteranopia
+    modus-operandi-tritanopia
+    modus-vivendi-tritanopia
+    current
+    list
+  )
+
+  if (( CURRENT == 2 )); then
+    _describe 'command' commands
+    return
+  fi
+
+  case $words[2] in
+    theme)
+      (( CURRENT == 3 )) && _values 'theme' $themes
+      ;;
+    packages)
+      if (( CURRENT == 3 )); then
+        _values 'package command' install upgrade
+      elif (( CURRENT == 4 )); then
+        _values 'option' --dry-run
+      fi
+      ;;
+    link|unlink)
+      (( CURRENT == 3 )) && _values 'option' --dry-run
+      ;;
+  esac
+}
+
+_config "$@"

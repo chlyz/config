@@ -57,6 +57,7 @@ setopt inc_append_history
 setopt share_history
 
 # Native completion is deliberately enabled before optional tool integrations.
+fpath=("${XDG_DATA_HOME:-$HOME/.local/share}/zsh/site-functions" $fpath)
 autoload -Uz compinit
 completion_directory="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
 mkdir -p -- "$completion_directory"

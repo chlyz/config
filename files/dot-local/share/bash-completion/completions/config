@@ -1,0 +1,33 @@
+_config_completion() {
+    local current=${COMP_WORDS[COMP_CWORD]}
+    local command=${COMP_WORDS[1]:-}
+    local commands='link unlink status theme update packages help'
+    local themes='modus-operandi-tinted modus-vivendi-tinted modus-operandi modus-vivendi modus-operandi-deuteranopia modus-vivendi-deuteranopia modus-operandi-tritanopia modus-vivendi-tritanopia current list'
+
+    if ((COMP_CWORD == 1)); then
+        mapfile -t COMPREPLY < <(compgen -W "$commands" -- "$current")
+        return
+    fi
+
+    case $command in
+        theme)
+            if ((COMP_CWORD == 2)); then
+                mapfile -t COMPREPLY < <(compgen -W "$themes" -- "$current")
+            fi
+            ;;
+        packages)
+            if ((COMP_CWORD == 2)); then
+                mapfile -t COMPREPLY < <(compgen -W 'install upgrade' -- "$current")
+            elif ((COMP_CWORD == 3)); then
+                mapfile -t COMPREPLY < <(compgen -W '--dry-run' -- "$current")
+            fi
+            ;;
+        link | unlink)
+            if ((COMP_CWORD == 2)); then
+                mapfile -t COMPREPLY < <(compgen -W '--dry-run' -- "$current")
+            fi
+            ;;
+    esac
+}
+
+complete -F _config_completion config

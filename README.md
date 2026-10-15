@@ -58,6 +58,9 @@ config theme current
 config theme list
 ```
 
+The `config` command installs native completion definitions for Bash, Zsh, and
+Fish, including subcommands, options, and every supported Modus theme name.
+
 ## Taskwarrior
 
 Taskwarrior stores tasks and hooks under `~/.task` and follows the active Modus
