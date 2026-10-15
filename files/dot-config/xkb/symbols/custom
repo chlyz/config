@@ -1,0 +1,23 @@
+// Personal XKB options loaded by Sway from ~/.config/xkb.
+
+partial modifier_keys
+xkb_symbols "shift_lsgt" {
+    // The ISO key between left Shift and Z (< on the US Dvorak layout).
+    replace key <LSGT> { [ Shift_L, Shift_L, Shift_L, Shift_L ] };
+    modifier_map Shift { <LSGT> };
+};
+
+xkb_symbols "dvorak_shift" {
+    include "us(dvorak)"
+    include "custom(shift_lsgt)"
+};
+
+xkb_symbols "colemak_shift" {
+    include "us(colemak)"
+    include "custom(shift_lsgt)"
+};
+
+xkb_symbols "colemak_dh_shift" {
+    include "us(colemak_dh)"
+    include "custom(shift_lsgt)"
+};

@@ -29,10 +29,10 @@ exec emacsclient --create-frame --no-wait --alternate-editor=""
 # Use a neutral desktop backdrop so the Modus window chrome stands out.
 output * bg #000000 solid_color
 
-# US Dvorak primary and Swedish secondary layout for all keyboards.
+# US Dvorak primary, standard Swedish secondary, and Colemak trial layouts.
 input type:keyboard {
-    xkb_layout "us,se"
-    xkb_variant "dvorak,"
+    xkb_layout "custom,se,custom,custom"
+    xkb_variant "dvorak_shift,,colemak_shift,colemak_dh_shift"
     xkb_options "ctrl:swap_lalt_lctl,ctrl:swap_ralt_rctl,caps:swapescape"
 }
 
