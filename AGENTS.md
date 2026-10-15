@@ -25,7 +25,7 @@
 
 ## Repository text
 
-- Use a 100-character line-length guideline for Markdown and normal text.
+- Use an 80-character line-length guideline for Markdown and normal text.
 - Run Rumdl for changed Markdown before a commit when it is available.
 
 ## Emacs configuration

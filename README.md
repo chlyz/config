@@ -33,10 +33,11 @@ config unlink
 
 ## Project workspaces
 
-`project [DIRECTORY]` creates or attaches to a tmux session for a project (the current directory
-by default). On first use, it opens an `editor` window running Neovim and a `codex` window running
-Codex with `gpt-5.6-terra` in the same directory. A later invocation attaches to the existing
-workspace instead of starting new editor or Codex processes:
+`project [DIRECTORY]` creates or attaches to a tmux session for a project (the
+current directory by default). On first use, it opens an `editor` window running
+Neovim and a `codex` window running Codex with `gpt-5.6-terra` in the same
+directory. A later invocation attaches to the existing workspace instead of
+starting new editor or Codex processes:
 
 ```sh
 project ~/source/ferrichess
@@ -56,15 +57,16 @@ packages:
 config packages install
 ```
 
-The session name is based on the directory name. The command refuses to reuse a same-named session
-that belongs to a different directory.
+The session name is based on the directory name. The command refuses to reuse a
+same-named session that belongs to a different directory.
 
 ## Zsh
 
-The Zsh setup is intentionally small and built-in-first: native completion and shared history, a
-restrained directory-and-Git prompt, plus FZF, zoxide, and `lf` when installed. Zsh Vi Mode owns
-modal command-line editing, cursor shape, and Wayland clipboard integration. It is inspired by
-Wincent's Bash-like Zsh configuration and by Protesilaos' preference for transparent, deliberate
+The Zsh setup is intentionally small and built-in-first: native completion and
+shared history, a restrained directory-and-Git prompt, plus FZF, zoxide, and
+`lf` when installed. Zsh Vi Mode owns modal command-line editing, cursor shape,
+and Wayland clipboard integration. It is inspired by Wincent's Bash-like Zsh
+configuration and by Protesilaos' preference for transparent, deliberate
 configuration.
 
 Try it without changing your login shell:
@@ -73,7 +75,8 @@ Try it without changing your login shell:
 zsh
 ```
 
-Once you are comfortable with it, make it your login shell with `chsh -s "$(command -v zsh)"`.
+Once you are comfortable with it, make it your login shell with `chsh -s
+"$(command -v zsh)"`.
 
 Path components beginning with `dot-` are mapped to dotfiles: for example,
 `files/dot-bashrc` becomes `~/.bashrc` and `files/dot-config/emacs/init.el`
@@ -87,12 +90,12 @@ ensures the stable toolchain, installs the pinned versions of Rumdl and
 Alacritty, and links the repository. `config update` runs the same workflow.
 
 Alacritty is installed under Cargo's user bin directory, with matching terminfo,
-desktop entry, icon, and Bash completion files installed under the home directory.
-The system manifests list the platform build dependencies: use
+desktop entry, icon, and Bash completion files installed under the home
+directory. The system manifests list the platform build dependencies: use
 [`systems/fedora.toml`](systems/fedora.toml) on Fedora or
 [`systems/ubuntu.toml`](systems/ubuntu.toml) on Ubuntu 22.04. Existing distro
-packages are left untouched and should be removed manually once the Cargo version
-has been verified.
+packages are left untouched and should be removed manually once the Cargo
+version has been verified.
 
 ## System packages
 
