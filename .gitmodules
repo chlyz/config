@@ -1,3 +1,6 @@
 [submodule "mattpocock-skills"]
 	path = vendor/mattpocock-skills
 	url = https://github.com/mattpocock/skills.git
+[submodule "vendor/terminal-modus"]
+	path = vendor/terminal-modus
+	url = https://github.com/chlyz/terminal-modus.git

@@ -2,14 +2,24 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::env;
 use std::ffi::OsStr;
 use std::fs;
-use std::io;
+use std::io::{self, Write};
 use std::os::unix::fs::symlink;
 use std::path::{Path, PathBuf};
-use std::process::{Command, ExitCode};
+use std::process::{Command, ExitCode, Stdio};
 
 use serde::Deserialize;
 
 const PACKAGES: [&str; 2] = ["files", "scripts"];
+const THEMES: [&str; 8] = [
+    "modus-operandi-tinted",
+    "modus-vivendi-tinted",
+    "modus-operandi",
+    "modus-vivendi",
+    "modus-operandi-deuteranopia",
+    "modus-vivendi-deuteranopia",
+    "modus-operandi-tritanopia",
+    "modus-vivendi-tritanopia",
+];
 
 #[derive(Debug)]
 struct Link {
@@ -38,8 +48,90 @@ enum LinkState {
 
 fn usage() {
     println!(
-        "Usage: config <command> [--dry-run]\n\nCommands:\n  link                    Link this repository into $HOME\n  unlink                  Remove links owned by this repository\n  status                  Show the state of managed links\n  update                  Update stable Rust and repository tools\n  packages install        Install system packages and user tools\n  packages upgrade        Upgrade system packages and user tools\n  packages <command> --dry-run\n                          Print package and tool commands without running them\n  help                    Show this help"
+        "Usage: config <command> [--dry-run]\n\nCommands:\n  link                    Link this repository into $HOME\n  unlink                  Remove links owned by this repository\n  status                  Show the state of managed links\n  theme [THEME]           Select and apply a theme to all applications\n  theme current|list      Show the current or available themes\n  update                  Update stable Rust and repository tools\n  packages install        Install system packages and user tools\n  packages upgrade        Upgrade system packages and user tools\n  packages <command> --dry-run\n                          Print package and tool commands without running them\n  help                    Show this help"
     );
+}
+
+fn current_theme() -> Option<String> {
+    let target = target_directory().ok()?;
+    fs::read_to_string(target.join(".config/modus-theme/current"))
+        .ok()
+        .map(|theme| theme.trim().to_owned())
+        .filter(|theme| !theme.is_empty())
+}
+
+fn select_with(program: &str, arguments: &[&str]) -> Option<String> {
+    let mut child = Command::new(program)
+        .args(arguments)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .spawn()
+        .ok()?;
+    child
+        .stdin
+        .take()?
+        .write_all(THEMES.join("\n").as_bytes())
+        .ok()?;
+    let output = child.wait_with_output().ok()?;
+    if !output.status.success() {
+        return None;
+    }
+    let choice = String::from_utf8(output.stdout).ok()?.trim().to_owned();
+    THEMES.contains(&choice.as_str()).then_some(choice)
+}
+
+fn choose_theme() -> Option<String> {
+    select_with("rofi", &["-dmenu", "-i", "-p", "Theme"])
+        .or_else(|| select_with("fzf", &["--prompt=Theme> "]))
+}
+
+fn apply_theme(theme: &str) -> ExitCode {
+    let script = Path::new(env!("CARGO_MANIFEST_DIR")).join("scripts/dot-local/bin/set-theme");
+    let script = script.to_string_lossy();
+    if run("bash", &[&script, theme]).is_ok() {
+        println!("Theme: {theme}");
+        ExitCode::SUCCESS
+    } else {
+        ExitCode::FAILURE
+    }
+}
+
+fn theme(arguments: &[String]) -> ExitCode {
+    match arguments {
+        [] => match choose_theme() {
+            Some(choice) => apply_theme(&choice),
+            None => {
+                eprintln!("config: no theme selected (install rofi or fzf, or pass a theme name)");
+                ExitCode::FAILURE
+            }
+        },
+        [command] if command == "current" => {
+            if let Some(current) = current_theme() {
+                println!("{current}");
+                ExitCode::SUCCESS
+            } else {
+                eprintln!("config: no current theme");
+                ExitCode::FAILURE
+            }
+        }
+        [command] if command == "list" => {
+            let current = current_theme();
+            for available in THEMES {
+                let marker = if current.as_deref() == Some(available) {
+                    "*"
+                } else {
+                    " "
+                };
+                println!("{marker} {available}");
+            }
+            ExitCode::SUCCESS
+        }
+        [choice] if THEMES.contains(&choice.as_str()) => apply_theme(choice),
+        _ => {
+            eprintln!("config: expected theme [THEME|current|list]");
+            ExitCode::FAILURE
+        }
+    }
 }
 
 fn run(program: &str, arguments: &[&str]) -> Result<(), ()> {
@@ -588,6 +680,7 @@ fn main() -> ExitCode {
         Some("link") => command_with_dry_run(&arguments[1..], link),
         Some("unlink") => command_with_dry_run(&arguments[1..], unlink),
         Some("status") if arguments.len() == 1 => status(),
+        Some("theme") => theme(&arguments[1..]),
         Some("update") if arguments.len() == 1 => update(),
         Some("packages") => packages(&arguments[1..]),
         Some("help" | "--help" | "-h") | None => {

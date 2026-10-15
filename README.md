@@ -46,6 +46,18 @@ project
 
 In Bash, `p` is an alias for `project`.
 
+## Themes
+
+`config theme` opens a Rofi selector and applies the chosen Modus variant to
+Emacs, Neovim, Alacritty, Kitty, Foot, tmux, Taskwarrior, Sway/i3, Waybar,
+Rofi, and Codex. A theme can also be selected directly:
+
+```sh
+config theme modus-vivendi-tinted
+config theme current
+config theme list
+```
+
 ## Taskwarrior
 
 Taskwarrior stores tasks and hooks under `~/.task` and follows the active Modus

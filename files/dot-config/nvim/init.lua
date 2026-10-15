@@ -112,4 +112,23 @@ vim.keymap.set("n", "<leader>gm", "<cmd>Gvdiffsplit! master<cr>", {
 
 vim.opt.termguicolors = true
 vim.opt.background = "dark"
-vim.cmd.colorscheme("modus_vivendi_tinted")
+
+-- Terminal Modus supplies the shared generated Operandi/Vivendi schemes.
+-- The local tinted scheme remains available until that variant is generated.
+vim.opt.runtimepath:prepend(vim.fn.expand("~/config/vendor/terminal-modus"))
+
+local selected_theme = "modus_vivendi_tinted"
+local theme_state = io.open(vim.fn.expand("~/.config/modus-theme/current"), "r")
+if theme_state then
+  selected_theme = vim.trim(theme_state:read("*a"))
+  theme_state:close()
+end
+
+local colorscheme = selected_theme:gsub("-", "_")
+local available = vim.fn.getcompletion(colorscheme, "color")
+if not vim.tbl_contains(available, colorscheme) then
+  colorscheme = vim.startswith(selected_theme, "modus-operandi")
+      and "modus_operandi"
+    or "modus_vivendi"
+end
+vim.cmd.colorscheme(colorscheme)
