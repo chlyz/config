@@ -9,9 +9,11 @@ local palette = {
   bg_main = "#0d0e1c", bg_dim = "#1d2235", fg_main = "#ffffff", fg_dim = "#989898",
   fg_alt = "#c6daff", bg_active = "#4a4f69", bg_inactive = "#2b3045", border = "#61647a",
   red = "#ff5f59", red_faint = "#ef8386", red_cooler = "#ff7f86",
-  green_cooler = "#11c777", yellow = "#d0bc00", yellow_faint = "#d2b580",
+  green_cooler = "#11c777", green_faint = "#88ca9f",
+  yellow = "#d0bc00", yellow_faint = "#d2b580",
   yellow_warmer = "#fec43f", blue = "#2fafff", blue_warmer = "#79a8ff",
-  blue_cooler = "#00bcff", magenta = "#feacd0", magenta_warmer = "#f78fe7",
+  blue_cooler = "#00bcff", blue_faint = "#82b0ec",
+  magenta = "#feacd0", magenta_warmer = "#f78fe7",
   magenta_cooler = "#b6a0ff", magenta_intense = "#ff66ff", cyan = "#00d3d0",
   cyan_warmer = "#4ae2f0", cyan_cooler = "#6ae4b9", cyan_faint = "#9ac8e0",
   bg_completion = "#483d8a", bg_hover = "#45605e", bg_hl_line = "#303a6f", bg_region = "#555a66",
@@ -65,6 +67,21 @@ hi("Special", { fg = palette.magenta_warmer })
 hi("Delimiter", { fg = palette.fg_main })
 hi("Error", { fg = palette.fg_main, bg = palette.bg_error })
 hi("Todo", { fg = palette.fg_main, bg = palette.bg_warning, bold = true })
+
+hi("@markup.heading.1", { fg = palette.fg_main, bold = true })
+hi("@markup.heading.2", { fg = palette.yellow_faint, bold = true })
+hi("@markup.heading.3", { fg = palette.blue_faint, bold = true })
+hi("@markup.heading.4", { fg = palette.magenta, bold = true })
+hi("@markup.heading.5", { fg = palette.green_faint, bold = true })
+hi("@markup.heading.6", { fg = palette.red_faint, bold = true })
+hi("@markup.strong", { fg = palette.fg_main, bold = true })
+hi("@markup.italic", { fg = palette.fg_main, italic = true })
+hi("@markup.link", { fg = palette.blue_warmer, underline = true })
+hi("@markup.link.label", { fg = palette.blue_warmer, underline = true })
+hi("@markup.link.url", { fg = palette.blue_warmer, underline = true })
+hi("@markup.raw", { fg = palette.cyan_cooler })
+hi("@markup.raw.block", { fg = palette.fg_main, bg = palette.bg_dim })
+hi("@markup.quote", { fg = palette.fg_main, bg = palette.bg_dim })
 
 hi("DiagnosticError", { fg = palette.red })
 hi("DiagnosticWarn", { fg = palette.yellow })

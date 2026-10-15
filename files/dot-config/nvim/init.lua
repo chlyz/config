@@ -1,18 +1,30 @@
 vim.g.mapleader = vim.g.mapleader or " "
 
+local markdown_parsers = { "markdown", "markdown_inline" }
+
 vim.api.nvim_create_autocmd("PackChanged", {
   callback = function(event)
     if event.data.kind == "update" and event.data.spec.name == "nvim-treesitter" then
       if not event.data.active then
         vim.cmd.packadd("nvim-treesitter")
       end
-      require("nvim-treesitter").update({ "markdown" })
+      local parsers_updated = require("nvim-treesitter").update(markdown_parsers):wait(300000)
+      if not parsers_updated then
+        error("Could not update the Markdown Tree-sitter parsers")
+      end
     elseif event.data.spec.name == "telescope-fzf-native.nvim"
       and (event.data.kind == "install" or event.data.kind == "update")
     then
       local result = vim.system({ "make" }, { cwd = event.data.path }):wait()
       if result.code ~= 0 then
         error("Could not build telescope-fzf-native.nvim: " .. result.stderr)
+      end
+    elseif event.data.spec.name == "orderless-search"
+      and (event.data.kind == "install" or event.data.kind == "update")
+    then
+      local result = vim.system({ "cargo", "build", "--release" }, { cwd = event.data.path }):wait()
+      if result.code ~= 0 then
+        error("Could not build orderless-search: " .. result.stderr)
       end
     end
   end,
@@ -23,19 +35,23 @@ vim.pack.add({
   "https://github.com/nvim-telescope/telescope.nvim",
   "https://github.com/nvim-telescope/telescope-fzf-native.nvim",
   "https://github.com/crispgm/telescope-heading.nvim",
+  "https://github.com/chlyz/orderless-search",
   "https://github.com/nvim-treesitter/nvim-treesitter",
   "https://github.com/tpope/vim-fugitive",
   "https://github.com/stevearc/oil.nvim",
 })
 
-require("nvim-treesitter").install({ "markdown" })
+local parsers_installed = require("nvim-treesitter").install(markdown_parsers):wait(300000)
+if not parsers_installed then
+  error("Could not install the Markdown Tree-sitter parsers")
+end
 
 require("oil").setup()
 
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "markdown",
   callback = function(args)
-    pcall(vim.treesitter.start, args.buf)
+    vim.treesitter.start(args.buf)
   end,
 })
 
@@ -50,6 +66,12 @@ vim.api.nvim_create_autocmd("BufReadPost", {
       vim.api.nvim_win_set_cursor(0, position)
     end
   end,
+})
+
+local autoread_group = vim.api.nvim_create_augroup("autoread", { clear = true })
+vim.api.nvim_create_autocmd({ "FocusGained", "CursorHold" }, {
+  group = autoread_group,
+  command = "checktime",
 })
 
 require("telescope").setup({
@@ -72,10 +94,15 @@ require("telescope").setup({
       override_file_sorter = true,
       override_generic_sorter = true,
     },
+    orderless = {
+      override_file_sorter = true,
+      override_generic_sorter = true,
+    },
   },
 })
 
 require("telescope").load_extension("fzf")
+require("telescope").load_extension("orderless")
 require("telescope").load_extension("heading")
 
 local telescope = require("telescope.builtin")
@@ -86,6 +113,10 @@ vim.keymap.set("n", "<leader>.", telescope.git_files, {
 
 vim.keymap.set("n", "<leader>,", telescope.buffers, {
   desc = "Switch buffer",
+})
+
+vim.keymap.set("n", "<leader><leader>", "<cmd>buffer #<cr>", {
+  desc = "Switch to previous buffer",
 })
 
 vim.keymap.set("n", "<leader>'", function()

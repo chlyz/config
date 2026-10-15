@@ -8,6 +8,10 @@
       "rev": "b73018b75affd13fa38e2fc94ef753b465f770d7",
       "src": "https://github.com/stevearc/oil.nvim"
     },
+    "orderless-search": {
+      "rev": "55099f6623a0c1752d119660fa654aa20f062c2f",
+      "src": "https://github.com/chlyz/orderless-search"
+    },
     "plenary.nvim": {
       "rev": "74b06c6c75e4eeb3108ec01852001636d85a932b",
       "src": "https://github.com/nvim-lua/plenary.nvim"
