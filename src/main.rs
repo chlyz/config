@@ -1,4 +1,4 @@
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use std::env;
 use std::ffi::OsStr;
 use std::fs;
@@ -21,6 +21,8 @@ struct Link {
 struct SystemManifest {
     system: System,
     packages: toml::Table,
+    #[serde(default)]
+    uv_tools: BTreeMap<String, Vec<String>>,
 }
 
 #[derive(Deserialize)]
@@ -36,7 +38,7 @@ enum LinkState {
 
 fn usage() {
     println!(
-        "Usage: config <command> [--dry-run]\n\nCommands:\n  link                    Link this repository into $HOME\n  unlink                  Remove links owned by this repository\n  status                  Show the state of managed links\n  update                  Update stable Rust and repository tools\n  packages install        Install packages for the current distribution\n  packages upgrade        Upgrade all system packages\n  packages <command> --dry-run\n                          Print package-manager commands without running them\n  help                    Show this help"
+        "Usage: config <command> [--dry-run]\n\nCommands:\n  link                    Link this repository into $HOME\n  unlink                  Remove links owned by this repository\n  status                  Show the state of managed links\n  update                  Update stable Rust and repository tools\n  packages install        Install system packages and user tools\n  packages upgrade        Upgrade system packages and user tools\n  packages <command> --dry-run\n                          Print package and tool commands without running them\n  help                    Show this help"
     );
 }
 
@@ -96,6 +98,34 @@ fn package_names(manifest: &SystemManifest) -> Result<BTreeSet<String>, String> 
     Ok(names)
 }
 
+fn run_uv_tools(
+    tools: &BTreeMap<String, Vec<String>>,
+    install: bool,
+    dry_run: bool,
+) -> Result<(), ()> {
+    for (tool, dependencies) in tools {
+        let mut arguments = vec!["tool".to_owned()];
+        if install {
+            arguments.push("install".to_owned());
+            for dependency in dependencies {
+                arguments.push("--with".to_owned());
+                arguments.push(dependency.clone());
+            }
+        } else {
+            arguments.push("upgrade".to_owned());
+        }
+        arguments.push(tool.clone());
+
+        if dry_run {
+            println!("uv {}", arguments.join(" "));
+        } else {
+            let arguments: Vec<&str> = arguments.iter().map(String::as_str).collect();
+            run("uv", &arguments)?;
+        }
+    }
+    Ok(())
+}
+
 fn install_packages(dry_run: bool) -> ExitCode {
     let distribution = match current_distribution() {
         Ok(distribution) => distribution,
@@ -144,17 +174,20 @@ fn install_packages(dry_run: bool) -> ExitCode {
     arguments.extend(packages.iter().map(String::as_str));
     if dry_run {
         println!("sudo {manager} {}", arguments.join(" "));
-        return ExitCode::SUCCESS;
-    }
-
-    match run(
+    } else if run(
         "sudo",
         &[manager]
             .iter()
             .chain(arguments.iter())
             .copied()
             .collect::<Vec<_>>(),
-    ) {
+    )
+    .is_err()
+    {
+        return ExitCode::FAILURE;
+    }
+
+    match run_uv_tools(&manifest.uv_tools, true, dry_run) {
         Ok(()) => ExitCode::SUCCESS,
         Err(()) => ExitCode::FAILURE,
     }
@@ -193,7 +226,26 @@ fn upgrade_packages(dry_run: bool) -> ExitCode {
             return ExitCode::FAILURE;
         }
     }
-    ExitCode::SUCCESS
+    let manifest_path = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("systems")
+        .join(format!("{distribution}.toml"));
+    let manifest = match fs::read_to_string(&manifest_path)
+        .map_err(|error| format!("could not read {}: {error}", manifest_path.display()))
+        .and_then(|contents| {
+            toml::from_str::<SystemManifest>(&contents)
+                .map_err(|error| format!("could not parse {}: {error}", manifest_path.display()))
+        }) {
+        Ok(manifest) => manifest,
+        Err(error) => {
+            eprintln!("config: {error}");
+            return ExitCode::FAILURE;
+        }
+    };
+
+    match run_uv_tools(&manifest.uv_tools, false, dry_run) {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(()) => ExitCode::FAILURE,
+    }
 }
 
 fn mapped_component(component: &OsStr) -> PathBuf {
@@ -405,6 +457,9 @@ mod tests {
                 [packages]
                 editors = ["neovim", "emacs"]
                 shell = ["fzf", "neovim"]
+
+                [uv_tools]
+                mdformat = ["mdformat-gfm"]
             "#,
         )
         .expect("parse manifest");
@@ -412,6 +467,10 @@ mod tests {
         assert_eq!(
             package_names(&manifest).expect("collect packages"),
             BTreeSet::from(["emacs".to_owned(), "fzf".to_owned(), "neovim".to_owned()])
+        );
+        assert_eq!(
+            manifest.uv_tools,
+            BTreeMap::from([("mdformat".to_owned(), vec!["mdformat-gfm".to_owned()])])
         );
     }
 }

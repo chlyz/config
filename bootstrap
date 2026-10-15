@@ -11,6 +11,21 @@ zsh_vi_mode_version=v0.12.0
 cargo_home=${CARGO_HOME:-"$HOME/.cargo"}
 repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 
+install_uv() {
+    local installer
+
+    if command -v uv >/dev/null 2>&1; then
+        return
+    fi
+
+    installer=$(mktemp "${TMPDIR:-/tmp}/uv-installer.XXXXXX")
+    trap 'rm -f "$installer"' EXIT
+    curl --proto '=https' --tlsv1.2 --fail --location --show-error \
+        https://astral.sh/uv/install.sh -o "$installer"
+    sh "$installer" --no-modify-path
+    export PATH="$HOME/.local/bin:$PATH"
+}
+
 install_alacritty_assets() {
     local source_directory=
     local candidate
@@ -95,6 +110,7 @@ fi
 "${cargo_command[@]}" install alacritty --version "$alacritty_version" --locked
 install_alacritty_assets
 install_zsh_vi_mode
+install_uv
 
 "$repo_root/config" link
 

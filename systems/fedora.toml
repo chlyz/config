@@ -36,3 +36,7 @@ desktop = [
 ]
 wayland_tools = ["grim", "jq", "slurp", "wl-clipboard"]
 applications = ["task", "zathura"]
+
+# User-level Python command-line tools installed in isolated uv environments.
+[uv_tools]
+mdformat = ["mdformat-gfm"]
