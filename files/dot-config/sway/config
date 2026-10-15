@@ -12,11 +12,6 @@ exec nm-applet --indicator
 # Provide the PolicyKit password/authorization prompt needed by nm-applet.
 exec /usr/libexec/lxqt-policykit-agent
 
-# Waybar provides an interactive StatusNotifier tray; Swaybar's tray shows the
-# nm-applet icon but does not reliably deliver its click/menu events.  Restart
-# Waybar on every Sway reload so a stale duplicate cannot persist.
-exec_always sh -c 'pkill -x waybar; exec waybar'
-
 # Scale UI and text for a large/high-resolution TV display.
 output * scale 2
 
@@ -164,7 +159,8 @@ client.urgent           $modus-urgent   $modus-urgent   $modus-fg-main   $modus-
 client.placeholder      $modus-border   $modus-bg-alt   $modus-fg-dim    $modus-border   $modus-border
 client.background       $modus-bg
 
-# Hide the bar created by /etc/sway/config: Waybar supplies the panel instead.
+# Hide the bar created by /etc/sway/config. The enabled Waybar user service
+# supplies the panel through graphical-session.target instead.
 bar bar-0 {
     mode invisible
 }

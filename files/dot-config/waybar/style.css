@@ -35,6 +35,14 @@ window#waybar {
   color: @theme-dim;
 }
 
+#mode {
+  padding: 0 10px;
+  margin: 4px 0;
+  color: @theme-bg;
+  background: @theme-accent;
+  font-weight: bold;
+}
+
 #clock,
 #network,
 #pulseaudio,

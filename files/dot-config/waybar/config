@@ -3,7 +3,7 @@
   "position": "bottom",
   "height": 32,
   "spacing": 8,
-  "modules-left": ["sway/workspaces", "sway/window"],
+  "modules-left": ["sway/workspaces", "sway/mode", "sway/window"],
   "modules-center": ["clock"],
   "modules-right": ["network", "pulseaudio", "custom/game-mode", "battery", "tray"],
 
