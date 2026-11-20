@@ -64,3 +64,28 @@ if [ -d ~/.bashrc.d ]; then
 fi
 unset rc
 . "$HOME/.cargo/env"
+
+# Report Bash's directory to Foot for its new-terminal binding (OSC 7).
+if [[ $- == *i* && ${TERM-} == foot* ]] &&
+   ! declare -F __foot_report_cwd >/dev/null; then
+    __foot_report_cwd() {
+        local status=$? LC_ALL=C path= char encoded index
+
+        # Encode path bytes that have special meaning in a file URI.
+        for ((index = 0; index < ${#PWD}; index++)); do
+            char=${PWD:index:1}
+            case $char in
+                [a-zA-Z0-9/._~-]) path+=$char ;;
+                *)
+                    printf -v encoded '%%%02X' "'$char"
+                    path+=$encoded
+                    ;;
+            esac
+        done
+
+        printf '\e]7;file://%s%s\e\\' "$HOSTNAME" "$path"
+        return "$status"
+    }
+
+    PROMPT_COMMAND+=(__foot_report_cwd)
+fi

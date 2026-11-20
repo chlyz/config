@@ -97,7 +97,7 @@ for i = 1, 10 do
         hl.dsp.window.move({ workspace = i, follow = false }))
 end
 
-hl.bind("SUPER + Return", hl.dsp.exec_cmd("alacritty"))
+hl.bind("SUPER + Return", hl.dsp.exec_cmd("foot"))
 hl.bind("SUPER + C", hl.dsp.window.close())
 hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("hyprctl reload"))
 hl.bind("SUPER + SHIFT + E", hl.dsp.exec_cmd(

@@ -84,8 +84,14 @@ dim=$fg_dim
 accent_bg=$bg_active
 
 case "$theme" in
-    modus-operandi*) foot_theme='/usr/share/foot/themes/modus-operandi' ;;
-    *) foot_theme='/usr/share/foot/themes/modus-vivendi-tinted' ;;
+    modus-operandi*)
+        foot_theme='/usr/share/foot/themes/modus-operandi'
+        foot_color_theme=light
+        ;;
+    *)
+        foot_theme='/usr/share/foot/themes/modus-vivendi-tinted'
+        foot_color_theme=dark
+        ;;
 esac
 
 # Kitty's default DIM opacity is 0.4, which washes Codex tool output and
@@ -135,7 +141,10 @@ EOF
 cat > "$stage_dir/foot.ini" <<EOF
 include=$foot_theme
 
-[colors-dark]
+[main]
+initial-color-theme=$foot_color_theme
+
+[colors-$foot_color_theme]
 background=${bg#\#}
 foreground=${fg#\#}
 selection-foreground=${fg_region#\#}

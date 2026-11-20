@@ -36,8 +36,8 @@ if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
     created=false
     if [[ -z $address ]]; then
         # The window rule places the new terminal on the special workspace.
-        alacritty --class "$window_name" --title "$window_name" \
-            -e tmux new-session -A -s "$session" >/dev/null 2>&1 &
+        foot --app-id="$window_name" --title="$window_name" \
+            tmux new-session -A -s "$session" >/dev/null 2>&1 &
         created=true
         for _ in {1..50}; do
             address=$(dropdown_address)
@@ -161,9 +161,9 @@ choose_terminal() {
         return
     fi
 
-    # Alacritty is the primary terminal: tmux owns tabs, panes, and sessions.
-    # Retain Kitty and Foot as portable fallbacks.
-    if command -v alacritty >/dev/null 2>&1; then
+    if [[ $wm == sway ]] && command -v foot >/dev/null 2>&1; then
+        printf 'foot\n'
+    elif command -v alacritty >/dev/null 2>&1; then
         printf 'alacritty\n'
     elif command -v kitty >/dev/null 2>&1; then
         printf 'kitty\n'
@@ -215,7 +215,7 @@ launch_terminal() {
             ;;
         foot)
             foot --app-id="$window_name" --title="$window_name" \
-                -e tmux new-session -A -s "$session" &
+                tmux new-session -A -s "$session" &
             ;;
         *)
             printf 'toggle-terminal: unsupported terminal %s\n' "$terminal" >&2

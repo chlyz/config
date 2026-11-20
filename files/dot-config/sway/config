@@ -43,13 +43,6 @@ bindsym $mod+Shift+r exec ~/.local/bin/reload-wm
 # Open Rofi's desktop-application launcher with the remapped Alt+P.
 bindsym Alt+p exec rofi -show drun
 
-# Override the distribution terminal choice (Foot) with Alacritty.  The
-# distribution binding was already parsed by the included config, so replace
-# it explicitly rather than only changing the variable afterward.
-set $term alacritty
-unbindsym $mod+Return
-bindsym $mod+Return exec alacritty
-
 # Toggle the persistent dropdown terminal. Emacs calls the same script via
 # SPC t, while Sway owns this global shortcut so it works everywhere.
 bindsym $mod+t exec ~/.local/bin/toggle-terminal

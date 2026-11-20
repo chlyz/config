@@ -198,7 +198,7 @@ layouts, modifier remapping, and these shortcuts:
 | `Alt+P` | Open Rofi |
 | `Alt+B` | Toggle the bar |
 | `Alt` + left / right mouse drag | Move / resize a window |
-| `Super+Return` | Open Alacritty |
+| `Super+Return` | Open Foot |
 | `Super+C` | Close window |
 | `Super+1` through `Super+9`, `Super+0` | View workspaces 1 through 10 |
 | `Super+Shift+1` through `Super+Shift+9`, `Super+Shift+0` | Send window there |
@@ -227,9 +227,10 @@ The enabled Waybar user service selects the configuration for each session.
 `config theme` updates Hyprland's border colors alongside the other apps.
 
 The display uses 10-bit output with automatic HDR switching disabled to avoid
-TV mode changes during fullscreen video and workspace switching. The dropdown
-terminal uses the same centered, golden-ratio geometry as Sway. Emacs frames
-open on demand rather than at login in either session.
+TV mode changes during fullscreen video and workspace switching. Both Hyprland
+and Sway use Foot for `Super+Return` and the persistent `Super+T` dropdown. The
+dropdown keeps its centered, golden-ratio geometry. Emacs frames open on demand
+rather than at login in either session.
 
 Hyprlock shows the time, date, keyboard layout, and authentication feedback.
 Its password outline turns amber for Caps Lock, and the pointer stays hidden.
