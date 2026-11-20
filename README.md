@@ -4,14 +4,26 @@ This directory contains link packages. The `files` package owns personal
 configuration files, while `scripts` owns executables installed in
 `~/.local/bin`.
 
-Run the repository-local bootstrap script once after cloning:
+After cloning, make sure `curl`, `unzip`, and Fontconfig are available for the
+font install. Then run the repository-local bootstrap script:
 
 ```sh
 ./bootstrap
 ```
 
-It installs the required tools, links the configuration, and makes `config`
-available through `~/.local/bin`. After that, run `config` from any directory:
+It installs the repository's user tools and Aporetic fonts, then links the
+configuration and scripts. To install the [system packages](#system-packages),
+run:
+
+```sh
+config packages install
+```
+
+Bootstrap skips Aporetic when the font families are already installed. Run
+[`install-fonts`](scripts/dot-local/bin/install-fonts) to refresh Aporetic Sans,
+Aporetic Serif, and the mono and Nerd Font variants on demand.
+
+Run `config link` again when you need to apply new links:
 
 ```sh
 config link

@@ -1,6 +1,31 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+fonts_installed() {
+    local families family
+    families=$(fc-list -f '%{family[0]}\n') || return 1
+
+    for family in 'Aporetic Sans' 'Aporetic Serif' \
+        'Aporetic Sans Mono' 'Aporetic Serif Mono' \
+        AporeticSansMonoNerdFont AporeticSerifMonoNerdFont; do
+        grep -Fxq -- "$family" <<< "$families" || return 1
+    done
+}
+
+case "$#:${1-}" in
+    0:) ;;
+    1:--if-missing)
+        if fonts_installed; then
+            printf 'Aporetic fonts are already installed.\n'
+            exit 0
+        fi
+        ;;
+    *)
+        printf 'Usage: %s [--if-missing]\n' "${0##*/}" >&2
+        exit 2
+        ;;
+esac
+
 readonly font_dir="${XDG_DATA_HOME:-$HOME/.local/share}/fonts/aporetic"
 readonly work_dir="$(mktemp -d)"
 trap 'rm -rf "$work_dir"' EXIT

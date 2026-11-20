@@ -111,6 +111,7 @@ fi
 install_alacritty_assets
 install_zsh_vi_mode
 install_uv
+"$repo_root/scripts/dot-local/bin/install-fonts" --if-missing
 
 "$repo_root/config" link
 
