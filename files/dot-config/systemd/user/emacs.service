@@ -1,0 +1,12 @@
+[Unit]
+Description=Emacs daemon
+PartOf=graphical-session.target
+
+[Service]
+Type=notify
+ExecStart=/usr/bin/emacs --fg-daemon
+SuccessExitStatus=15
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target

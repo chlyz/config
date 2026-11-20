@@ -258,6 +258,23 @@ packages, and the NetworkManager service must be running. The `nm-applet`
 indicator additionally needs a PolicyKit agent; on Fedora use
 `lxqt-policykit`.
 
+## Shared graphical session services
+
+Sway and Hyprland use `graphical-session.target` to start shared desktop
+services. Keep their launch commands in user units or drop-ins under
+`files/dot-config/systemd/user/`.
+
+Enable the Emacs daemon after running `config link`:
+
+```sh
+systemctl --user daemon-reload
+systemctl --user enable emacs.service
+```
+
+The daemon starts at the next graphical login. `Super+H` opens the first Emacs
+frame or focuses an existing one. Use `systemctl --user status emacs.service`
+to check the daemon after logging in.
+
 ## Waybar
 
 Waybar replaces Swaybar and hosts an interactive tray for `nm-applet`. Its
