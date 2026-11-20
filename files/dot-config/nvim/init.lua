@@ -133,8 +133,11 @@ vim.keymap.set("n", "-", "<cmd>Oil<cr>", {
   desc = "Browse parent directory",
 })
 
-vim.keymap.set("n", "<leader>gs", "<cmd>Git<cr>", {
-  desc = "Fugitive status",
+vim.keymap.set("n", "<leader>gs", function()
+  vim.cmd("tab Git")
+  vim.cmd.normal("gU")
+end, {
+  desc = "Fugitive status at unstaged changes",
 })
 
 vim.keymap.set("n", "<leader>gm", "<cmd>Gvdiffsplit! master<cr>", {
