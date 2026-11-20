@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -eu
+
+case :${XDG_CURRENT_DESKTOP:-}: in
+    *:Hyprland:*)
+        config_home=${XDG_CONFIG_HOME:-$HOME/.config}
+        exec /usr/bin/waybar -c "$config_home/hypr/waybar.json" \
+            -s "$config_home/hypr/waybar.css"
+        ;;
+    *) exec /usr/bin/waybar ;;
+esac

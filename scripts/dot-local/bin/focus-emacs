@@ -2,6 +2,17 @@
 
 set -euo pipefail
 
+if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
+    address=$(hyprctl -j clients | jq -r \
+        'first(.[] | select((.class | ascii_downcase) == "emacs")
+        | .address) // empty')
+    if [[ -n $address ]]; then
+        exec hyprctl dispatch \
+            "hl.dsp.focus({window = 'address:$address'})"
+    fi
+    exec emacsclient --create-frame --no-wait --alternate-editor=""
+fi
+
 if command -v swaymsg >/dev/null 2>&1 &&
         swaymsg -t get_version >/dev/null 2>&1; then
     wm_command=swaymsg

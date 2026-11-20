@@ -106,6 +106,13 @@ cleanup_stage() {
 trap cleanup_stage EXIT
 printf '%s\n' "$theme" > "$stage_dir/current"
 
+cat > "$stage_dir/hyprland.lua" <<EOF
+hl.config({ general = { col = {
+    active_border = "rgb(${accent#\#})",
+    inactive_border = "rgb(${border#\#})",
+} } })
+EOF
+
 cat > "$stage_dir/sway.conf" <<EOF
 set \$modus-bg $bg
 set \$modus-bg-alt $bg_alt
@@ -338,7 +345,7 @@ EOF
 # Publish complete files at their stable paths.  Each rename stays on the same
 # filesystem, so applications never observe a partially written theme.
 for generated_file in \
-    sway.conf foot.ini kitty.conf alacritty.toml alacritty.yml i3.conf \
+    hyprland.lua sway.conf foot.ini kitty.conf alacritty.toml alacritty.yml i3.conf \
     tmux.conf rofi-palette.rasi rofi.rasi taskwarrior.theme waybar.css; do
     mv -f -- "$stage_dir/$generated_file" "$theme_dir/$generated_file"
 done
@@ -348,7 +355,9 @@ rmdir -- "$stage_dir"
 stage_dir=
 trap - EXIT
 
-if command -v swaymsg >/dev/null 2>&1 && [[ -n "${SWAYSOCK:-}" ]]; then
+if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
+    hyprctl reload >/dev/null 2>&1 || true
+elif command -v swaymsg >/dev/null 2>&1 && [[ -n "${SWAYSOCK:-}" ]]; then
     "$HOME/.local/bin/reload-wm" >/dev/null 2>&1 || true
 elif command -v i3-msg >/dev/null 2>&1; then
     "$HOME/.local/bin/reload-wm" >/dev/null 2>&1 || true

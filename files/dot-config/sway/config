@@ -15,11 +15,8 @@ exec /usr/libexec/lxqt-policykit-agent
 # Scale UI and text for a large/high-resolution TV display.
 output * scale 2
 
-# Keep Emacs as the primary workspace-1 environment.  An empty alternate
-# editor makes emacsclient start a daemon when necessary; --no-wait leaves the
-# GUI frame owned by that daemon after this startup command exits.
+# Keep manually opened Emacs frames on workspace 1.
 assign [app_id="emacs"] workspace number 1
-exec emacsclient --create-frame --no-wait --alternate-editor=""
 
 # Use a neutral desktop backdrop so the Modus window chrome stands out.
 output * bg #000000 solid_color

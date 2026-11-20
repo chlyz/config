@@ -17,6 +17,71 @@ if (( $# > 0 )); then
     exit 2
 fi
 
+dropdown_dimensions() {
+    local screen_width=$1 screen_height=$2 width height
+    height=$((screen_height * 80 / 100))
+    width=$((height * 1618 / 1000))
+    if (( width > screen_width * 95 / 100 )); then
+        width=$((screen_width * 95 / 100))
+    fi
+    printf '%s %s\n' "$width" "$height"
+}
+
+if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
+    dropdown_address() {
+        hyprctl -j clients | jq -r --arg name "$window_name" \
+            'first(.[] | select(.class == $name) | .address) // empty'
+    }
+    address=$(dropdown_address)
+    created=false
+    if [[ -z $address ]]; then
+        # The window rule places the new terminal on the special workspace.
+        alacritty --class "$window_name" --title "$window_name" \
+            -e tmux new-session -A -s "$session" >/dev/null 2>&1 &
+        created=true
+        for _ in {1..50}; do
+            address=$(dropdown_address)
+            [[ -n $address ]] && break
+            sleep 0.05
+        done
+        if [[ -z $address ]]; then
+            printf 'toggle-terminal: dropdown did not appear\n' >&2
+            exit 1
+        fi
+    fi
+
+    visible=false
+    if hyprctl -j monitors | jq -e \
+        'any(.[]; .focused and .specialWorkspace.name == "special:dropdown")' \
+        >/dev/null; then
+        visible=true
+    fi
+    if [[ $visible == true && $created == false ]]; then
+        exec hyprctl dispatch 'hl.dsp.workspace.toggle_special("dropdown")'
+    fi
+    if [[ $visible == false ]]; then
+        hyprctl dispatch 'hl.dsp.workspace.toggle_special("dropdown")' >/dev/null
+    fi
+    if [[ $preserve_geometry == false || $created == true ]]; then
+        read -r screen_width screen_height < <(
+            hyprctl -j monitors | jq -r '
+                first(.[] | select(.focused)) |
+                (if .transform % 2 == 1 then [.height, .width]
+                 else [.width, .height] end) as $size |
+                "\(($size[0] / .scale) | floor) \(($size[1] / .scale) | floor)"'
+        )
+        read -r width height < <(
+            dropdown_dimensions "$screen_width" "$screen_height"
+        )
+        hyprctl eval "hl.dispatch(hl.dsp.window.resize({
+            window = 'address:$address', x = $width, y = $height,
+            relative = false
+        })); hl.dispatch(hl.dsp.window.center({window = 'address:$address'}))" \
+            >/dev/null
+    fi
+    exit 0
+fi
+
 if command -v swaymsg >/dev/null 2>&1 && swaymsg -t get_version >/dev/null 2>&1; then
     wm='sway'
 elif command -v i3-msg >/dev/null 2>&1 && i3-msg -t get_version >/dev/null 2>&1; then
@@ -79,11 +144,9 @@ position_dropdown() {
     fi
 
     # Use 80% of the current output height and derive a golden-ratio width.
-    height=$((screen_height * 80 / 100))
-    width=$((height * 1618 / 1000))
-    if (( width > screen_width * 95 / 100 )); then
-        width=$((screen_width * 95 / 100))
-    fi
+    read -r width height < <(
+        dropdown_dimensions "$screen_width" "$screen_height"
+    )
 
     if [[ $wm == sway ]]; then
         swaymsg "$(selector) resize set width ${width}px height ${height}px, move position center" >/dev/null

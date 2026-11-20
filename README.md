@@ -49,7 +49,7 @@ In Bash, `p` is an alias for `project`.
 ## Themes
 
 `config theme` opens a Rofi selector and applies the chosen Modus variant to
-Emacs, Neovim, Alacritty, Kitty, Foot, tmux, Taskwarrior, Sway/i3, Waybar,
+Emacs, Neovim, Alacritty, Kitty, Foot, tmux, Taskwarrior, Sway/i3, Hyprland, Waybar,
 Rofi, and Codex. A theme can also be selected directly:
 
 ```sh
@@ -118,7 +118,7 @@ Platform manifests live in `systems/`. They list the system packages and
 user-level `uv` tools intentionally installed for this setup, grouped by
 purpose. They do not export Fedora's base image or dependency closure. The
 current machine is captured in
-[`systems/fedora.toml`](systems/fedora.toml) for Fedora 44.
+[`systems/fedora.toml`](systems/fedora.toml) for Fedora 45.
 
 Install every package declared for the current Fedora or Ubuntu system with:
 
@@ -141,6 +141,101 @@ all declared `uv` tools, run:
 ```sh
 config packages upgrade
 ```
+
+### Hyprland packages
+
+Hyprland is installed from the community-maintained
+[`lionheartp/Hyprland` COPR][hyprland-copr]. Its stable packages are built on
+Fedora infrastructure. The repository definition limits it to Hyprland and
+its supporting libraries, so it cannot supply unrelated packages such as
+Kitty, Waybar, or wlroots.
+
+Install the restricted repository definition once:
+
+```sh
+sudo install -Dm644 systems/hyprland.repo /etc/yum.repos.d/hyprland.repo
+```
+
+Then run `config packages install`. To install only the Hyprland stack without
+optional desktop applications, use:
+
+```sh
+sudo dnf --setopt=install_weak_deps=False install \
+  hyprland hyprland-guiutils hypridle hyprlock xdg-desktop-portal-hyprland
+```
+
+Use the stable `hyprland` package. The repository definition excludes
+`hyprland-git` and the Noctalia meta package. Updates use DNF; this repository
+no longer builds Hyprland from source.
+
+Installation leaves the current session running. Link the dotfiles with
+`config link`, then select Hyprland at login.
+
+[hyprland-copr]: https://copr.fedorainfracloud.org/coprs/lionheartp/Hyprland/
+
+### dwm-style Hyprland
+
+[`hyprland.lua`](files/dot-config/hypr/hyprland.lua) uses a left master area
+at 55% width, a right stack, and new windows as master. Native monocle applies
+to the focused workspace. Windows have one-pixel borders, compact gaps, square
+corners, and no animation, blur, or shadows. A lone tiled window has no gaps
+or border. The bottom bar uses the Sway bar's layout and shared stylesheet.
+
+The configuration retains the Sway setup's scale of 2, custom keyboard
+layouts, modifier remapping, and these shortcuts:
+
+| Shortcut | Action |
+| --- | --- |
+| `Alt+,` / `Alt+.` | Focus previous / next window in layout order |
+| `Alt+E` | Promote to master; on master, swap with the first stack window |
+| `Alt+U` | Toggle master/stack and monocle on this workspace |
+| `Alt+H` / `Alt+L` | Shrink / grow the master area |
+| `Alt+I` / `Alt+D` | Add / remove a master window |
+| `Alt+Shift+Space` | Toggle the focused window's floating state |
+| `Alt+1` through `Alt+9` | View a numbered workspace |
+| `Alt+Shift+1` through `Alt+Shift+9` | Send window to that workspace |
+| `Alt+O` | Return to the previous workspace |
+| `Alt+P` | Open Rofi |
+| `Alt+B` | Toggle the bar |
+| `Alt` + left / right mouse drag | Move / resize a window |
+| `Super+Return` | Open Alacritty |
+| `Super+C` | Close window |
+| `Super+1` through `Super+9`, `Super+0` | View workspaces 1 through 10 |
+| `Super+Shift+1` through `Super+Shift+9`, `Super+Shift+0` | Send window there |
+| `Super+T` | Toggle the persistent tmux dropdown |
+| `Super+H` | Focus or open Emacs |
+| `Super+Space` | Switch keyboard layout |
+| `Super+F` | Toggle fullscreen |
+| `Super+S` | Copy a screenshot region |
+| `Print` | Save a full screenshot with Grim |
+| `Super+N` | Open the network menu |
+| `Super+Shift+L` | Lock |
+| `Super+Shift+G` | Toggle game mode, disabling idle lock, display-off, and suspend |
+| `Super+Shift+R` | Reload configuration |
+| `Super+Shift+E` | Ask for confirmation before exiting Hyprland |
+
+Hypridle locks after 15 minutes, turns displays off after 20 minutes, and
+suspends the computer after 30 minutes idle.
+Visible Steam games inhibit idle handling even when unfocused. The game-mode
+bar indicator shows automatic inhibition or the manual override; clicking it
+toggles the manual override. Manual locking remains available in game mode.
+Media playback and brightness keys follow the Sway bindings. The bar includes
+battery status and network details; right-click the network module to open
+NetworkManager's connection editor.
+Hyprland uses its own bar configuration; Sway keeps its existing bar.
+The enabled Waybar user service selects the configuration for each session.
+`config theme` updates Hyprland's border colors alongside the other apps.
+
+The display uses 10-bit output with automatic HDR switching disabled to avoid
+TV mode changes during fullscreen video and workspace switching. The dropdown
+terminal uses the same centered, golden-ratio geometry as Sway. Emacs frames
+open on demand rather than at login in either session.
+
+Hyprlock shows the time, date, keyboard layout, and authentication feedback.
+Its password outline turns amber for Caps Lock, and the pointer stays hidden.
+
+Workspaces provide numbered destinations resembling dwm tags. They do not
+provide dwm's multi-tag views or let one window belong to several workspaces.
 
 ## Network menu
 

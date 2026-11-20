@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Keep Hypridle under systemd so toggling cannot create duplicate daemons.
+service=hypridle.service
+if systemctl --user is-active --quiet "$service"; then
+    systemctl --user stop "$service"
+else
+    systemctl --user start "$service"
+fi

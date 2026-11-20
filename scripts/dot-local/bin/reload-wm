@@ -2,6 +2,10 @@
 
 set -eu
 
+if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
+    exec hyprctl reload
+fi
+
 window_name='dropdown-terminal'
 was_visible=false
 

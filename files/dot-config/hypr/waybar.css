@@ -1,0 +1,7 @@
+@import url("../waybar/style.css");
+
+/* Hyprland uses active where Sway uses focused. */
+#workspaces button.active {
+  color: @theme-bg;
+  background: @theme-accent;
+}

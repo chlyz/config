@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if hyprctl -j clients | jq -e '
+    any(.[]; (.class | test("^steam_app_[0-9]+$")) and .inhibitingIdle)
+' >/dev/null; then
+    printf '%s\n' \
+        '{"text":"GAME","tooltip":"Game mode: a visible game is inhibiting idle handling.","class":"active"}'
+elif ! systemctl --user is-active --quiet hypridle.service; then
+    printf '%s\n' \
+        '{"text":"GAME","tooltip":"Game mode: idle locking and display sleep are disabled.","class":"active"}'
+else
+    printf '%s\n' '{"text":"","class":"inactive"}'
+fi

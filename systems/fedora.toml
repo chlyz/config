@@ -1,11 +1,11 @@
-# Packages intentionally installed for this dotfiles setup on Fedora 44.
+# Packages intentionally installed for this dotfiles setup on Fedora 45.
 # This is not a full image export: Fedora's base packages and their dependency
 # closure are deliberately omitted.  Package versions stay unconstrained so a
 # current Fedora release can resolve supported builds.
 
 [system]
 distribution = "fedora"
-release = 44
+release = 45
 
 [packages]
 bootstrap = ["curl", "git"]
@@ -25,14 +25,27 @@ alacritty_build = [
 ]
 desktop = [
   "NetworkManager",
+  "brightnessctl",
   "lxqt-policykit",
   "network-manager-applet",
   "nm-connection-editor",
+  "pavucontrol",
+  "playerctl",
   "rofi",
   "sway",
   "swayidle",
   "swaylock",
   "waybar",
+]
+# Requires the restricted COPR definition in systems/hyprland.repo.
+hyprland = [
+  "hyprland",
+  "hyprland-guiutils",
+  "hypridle",
+  "hyprlock",
+  "xdg-desktop-portal-hyprland",
+  "xdg-desktop-portal-gtk",
+  "xorg-x11-server-Xwayland",
 ]
 wayland_tools = ["grim", "jq", "slurp", "wl-clipboard"]
 applications = ["task", "zathura"]

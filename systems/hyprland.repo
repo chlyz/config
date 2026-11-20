@@ -1,0 +1,12 @@
+[copr:copr.fedorainfracloud.org:lionheartp:Hyprland]
+name=Hyprland stable packages from lionheartp/Hyprland
+baseurl=https://download.copr.fedorainfracloud.org/results/lionheartp/Hyprland/fedora-$releasever-$basearch/
+type=rpm-md
+enabled=1
+skip_if_unavailable=False
+gpgcheck=1
+gpgkey=https://download.copr.fedorainfracloud.org/results/lionheartp/Hyprland/pubkey.gpg
+repo_gpgcheck=0
+includepkgs=hyprland,hyprland-guiutils,hypridle,hyprlock,
+    xdg-desktop-portal-hyprland,
+    aquamarine,hyprcursor,hyprgraphics,hyprlang,hyprutils,hyprwire,hyprtoolkit
