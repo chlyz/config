@@ -8,6 +8,11 @@ operation with elevated sandbox permissions first. Git index updates, commits,
 and network pushes may require elevation because `.git` is read-only and
 network credentials are unavailable inside the default sandbox.
 
+## Git workflow
+
+- For each new file intended for the repository, run `git add -N -- <path>` so
+  it appears in `git diff` and can be staged hunk by hunk.
+
 ## Repository text
 
 - Use an 80-character line-length guideline for Markdown and normal text.
