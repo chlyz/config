@@ -1,0 +1,7 @@
+#!/bin/sh
+set -eu
+
+snapshot=$(mktemp /tmp/kitty-scrollback.XXXXXXXXXX)
+trap 'rm -f -- "$snapshot"' EXIT
+cat > "$snapshot"
+emacsclient --eval "(my-kitty-scrollback-frame \"$snapshot\")" >/dev/null

@@ -15,8 +15,14 @@ export VISUAL=nvim
 export SUDO_EDITOR=nvim
 export TERMINAL=alacritty
 
+# The local chess data setting is shared with Bash.
+[[ -r "$HOME/.bashrc.d/50-chessable-export" ]] && source "$HOME/.bashrc.d/50-chessable-export"
+
 [[ -r "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
 
+alias ls='ls --color=auto --group-directories-first'
+alias grep='grep --color=auto'
+alias vi=vim
 alias e=nvim
 alias p=project
 
@@ -37,7 +43,6 @@ _config_completion() {
         _arguments '--dry-run[print commands without running them]'
     fi
 }
-compdef _config_completion config
 
 # Share useful history between interactive shells without retaining duplicate
 # or accidental commands that start with a space.
@@ -62,11 +67,13 @@ autoload -Uz compinit
 completion_directory="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
 mkdir -p -- "$completion_directory"
 compinit -d "$completion_directory/zcompdump"
+compdef _config_completion config
 zstyle ':completion:*' auto-description 'specify: %d'
 zstyle ':completion:*' completer _complete _match _approximate
 zstyle ':completion:*' format 'Completing %d'
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 zstyle ':completion:*' menu select
 zstyle ':completion:*' verbose yes
 
@@ -76,27 +83,49 @@ setopt auto_pushd
 setopt pushd_ignore_dups
 setopt pushd_minus
 
-# A quiet prompt: current directory on the left, repository branch on the
-# right, and a visible distinction between successful and failed commands.
-autoload -Uz add-zsh-hook colors vcs_info
-colors
-setopt prompt_subst
-setopt transient_rprompt
-zstyle ':vcs_info:git:*' formats '%F{blue}%b%f'
-
-update_vcs_info() {
-    vcs_info
+# Cache the abbreviated path when changing directories.
+_update_prompt_path() {
+    local dir=$PWD short='' part
+    if [[ $dir != / && $dir != "$HOME" ]]; then
+        short=/${dir:t}
+        dir=${dir:h}
+        while [[ $dir != / && $dir != "$HOME" ]]; do
+            part=${dir:t}
+            if [[ $part == .* ]]; then
+                part=${part[1,2]}
+            else
+                part=${part[1]}
+            fi
+            short=/${part:l}$short
+            dir=${dir:h}
+        done
+    fi
+    [[ $dir == "$HOME" ]] && short="~$short"
+    psvar[1]=${short:-/}
 }
-
-add-zsh-hook precmd update_vcs_info
-PROMPT='%F{blue}%1~%f %(?.%F{green}❯%f.%F{yellow}❯%f) '
-RPROMPT='${vcs_info_msg_0_}'
+autoload -Uz add-zsh-hook
+add-zsh-hook chpwd _update_prompt_path
+_update_prompt_path
+PROMPT='%F{blue}%1v%f %(?.%F{#db7b5f}❯%f.%F{yellow}❯%f) '
 
 # ZVM owns the Vi keymaps and modal-editing experience. Its cursor-shape and
 # clipboard integration use the terminal and Wayland tools already in use.
 ZVM_VI_EDITOR=$EDITOR
 ZVM_SYSTEM_CLIPBOARD_ENABLED=true
 zvm_plugin="$HOME/.local/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh"
+# Search on request, after ZVM has initialized its keymaps.
+zvm_after_init() {
+    local plugin="$HOME/.local/share/zsh-history-substring-search/zsh-history-substring-search.zsh"
+    [[ -r $plugin ]] || return 0
+    source "$plugin"
+    local mode
+    for mode in viins vicmd; do
+        bindkey -M "$mode" '^[[A' history-substring-search-up
+        bindkey -M "$mode" '^[[B' history-substring-search-down
+        bindkey -M "$mode" '^[OA' history-substring-search-up
+        bindkey -M "$mode" '^[OB' history-substring-search-down
+    done
+}
 [[ -r $zvm_plugin ]] && source "$zvm_plugin"
 
 # Open lf and adopt its final directory. Ctrl-O is available in insert mode.
@@ -128,5 +157,4 @@ if (( $+commands[fzf] )); then
     export FZF_DEFAULT_OPTS='--layout=reverse --height=~12 --prompt="› " --pointer="▸" --marker="•" --color=bg:#0d0e1c,bg+:#1d2235,fg:#c6daff,fg+:#ffffff,hl:#2fafff,hl+:#2fafff,header:#989898,info:#989898,prompt:#2fafff,pointer:#2fafff,marker:#2fafff,spinner:#2fafff,separator:#61647a,gutter:#0d0e1c,query:#ffffff,scrollbar:#61647a,selected-bg:#2fafff,selected-fg:#0d0e1c'
     fzf_shell_directory=/usr/share/fzf/shell
     [[ -r "$fzf_shell_directory/key-bindings.zsh" ]] && source "$fzf_shell_directory/key-bindings.zsh"
-    [[ -r "$fzf_shell_directory/completion.zsh" ]] && source "$fzf_shell_directory/completion.zsh"
 fi

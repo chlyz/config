@@ -61,9 +61,9 @@ install_alacritty_assets() {
     fi
 }
 
-install_zsh_vi_mode() {
-    local destination="$HOME/.local/share/zsh-vi-mode"
-    local repository=https://github.com/jeffreytse/zsh-vi-mode.git
+install_zsh_plugin() {
+    local name="$1" version="$2" repository="$3"
+    local destination="$HOME/.local/share/$name"
 
     if [[ -e $destination ]]; then
         if [[ ! -d $destination/.git ]]; then
@@ -74,8 +74,8 @@ install_zsh_vi_mode() {
     fi
 
     install -d "${destination%/*}"
-    git clone --depth 1 --branch "$zsh_vi_mode_version" "$repository" "$destination"
-    printf 'Installed Zsh Vi Mode %s.\n' "$zsh_vi_mode_version"
+    git clone --depth 1 --branch "$version" "$repository" "$destination"
+    printf 'Installed %s %s.\n' "$name" "$version"
 }
 
 if ! git -C "$repo_root" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
@@ -109,7 +109,9 @@ fi
 "${cargo_command[@]}" install rumdl --version "$rumdl_version" --locked
 "${cargo_command[@]}" install alacritty --version "$alacritty_version" --locked
 install_alacritty_assets
-install_zsh_vi_mode
+install_zsh_plugin zsh-vi-mode "$zsh_vi_mode_version" https://github.com/jeffreytse/zsh-vi-mode.git
+install_zsh_plugin zsh-history-substring-search v1.1.0 \
+    https://github.com/zsh-users/zsh-history-substring-search.git
 install_uv
 "$repo_root/scripts/dot-local/bin/install-fonts" --if-missing
 
