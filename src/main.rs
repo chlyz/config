@@ -33,6 +33,8 @@ struct SystemManifest {
     packages: toml::Table,
     #[serde(default)]
     uv_tools: BTreeMap<String, Vec<String>>,
+    #[serde(default)]
+    flatpak_apps: Vec<String>,
 }
 
 #[derive(Deserialize)]
@@ -218,6 +220,38 @@ fn run_uv_tools(
     Ok(())
 }
 
+fn install_flatpak_apps(apps: &[String], dry_run: bool) -> Result<(), ()> {
+    if apps.is_empty() {
+        return Ok(());
+    }
+
+    let remote_arguments = [
+        "remote-add",
+        "--user",
+        "--if-not-exists",
+        "flathub",
+        "https://dl.flathub.org/repo/flathub.flatpakrepo",
+    ];
+    let mut install_arguments = vec![
+        "install",
+        "--user",
+        "--assumeyes",
+        "--or-update",
+        "--app",
+        "flathub",
+    ];
+    install_arguments.extend(apps.iter().map(String::as_str));
+
+    for arguments in [remote_arguments.as_slice(), install_arguments.as_slice()] {
+        if dry_run {
+            println!("flatpak {}", arguments.join(" "));
+        } else {
+            run("flatpak", arguments)?;
+        }
+    }
+    Ok(())
+}
+
 fn install_packages(dry_run: bool) -> ExitCode {
     let distribution = match current_distribution() {
         Ok(distribution) => distribution,
@@ -279,7 +313,9 @@ fn install_packages(dry_run: bool) -> ExitCode {
         return ExitCode::FAILURE;
     }
 
-    match run_uv_tools(&manifest.uv_tools, true, dry_run) {
+    match run_uv_tools(&manifest.uv_tools, true, dry_run)
+        .and_then(|()| install_flatpak_apps(&manifest.flatpak_apps, dry_run))
+    {
         Ok(()) => ExitCode::SUCCESS,
         Err(()) => ExitCode::FAILURE,
     }

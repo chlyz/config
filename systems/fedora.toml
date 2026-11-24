@@ -3,6 +3,8 @@
 # closure are deliberately omitted.  Package versions stay unconstrained so a
 # current Fedora release can resolve supported builds.
 
+flatpak_apps = ["org.localsend.localsend_app"]
+
 [system]
 distribution = "fedora"
 release = 45
@@ -48,7 +50,7 @@ hyprland = [
   "xorg-x11-server-Xwayland",
 ]
 wayland_tools = ["grim", "jq", "slurp", "wl-clipboard"]
-applications = ["task", "zathura"]
+applications = ["flatpak", "task", "zathura"]
 
 # User-level Python command-line tools installed in isolated uv environments.
 [uv_tools]

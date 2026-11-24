@@ -126,10 +126,9 @@ version has been verified.
 
 ## System packages
 
-Platform manifests live in `systems/`. They list the system packages and
-user-level `uv` tools intentionally installed for this setup, grouped by
-purpose. They do not export Fedora's base image or dependency closure. The
-current machine is captured in
+Platform manifests live in `systems/`. They list the system packages,
+user-level `uv` tools, and Flatpak apps installed for this setup. They do not
+export Fedora's base image or dependency closure. The current machine uses
 [`systems/fedora.toml`](systems/fedora.toml) for Fedora 45.
 
 Install every package declared for the current Fedora or Ubuntu system with:
@@ -140,8 +139,9 @@ config packages install
 
 The command detects the distribution from `/etc/os-release`, selects the
 matching manifest, runs the system package manager through `sudo`, then installs
-the declared `uv` tools. Bootstrap installs `uv` when it is missing. Preview the
-commands without making changes with:
+the declared `uv` tools and Flatpak apps. Bootstrap installs `uv` when it is
+missing. Flatpak apps, including LocalSend on Fedora, use the per-user Flathub
+remote. Preview the commands without making changes with:
 
 ```sh
 config packages install --dry-run
@@ -189,9 +189,11 @@ Installation leaves the current session running. Link the dotfiles with
 
 [`hyprland.lua`](files/dot-config/hypr/hyprland.lua) uses a left master area
 at 55% width, a right stack, and new windows as master. Native monocle applies
-to the focused workspace. Windows have one-pixel borders, compact gaps, square
-corners, and no animation, blur, or shadows. A lone tiled window has no gaps
-or border. The bottom bar uses the Sway bar's layout and shared stylesheet.
+to the focused workspace. Master/stack uses one-pixel borders and hides the
+border on a lone tiled window. Monocle is borderless. Windows have compact
+gaps, square corners, and no animation, blur, or shadows. Gaps disappear when
+only one tiled window is visible. The bottom bar uses the Sway bar's layout
+and shared stylesheet.
 
 The configuration retains the Sway setup's scale of 2, custom keyboard
 layouts, modifier remapping, and these shortcuts:
@@ -199,7 +201,7 @@ layouts, modifier remapping, and these shortcuts:
 | Shortcut | Action |
 | --- | --- |
 | `Alt+,` / `Alt+.` | Focus previous / next window in layout order |
-| `Alt+E` | Promote to master; on master, swap with the first stack window |
+| `Super+E` / `Alt+E` | Zoom the focused tile to master |
 | `Alt+U` | Toggle master/stack and monocle on this workspace |
 | `Alt+H` / `Alt+L` | Shrink / grow the master area |
 | `Alt+I` / `Alt+D` | Add / remove a master window |
@@ -225,6 +227,10 @@ layouts, modifier remapping, and these shortcuts:
 | `Super+Shift+G` | Toggle game mode, disabling idle lock, display-off, and suspend |
 | `Super+Shift+R` | Reload configuration |
 | `Super+Shift+E` | Ask for confirmation before exiting Hyprland |
+
+Zoom moves the focused tile to the front and preserves the order of the
+other tiles. Zooming the master promotes the second tile. Monocle uses the
+same order for focus cycling and restores it when returning to master/stack.
 
 Hypridle locks after 15 minutes, turns displays off after 20 minutes, and
 suspends the computer after 30 minutes idle.
@@ -261,8 +267,19 @@ indicator additionally needs a PolicyKit agent; on Fedora use
 ## Shared graphical session services
 
 Sway and Hyprland use `graphical-session.target` to start shared desktop
-services. Keep their launch commands in user units or drop-ins under
-`files/dot-config/systemd/user/`.
+services such as Waybar and LocalSend. Keep their launch commands in user units
+or drop-ins under `files/dot-config/systemd/user/`. LocalSend uses the same
+settings in both sessions and starts hidden in the tray.
+
+After installing the Fedora packages and running `config link`, enable LocalSend
+from a running graphical session:
+
+```sh
+systemctl --user daemon-reload
+systemctl --user enable --now localsend.service
+```
+
+Use `systemctl --user status localsend.service` to check whether it is running.
 
 Enable the Emacs daemon after running `config link`:
 
