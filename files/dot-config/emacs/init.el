@@ -100,8 +100,7 @@
     (kbd "C-a") #'evil-numbers/inc-at-pt
     (kbd "C-x") #'evil-numbers/dec-at-pt))
 
-;; Use Space as a Doom-style leader while keeping only the two requested
-;; project/file actions: Space-. and Space-,.
+;; Group editing and project commands under the Evil leader key.
 (use-package evil-leader
   :after evil
   :config
@@ -110,6 +109,10 @@
   (evil-leader/set-key
     "." #'find-file
     "," #'switch-to-buffer
+    "bc" #'project-compile
+    "br" #'project-recompile
+    "bn" #'next-error
+    "bp" #'previous-error
     "r" #'my-recent-open
     "t" (lambda ()
           (interactive)
@@ -260,6 +263,155 @@
   (evil-leader/set-key
     "p" #'my-project-switch
     "," #'persp-switch-to-buffer*))
+
+(use-package magit
+  :commands magit-status)
+
+(defun my-open-kitty ()
+  "Open kitty at the Git worktree root or in the buffer's directory."
+  (interactive)
+  (when (file-remote-p default-directory)
+    (user-error "Opening kitty requires a local directory"))
+  (let ((dir (or (locate-dominating-file default-directory ".git")
+                 default-directory)))
+    (start-process "kitty" nil "kitty" "--directory" (expand-file-name dir))))
+
+(global-set-key (kbd "C-<return>") #'my-open-kitty)
+
+(defun my-kitty-project-frame ()
+  "Open a graphical frame for the client directory, showing Git status there."
+  (let ((dir default-directory))
+    (select-frame-set-input-focus (make-frame '((window-system . pgtk))))
+    (if (locate-dominating-file dir ".git")
+        (magit-status dir)
+      (dired dir))
+    (delete-other-windows)))
+
+(defconst my-codex-message-regexp "^[[:blank:]]*[›•] "
+  "Start of a prompt or output item in a Codex terminal capture.")
+
+(defun my-codex-jump-prompt (forward)
+  "Jump to the next visible prompt, or the previous one if FORWARD is nil."
+  (let ((target
+         (save-excursion
+           (if forward (end-of-line) (beginning-of-line))
+           (catch 'prompt
+             (while (funcall (if forward #'re-search-forward #'re-search-backward)
+                             "^[[:blank:]]*› " nil t)
+               (unless (invisible-p (match-beginning 0))
+                 (throw 'prompt (match-beginning 0))))))))
+    (if target (goto-char target) (message "No more prompts in this direction"))))
+
+(define-minor-mode codex-scrollback-mode
+  "Highlight Codex terminal output and navigate its visible entries."
+  :lighter " Codex"
+  :keymap (let ((map (make-sparse-keymap)))
+            (define-key map (kbd "M-n")
+                        (lambda () (interactive)
+                          (end-of-line)
+                          (when (re-search-forward my-codex-message-regexp nil t)
+                            (beginning-of-line))))
+            (define-key map (kbd "M-p")
+                        (lambda () (interactive)
+                          (beginning-of-line)
+                          (when (re-search-backward my-codex-message-regexp nil t)
+                            (beginning-of-line))))
+            map)
+  (remove-overlays (point-min) (point-max) 'codex-scrollback t)
+  (when codex-scrollback-mode
+    (save-excursion
+      ;; Anchor on the composer so status-like text in replies stays visible.
+      (goto-char (point-max))
+      (when (re-search-backward "^[[:blank:]]*› " nil t)
+        (let ((empty-prompt
+               (when (looking-at-p
+                      "^[[:blank:]]*› Ask Codex to do anything[[:blank:]]*$")
+                 (point))))
+          (forward-line 1)
+          (when (re-search-forward
+                 "^[[:blank:]]*.* · Context [0-9]+% used\\b" nil t)
+            (let* ((start (or empty-prompt (line-beginning-position)))
+                   (footer (make-overlay (max (point-min) (1- start))
+                                         (point-max))))
+              (overlay-put footer 'codex-scrollback t)
+              (overlay-put footer 'invisible t)))))
+      (goto-char (point-min))
+      (while (re-search-forward
+              "^[[:blank:]]*Worked for [0-9][0-9dhms .]* [•·] [^\n]+$" nil t)
+        (let ((timing (make-overlay (match-beginning 0)
+                                    (min (point-max) (1+ (match-end 0))))))
+          (overlay-put timing 'codex-scrollback t)
+          (overlay-put timing 'invisible t)))
+      ;; Count displayed blank lines after hiding the composer and timings.
+      (goto-char (point-min))
+      (let ((previous-blank nil))
+        (while (not (eobp))
+          (let ((start (point)) (blank (looking-at-p "[[:blank:]]*$")))
+            (forward-line 1)
+            (unless (invisible-p start)
+              (when (and blank previous-blank)
+                (let ((gap (make-overlay start (point))))
+                  (overlay-put gap 'codex-scrollback t)
+                  (overlay-put gap 'invisible t)))
+              (setq previous-blank blank)))))
+      (dolist (rule '(("^[[:blank:]]*› .*" . minibuffer-prompt)
+                      ("^[[:blank:]]*•" . font-lock-keyword-face)
+                      ("^[[:blank:]]*⚠.*" . warning)))
+        (goto-char (point-min))
+        (while (re-search-forward (car rule) nil t)
+          (let ((overlay (make-overlay (match-beginning 0) (match-end 0))))
+            (overlay-put overlay 'codex-scrollback t)
+            (overlay-put overlay 'face (cdr rule))))))))
+
+(evil-define-minor-mode-key 'normal 'codex-scrollback-mode
+  (kbd "g j") (lambda () (interactive) (my-codex-jump-prompt t))
+  (kbd "g k") (lambda () (interactive) (my-codex-jump-prompt nil)))
+
+(defun my-detect-codex-scrollback ()
+  "Recognize the Codex composer or its shortcuts footer in a capture."
+  (save-excursion
+    (goto-char (point-min))
+    (when (re-search-forward
+           "^[[:blank:]]*\\(?:› Ask Codex to\\|← for agents · ? for shortcuts\\)"
+           nil t)
+      (codex-scrollback-mode 1))))
+
+(defun my-scrollback-last-visible-char ()
+  "Return the position of the last visible non-whitespace character."
+  (save-excursion
+    (goto-char (point-max))
+    (catch 'visible
+      (while (re-search-backward "[^[:space:]]" nil t)
+        (unless (invisible-p (point)) (throw 'visible (point))))
+      (point-min))))
+
+(defun my-kitty-scrollback-frame (snapshot)
+  "Display the terminal text in SNAPSHOT in a graphical frame."
+  (let ((dir default-directory))
+    (select-frame-set-input-focus (make-frame '((window-system . pgtk))))
+    (switch-to-buffer (generate-new-buffer "*kitty scrollback*"))
+    (setq default-directory dir)
+    (let ((coding-system-for-read 'utf-8-unix))
+      (insert-file-contents snapshot))
+    (delete-trailing-whitespace (point-min) (point-max))
+    (goto-char (point-max))
+    (skip-chars-backward "\n")
+    (delete-region (point) (point-max))
+    (visual-line-mode 1)
+    (evil-local-set-key 'motion (kbd "j") #'evil-next-visual-line)
+    (evil-local-set-key 'motion (kbd "k") #'evil-previous-visual-line)
+    (add-hook 'window-size-change-functions
+              (lambda (window)
+                (with-selected-window window
+                  (when (= (point) (my-scrollback-last-visible-char))
+                    (let ((scroll-margin 0)) (recenter -1)))))
+              nil t)
+    (view-mode 1)
+    (my-detect-codex-scrollback)
+    (delete-other-windows)
+    (goto-char (my-scrollback-last-visible-char))
+    (let ((scroll-margin 0))
+      (recenter -1))))
 
 ;; Markdown receives the same restrained, semantic treatment as Org: structural
 ;; markup and code are distinct without adding custom faces or decoration.
