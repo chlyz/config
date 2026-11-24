@@ -6,6 +6,16 @@ prefix_rule(
 )
 
 # Read-only source inspection.
+hyprctl_queries = [
+    "activewindow", "activeworkspace", "animations", "binds", "clients",
+    "configerrors", "cursorpos", "decorations", "devices", "getoption",
+    "getprop", "globalshortcuts", "instances", "layers", "layouts",
+    "monitors", "rollinglog", "splash", "status", "systeminfo", "version",
+    "workspacerules", "workspaces",
+]
+prefix_rule(pattern = ["hyprctl", hyprctl_queries], decision = "allow")
+prefix_rule(pattern = ["hyprctl", "-j", hyprctl_queries], decision = "allow")
+
 prefix_rule(pattern = ["rg"], decision = "allow")
 prefix_rule(pattern = ["pgrep"], decision = "allow")
 prefix_rule(pattern = ["git", "status"], decision = "allow")
@@ -59,3 +69,4 @@ prefix_rule(pattern=["/home/chrly/source/chessable-export/target/release/chessab
 prefix_rule(pattern=["./sync-chessable", "--all", "--dry-run"], decision="allow")
 prefix_rule(pattern=["git", "add", "src/browser.rs", "tests/library-scan.test.mjs"], decision="allow")
 prefix_rule(pattern=["swaymsg", "reload"], decision="allow")
+prefix_rule(pattern=["git", "add", "-N", "--", "training/step-3/index.md", "training/step-3/08-mini-plans.md"], decision="allow")
