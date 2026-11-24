@@ -3,12 +3,12 @@
   "position": "bottom",
   "height": 32,
   "spacing": 8,
-  "modules-left": ["hyprland/workspaces", "hyprland/window"],
+  "modules-left": ["ext/workspaces", "hyprland/window"],
   "modules-center": ["clock"],
   "modules-right": ["network", "pulseaudio", "custom/game-mode", "battery", "tray"],
 
-  "hyprland/workspaces": {
-    "disable-scroll": true,
+  "ext/workspaces": {
+    "on-click": "activate",
     "all-outputs": false,
     "format": "{name}"
   },

@@ -35,3 +35,10 @@
   inspiration reference; adapt its ideas deliberately rather than copying it wholesale.
 
 [prot-dotemacs]: https://protesilaos.com/emacs/dotemacs
+
+## Desktop autostart
+
+- For desktop apps that should run in both Sway and Hyprland, use one systemd
+  user service tied to `graphical-session.target`. Follow the
+  [shared graphical session services](README.md#shared-graphical-session-services)
+  setup for unit placement, enablement, and verification.

@@ -1,0 +1,13 @@
+[Unit]
+Description=LocalSend file sharing
+PartOf=graphical-session.target
+After=graphical-session.target
+Requisite=graphical-session.target
+
+[Service]
+ExecCondition=/usr/bin/flatpak info --user --show-ref org.localsend.localsend_app
+ExecStart=/usr/bin/flatpak run --user org.localsend.localsend_app --hidden
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target

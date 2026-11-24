@@ -41,12 +41,10 @@ hl.config({
     },
 })
 
--- Match Sway's smart gaps and borders for a lone visible tiled window.
+-- Remove gaps when only one tiled window is visible.
 hl.workspace_rule({ workspace = "w[tv1]", gaps_in = 0, gaps_out = 0 })
-hl.window_rule({
-    name = "smart-borders",
-    match = { float = false, workspace = "w[tv1]" }, border_size = 0,
-})
+-- Hide the frame on a lone tiled window without affecting floating windows.
+hl.workspace_rule({ workspace = "w[1] w[t1]", no_border = true })
 
 local config_home = os.getenv("XDG_CONFIG_HOME") or os.getenv("HOME") .. "/.config"
 local theme_path = config_home .. "/modus-theme/hyprland.lua"
@@ -56,24 +54,151 @@ if theme_file then
     dofile(theme_path)
 end
 
--- Native monocle on the focused workspace, leaving other workspaces alone.
+-- The native layouts keep independent orders. Carry the master order through
+-- monocle so zoom and focus cycling use the same list in both layouts.
 local monocles = {}
-local function toggle_monocle()
-    local workspace = hl.get_active_workspace()
-    if not workspace or not workspace.id or workspace.id < 1 then return end
-    local id = workspace.id
-    if monocles[id] then
-        monocles[id]:set_enabled(not monocles[id]:is_enabled())
-    else
-        monocles[id] = hl.workspace_rule({
-            workspace = tostring(id), layout = "monocle",
-        })
+local function layout(message)
+    hl.dispatch(hl.dsp.layout(message))
+end
+
+local function tiles(workspace)
+    local windows = {}
+    for _, w in ipairs(hl.get_workspace_windows(workspace)) do
+        if not w.floating and not w.hidden then windows[#windows + 1] = w end
+    end
+    return windows
+end
+
+local function master_order(workspace)
+    local windows = tiles(workspace)
+    -- Left-oriented master, then stack, each read from top to bottom.
+    table.sort(windows, function(a, b)
+        if a.at.x == b.at.x then return a.at.y < b.at.y end
+        return a.at.x < b.at.x
+    end)
+    local order = {}
+    for i, w in ipairs(windows) do order[i] = w.stable_id end
+    return order
+end
+
+local function index_of(order, id)
+    for i, entry in ipairs(order) do
+        if entry == id then return i end
     end
 end
 
-hl.bind("ALT + comma", hl.dsp.layout("cycleprev"))
-hl.bind("ALT + period", hl.dsp.layout("cyclenext"))
-hl.bind("ALT + E", hl.dsp.layout("swapwithmaster master"))
+local function monocle_order(workspace, state)
+    local live, order = {}, {}
+    for _, w in ipairs(tiles(workspace)) do
+        live[w.stable_id] = true
+        if not index_of(state.order, w.stable_id) then
+            table.insert(order, 1, w.stable_id)
+        end
+    end
+    for _, id in ipairs(state.order) do
+        if live[id] then order[#order + 1] = id end
+    end
+    state.order = order
+    return order
+end
+
+local function show_monocle(id, count)
+    -- Inactive monocle windows block direct focus. Cycle the native layout.
+    for _ = 1, count do
+        local w = hl.get_active_window()
+        if w and w.stable_id == id then return end
+        layout("cyclenext")
+    end
+end
+
+local function focus_id(id)
+    hl.dispatch(hl.dsp.focus({ window = "stableid:" .. id }))
+end
+
+local function toggle_monocle()
+    local ws = hl.get_active_workspace()
+    if not ws or ws.id < 1 or hl.get_active_special_workspace() then return end
+    local w = hl.get_active_window()
+    local focused = w and w.workspace and w.workspace.id == ws.id and w.stable_id
+    local state = monocles[ws.id] or {}
+    monocles[ws.id] = state
+    if ws.tiled_layout == "master" then
+        state.order = master_order(ws)
+        if state.rule then
+            state.rule:set_enabled(true)
+        else
+            state.rule = hl.workspace_rule({
+                workspace = tostring(ws.id), layout = "monocle", no_border = true,
+            })
+        end
+        hl.exec_scheduled_prop_refresh_immediately()
+        if index_of(state.order, focused) then
+            show_monocle(focused, #state.order)
+        elseif focused then
+            focus_id(focused)
+        end
+    elseif ws.tiled_layout == "monocle" and state.rule then
+        local wanted = monocle_order(ws, state)
+        state.rule:set_enabled(false)
+        hl.exec_scheduled_prop_refresh_immediately()
+        if ws.tiled_layout ~= "master" then return end
+        local order = master_order(ws)
+        for i, id in ipairs(wanted) do
+            local pos = index_of(order, id)
+            if pos and pos > i then
+                focus_id(id)
+                for _ = i + 1, pos do layout("swapprev noloop") end
+                table.insert(order, i, table.remove(order, pos))
+            end
+        end
+        if focused then focus_id(focused) end
+    end
+end
+
+local function cycle(step)
+    local ws = hl.get_active_special_workspace() or hl.get_active_workspace()
+    local state = ws and monocles[ws.id]
+    if ws and ws.tiled_layout == "monocle" and state and state.order then
+        local order = monocle_order(ws, state)
+        local w = hl.get_active_window()
+        local i = w and index_of(order, w.stable_id)
+        if i then
+            show_monocle(order[(i - 1 + step) % #order + 1], #order)
+            return
+        end
+    end
+    layout(step == 1 and "cyclenext" or "cycleprev")
+end
+
+local function zoom()
+    local w = hl.get_active_window()
+    if not w or w.floating or not w.workspace then return end
+    local ws = w.workspace
+    local state = monocles[ws.id]
+    local order
+    if ws.tiled_layout == "master" then
+        order = master_order(ws)
+    elseif ws.tiled_layout == "monocle" and state and state.order then
+        order = monocle_order(ws, state)
+    else
+        return
+    end
+    local i = index_of(order, w.stable_id)
+    if not i or #order < 2 then return end
+    if i == 1 then i = 2 end
+    if ws.tiled_layout == "master" then
+        focus_id(order[i])
+        for _ = 2, i do layout("swapprev noloop") end
+    else
+        show_monocle(order[i], #order)
+        table.insert(order, 1, table.remove(order, i))
+    end
+end
+
+hl.bind("ALT + comma", function() cycle(-1) end)
+hl.bind("ALT + period", function() cycle(1) end)
+hl.bind("ALT + E", zoom)
+hl.bind("SUPER + E", zoom)
 hl.bind("ALT + U", toggle_monocle)
 hl.bind("ALT + O", hl.dsp.focus({ workspace = "previous" }))
 hl.bind("ALT + H", hl.dsp.layout("mfact -0.05"), { repeating = true })
@@ -97,7 +222,7 @@ for i = 1, 10 do
         hl.dsp.window.move({ workspace = i, follow = false }))
 end
 
-hl.bind("SUPER + Return", hl.dsp.exec_cmd("foot"))
+hl.bind("SUPER + Return", hl.dsp.exec_cmd("kitty"))
 hl.bind("SUPER + C", hl.dsp.window.close())
 hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("hyprctl reload"))
 hl.bind("SUPER + SHIFT + E", hl.dsp.exec_cmd(
